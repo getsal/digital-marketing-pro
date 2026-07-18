@@ -1,4 +1,4 @@
-"""
+﻿"""
 Hermes Agent native plugin adapter for Digital Marketing Pro.
 
 This file is read ONLY by Hermes Agent (Nous Research). Every other platform
@@ -45,7 +45,7 @@ logger = logging.getLogger("digital-marketing-pro")
 
 PLUGIN_ROOT = Path(__file__).resolve().parent
 SKILLS_DIR = PLUGIN_ROOT / "skills"
-PLUGIN_VERSION = "3.15.0"
+PLUGIN_VERSION = "3.15.1"
 
 
 def _parse_skill_frontmatter(skill_md_path: Path) -> dict:

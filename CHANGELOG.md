@@ -4,6 +4,13 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.15.1] — 2026-07-12
+
+### Changed — plugin self-containment
+
+- **Removed every cross-plugin capability reference.** Skills no longer point users at SocialForge or ContentForge for any activity — DMP is fully standalone. Affected skills: `ad-creative` (visual production handoff is now tool-agnostic), `engagement-workflow` (Part 11 asset rendering no longer requires another plugin), `c2pa-metadata`, `launch-campaign` (C2PA signing + resume are DMP-native paths), `content-engine` (AI-detection guidance is self-contained; repurposing routes to `content-repurpose`), `keyword-cluster`, `campaign-audit`, `validate-profile` (now checks DMP's own publish dir `$DIGITAL_MARKETING_PRO_PUBLISH_DIR` / `~/Documents/DigitalMarketingPro/` instead of ContentForge's), `context-engine/eu-code-of-practice.md`, `context-engine/compliance-rules.md`.
+- README suite table and "other plugins" links are unchanged — cross-promotion stays; capability delegation is gone.
+
 ## [3.15.0] — 2026-07-07
 
 **The Reliability & Truth release — a full-repo audit (orchestration, agents, skills/commands, Python scripts, configs/docs/manifests) surfaced ~200 findings; this release fixes them in one coordinated pass.** The theme is honesty: every fabricated capability, fictional package, phantom script flag, stale count, and unsafe gate is either fixed or explicitly labeled. Mirrors ContentForge v3.16.0 (same release class, same day).
