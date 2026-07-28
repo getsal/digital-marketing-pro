@@ -4,6 +4,20 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.16.0] — 2026-07-12
+
+### Changed — July 2026 Market Refresh
+
+All claims below verified against primary sources on 2026-07-12 (vendor docs, EU Commission, platform changelogs).
+
+- **EU AI Act — FINAL Code of Practice adopted.** `context-engine/eu-code-of-practice.md` rewritten from "second draft, final not yet published" to the **final Code of Practice on Transparency of AI-Generated Content (published 10 June 2026)**: official PDF cited, standardized EU disclosure icons now published (use them), initial-signatory window closes **22 July 2026**, Commission confirms the Code as an adequate voluntary compliance tool, and the **final Article 50 Guidelines** are adopted (`compliance-rules.md` §1.1b.i updated draft→final). Article 50 applies 2 Aug 2026.
+- **Model registry: Claude 5 + GPT-5.6 families added** (`model_registry.json` 62→68 entries, mirrored to the ContentForge registry): `claude-fable-5` (Mythos-class, $10/$50, refusal/fallback semantics documented), `claude-opus-5` ($5/$25, May-2026 knowledge cutoff — Anthropic's new recommended default), `claude-sonnet-5` (intro $2/$10 through Aug 31), `gpt-5.6-sol` / `-terra` / `-luna` (GA July 9; $5/$30, $2.50/$15, $1/$6). Aliases re-pointed: `latest-text-anthropic` → claude-opus-5, `latest-text-openai` → gpt-5.6-sol. `claude-opus-4-8` → supported/legacy (context corrected to 1M); `claude-opus-4-1` flagged **retires 2026-08-05**.
+- **`docs/MODEL-CURATOR.md`**: alias table re-dated, parameter-compatibility section extended to the Claude 5 family, new **Fable 5 refusal handling** guidance (`stop_reason: "refusal"` as HTTP 200 + `fallbacks` parameter + fallback credit).
+- **Meta Marketing API v25 truth pass**: `meta-ads.md`, `paid-advertising/SKILL.md`, `execution-workflows.md`, `ai-marketing-tools.md` now state that standalone Advantage+ Shopping/App campaigns can no longer be created via the API (all versions since 19 May 2026; v26 pauses remaining ones Sept 2026 — unified Advantage+ is the go-forward path) and that the **Page Viewer metric** replaces legacy reach metrics.
+- **Google Ads API v25** (July 2026 major: legacy lifecycle-goal resources removed → unified `Goal`/`CampaignGoalConfig`; loyalty-retention goal; Shorts social metrics) documented with a deliberate-adoption note; v24.2 remains the stable target. **LinkedIn 202607** documented (auto Not-Interested CTA on Message Ads; `SHA256_IP_ADDRESS` in Conversions API).
+- **`gsc-ai-performance`**: report family now covers **Discover** generative surfaces; data backfilled from 18 May 2026; access expanded July 2026; API surface still unpublished.
+- **README rotation**: hero/cost/examples reference Opus-class models (measured on 4.8, Opus 5 current at the same price); What's-new intro reframed to the July 2026 state.
+
 ## [3.15.1] — 2026-07-12
 
 ### Changed — plugin self-containment

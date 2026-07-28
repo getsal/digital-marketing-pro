@@ -55,14 +55,14 @@ You: Help me plan a summer campaign
 
 Claude Code v2.1.149 (released May 2026) exposes per-model token usage and projected cost via the `/usage` slash command. For agencies running multi-client workloads, this is the cleanest way to attribute Claude Code consumption to brands:
 
-- **Per-session view**: shows tokens consumed by Opus 4.7, Sonnet 4.6, Haiku 4.5, and any sub-agent runs in the current session — with billed cost in USD if your account has billing enabled.
+- **Per-session view**: shows tokens consumed by each model (e.g. Opus 5, Fable 5, Sonnet 5, Haiku 4.5) and any sub-agent runs in the current session — with billed cost in USD if your account has billing enabled.
 - **Time-window view**: `/usage --since 7d` aggregates the last 7 days. Useful for the weekly agency pulse.
 - **Project / directory scoped**: usage is tracked per working directory, so a brand-per-directory pattern (`~/work/clients/{slug}`) automatically gives you brand-attributable spend without extra tooling.
 
 **Operational implications:**
 
 - The 12-Part engagement (~250K–600K tokens) bills meaningfully against an agency account when run repeatedly across 50–200 brands. `/usage` lets you charge through to clients with defensible per-engagement cost numbers.
-- Opus 4.7 1M-context single-conversation engagements (see `skills/engagement-workflow/SKILL.md`) trade more tokens for fewer round-trips — `/usage` confirms whether that tradeoff is net cheaper for your tier.
+- 1M-context single-conversation engagements (Opus 4.7+ and the Claude 5 family — see `skills/engagement-workflow/SKILL.md`) trade more tokens for fewer round-trips — `/usage` confirms whether that tradeoff is net cheaper for your tier.
 - On Pro / 5× / 20× Max plans, `/usage` shows quota burn rate against the rolling 5-hour and weekly windows — the warning to stop firing parallel sub-agents *before* you cap out, not after.
 
 **Where to surface this in client reports**: the `/digital-marketing-pro:agency-dashboard` skill's "team utilization" section now references `/usage` output as the source of truth for Claude Code consumption costs (see the dashboard skill for the workflow).
