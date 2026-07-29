@@ -13,7 +13,24 @@ on:
       - "**/SKILL.md"
 
 jobs:
+  # TESSL_API_KEY is an optional repo secret. It is read once here so the review
+  # job can be skipped cleanly when the secret is absent: `if:` conditions cannot
+  # reference `secrets` directly, and forks never receive repo secrets. Without
+  # this gate every SKILL.md PR from a fork — and every PR on a clone that has
+  # not set the secret — fails at `tessl review` with an auth error.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        env:
+          TESSL_API_KEY: ${{ secrets.TESSL_API_KEY }}
+        run: echo "enabled=${TESSL_API_KEY:+true}" >> "$GITHUB_OUTPUT"
+
   review:
+    needs: gate
+    if: needs.gate.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -27,7 +44,7 @@ jobs:
       - name: Review changed skills
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TESSL_API_KEY: ${{ secrets.TESSL_API_KEY }}   # repo secret if your plan requires it
+          TESSL_API_KEY: ${{ secrets.TESSL_API_KEY }}
         run: |
           tessl review \
             --base "origin/${{ github.base_ref }}" \
