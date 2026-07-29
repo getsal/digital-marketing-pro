@@ -135,7 +135,7 @@ def resolve(alias_or_id: str, *, allow_deprecated: bool = False) -> str:
 
 def check(model_id: str) -> tuple[str, str | None]:
     """Return (status, replacement_id) for a model ID.
-    status is one of: current, supported, preview, deprecated, unknown."""
+    status is one of: current, supported, preview, deprecated, retired, unknown."""
     idx = _model_index()
     if model_id not in idx:
         return ("unknown", None)
@@ -223,8 +223,17 @@ def _cmd_check_params(path_str: str, *, as_json: bool = False) -> int:
     unsafe_params = ("temperature", "top_p", "top_k")
     findings = []
     has_opus_47_plus = bool(risky_model_pat.search(text))
-    has_alias_call = "latest-text-anthropic" in text  # resolves to opus-4-8 in the registry
-    targets_47_plus = has_opus_47_plus or has_alias_call
+    # The alias only matters if the id it currently resolves to (looked up LIVE
+    # from the registry, not assumed) is in the param-rejecting Opus 4.7+ family.
+    has_alias_call = "latest-text-anthropic" in text
+    alias_target = ""
+    if has_alias_call:
+        try:
+            alias_target = get_registry().get("aliases", {}).get("latest-text-anthropic", "")
+        except Exception:
+            alias_target = ""
+    alias_is_risky = bool(_re.search(r"claude-opus-(?:4-[789]|[5-9])", alias_target))
+    targets_47_plus = has_opus_47_plus or (has_alias_call and alias_is_risky)
 
     if targets_47_plus:
         for lineno, line in enumerate(text.splitlines(), start=1):
@@ -270,7 +279,7 @@ def main() -> int:
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--alias", help="Resolve an alias (e.g. latest-fast-anthropic) OR a model id")
-    group.add_argument("--check", help="Report status (current/deprecated/supported/preview/unknown) for a model id")
+    group.add_argument("--check", help="Report status (current/supported/preview/deprecated/retired/unknown) for a model id")
     group.add_argument("--list", action="store_true", help="List models (filter with --vendor / --modality / --status / --tier)")
     group.add_argument("--registry-age", action="store_true", help="Print days since last_updated")
     group.add_argument("--registry-path", action="store_true", help="Print path to the loaded registry file")

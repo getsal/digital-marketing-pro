@@ -3,8 +3,8 @@
 dm-status.py — Unified Digital Marketing Pro status snapshot.
 
 Reads brand profile, engagement state, recent insights, recent compliance
-violations, Python dependency mode, and MCP connector status, then prints
-a single human-readable status summary.
+violations, and Python dependency mode, then prints a single human-readable
+status summary.
 
 In v3.0 and earlier, the SessionStart hook ran setup.py automatically at
 every Claude Code session start to print a 15-line brand summary banner.
@@ -49,8 +49,6 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
-import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 

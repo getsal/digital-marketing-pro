@@ -263,13 +263,6 @@ def list_runs_needing_sync(brand: str) -> dict:
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _slugify(s: str) -> str:
-    # Delegate to the ONE shared slugifier. The old per-char version turned
-    # "Acme & Co" into "acme---co" while other scripts produced "acme-co",
-    # so Cowork/Drive filed the brand under a different slug than local state.
-    return _common.slugify_brand(s)
-
-
 def _file_hash(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:

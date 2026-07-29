@@ -137,14 +137,16 @@ class TestRunCheckpointSync(DriveSyncStateBase):
 
 
 class TestSlugify(DriveSyncStateBase):
+    # drive-sync-state.py delegates slugification to the ONE shared slugifier
+    # (_common.slugify_brand); the local _slugify wrapper was removed.
     def test_slugify_handles_spaces_and_case(self):
-        self.assertEqual(self.dss._slugify("Acme Corp"), "acme-corp")
+        self.assertEqual(self.dss._common.slugify_brand("Acme Corp"), "acme-corp")
 
     def test_slugify_handles_special_chars(self):
-        self.assertEqual(self.dss._slugify("Acme/Corp v2!"), "acme-corp-v2")
+        self.assertEqual(self.dss._common.slugify_brand("Acme/Corp v2!"), "acme-corp-v2")
 
     def test_slugify_strips_trailing_hyphens(self):
-        self.assertEqual(self.dss._slugify("---trim---"), "trim")
+        self.assertEqual(self.dss._common.slugify_brand("---trim---"), "trim")
 
 
 if __name__ == "__main__":

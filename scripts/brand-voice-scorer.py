@@ -43,6 +43,11 @@ import json
 import sys
 from pathlib import Path
 
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
+
 # ---------------------------------------------------------------------------
 # NLTK bootstrap — download the required data silently on first run
 # ---------------------------------------------------------------------------
@@ -182,7 +187,7 @@ def normalize_profile(profile: dict) -> dict:
 
 def load_brand_profile(slug: str) -> dict:
     """Load a brand voice profile JSON from the standard location."""
-    profile_path = Path.home() / ".claude-marketing" / "brands" / slug / "profile.json"
+    profile_path = _common.brand_dir(slug) / "profile.json"
     if not profile_path.exists():
         return {
             "error": f"Brand profile not found at {profile_path}",
@@ -489,6 +494,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+    args.brand = _common.slugify_brand(args.brand)
 
     # Load brand profile
     profile = load_brand_profile(args.brand)

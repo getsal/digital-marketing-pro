@@ -1,6 +1,6 @@
 # Technical Architecture Reference
 
-**Digital Marketing Pro** -- Claude Code Plugin v3.15.0
+**Digital Marketing Pro** -- Claude Code Plugin v3.17.0
 
 This document describes the internal architecture of the Digital Marketing Pro plugin for developers and contributors. It covers file structure, the WAT framework mapping, component anatomy, the hook system, script conventions, data persistence, adaptive scoring, the v3.0 methodology layer, and extension points.
 
@@ -56,7 +56,7 @@ digital-marketing-pro/
 │   ├── connector-status.py            # Connector discovery and status reporting
 │   ├── email-preview.py               # Email rendering preview
 │   ├── headline-analyzer.py           # Headline effectiveness scoring
-│   ├── keyword-clusterer.py           # Keyword grouping
+│   ├── keyword_cluster.py             # SERP-overlap keyword clustering
 │   ├── readability-analyzer.py        # Readability metrics
 │   ├── schema-generator.py            # JSON-LD schema markup
 │   ├── utm-generator.py               # UTM parameters + QR codes
@@ -251,7 +251,7 @@ Every command SKILL.md follows this structure:
 name: command-name
 description: "One sentence describing when to invoke this command."
 argument-hint: "[primary-input --option1 --option2]"
-disable-model-invocation: true  # Only on execution skills (publish, send, launch, import, export)
+disable-model-invocation: false  # Execution skills (publish, send, launch, import, export) pair this with a mandatory "## Execution gate" typed-yes block
 ---
 
 # /digital-marketing-pro:command-name
@@ -334,13 +334,13 @@ N. Check brand guidelines for content. [Load guidelines/_manifest.json,
 |-------|-------------|-------------------|-------------|
 | marketing-strategist | Strategy, planning, positioning, GTM | SOSTAC, RACE, AARRR | utm-generator, campaign-tracker, roi-calculator, budget-optimizer, revenue-forecaster |
 | content-creator | Writing, copywriting, content production | PAS, AIDA, storytelling | brand-voice-scorer, content-scorer, social-post-formatter, headline-analyzer, email-preview, content-repurposer, review-response-drafter |
-| seo-specialist | SEO, AEO, GEO, keywords, technical SEO, local SEO | E-E-A-T, topic clusters, Core Web Vitals | keyword-clusterer, schema-generator, ai-visibility-checker, competitor-scraper, tech-seo-auditor, local-seo-checker, link-profile-analyzer |
+| seo-specialist | SEO, AEO, GEO, keywords, technical SEO, local SEO | E-E-A-T, topic clusters, Core Web Vitals | keyword_cluster, schema-generator, ai-visibility-checker, competitor-scraper, tech-seo-auditor, local-seo-checker, link-profile-analyzer |
 | analytics-analyst | Metrics, KPIs, reports, anomalies | Attribution, MMM, incrementality | utm-generator, adaptive-scorer, campaign-tracker, roi-calculator, clv-calculator, budget-optimizer, revenue-forecaster, ad-budget-pacer |
 | brand-guardian | Compliance, voice consistency, quality | Brand scorecards, voice scales | brand-voice-scorer, content-scorer, readability-analyzer, adaptive-scorer |
 | media-buyer | Ad platforms, budget, bidding, targeting | ROAS, CPM/CPC modeling | utm-generator, content-scorer, headline-analyzer, ad-budget-pacer, budget-optimizer |
 | growth-engineer | PLG, referrals, viral loops, retention | AARRR, ICE scoring, cohort analysis | content-scorer, utm-generator |
 | influencer-manager | Creator partnerships, UGC, briefs | Tier frameworks, FTC compliance | social-post-formatter, content-scorer, brand-voice-scorer |
-| competitive-intel | Competitor analysis, market positioning, ongoing monitoring (mode: snapshot \| monitoring) | Perceptual maps, SWOT, gap analysis, change detection | competitor-scraper, keyword-clusterer, competitor-tracker, narrative-mapper, audience-simulator |
+| competitive-intel | Competitor analysis, market positioning, ongoing monitoring (mode: snapshot \| monitoring) | Perceptual maps, SWOT, gap analysis, change detection | competitor-scraper, keyword_cluster, competitor-tracker, narrative-mapper, audience-simulator |
 | pr-outreach | Media relations, press releases, pitches | Newsjacking, PESO model | content-scorer, readability-analyzer, headline-analyzer |
 | email-specialist | Email marketing, deliverability, automation | Lifecycle, RFM, A/B testing | email-preview, content-scorer, readability-analyzer, brand-voice-scorer, headline-analyzer, adaptive-scorer, email-subject-tester, spam-score-checker, send-time-optimizer |
 | cro-specialist | CRO, landing pages, A/B testing, pricing | Hypothesis testing, Bayesian analysis | content-scorer, headline-analyzer, readability-analyzer, adaptive-scorer, sample-size-calculator, significance-tester, form-analyzer |
@@ -639,7 +639,7 @@ The shipped `.mcp.json` is **empty** (`{"mcpServers":{}}`, gitignored) — nothi
 }
 ```
 
-All 65 server credentials are referenced via `${ENV_VAR}` placeholders. Servers only activate when the corresponding environment variables are set. No credentials are stored in plugin code. The plugin works fully without any MCP servers enabled -- they add live data capabilities but are not required.
+All 68 server credentials are referenced via `${ENV_VAR}` placeholders. Servers only activate when the corresponding environment variables are set. No credentials are stored in plugin code. The plugin works fully without any MCP servers enabled -- they add live data capabilities but are not required.
 
 ---
 
@@ -791,7 +791,7 @@ All execution actions require explicit human approval before any external write 
 
 ### Execution Safety Gate (reference PreToolUse Hook — disabled by default)
 
-The `mcp_.*` PreToolUse matcher is part of the reference hook set (shipped disabled; see Section 7). The same write-approval guarantee is enforced at the agent layer and by `disable-model-invocation` on execution skills even with hooks off. When enabled, the matcher intercepts all MCP tool calls and checks:
+The `mcp_.*` PreToolUse matcher is part of the reference hook set (shipped disabled; see Section 7). The same write-approval guarantee is enforced at the agent layer and by the mandatory typed-yes "## Execution gate" blocks on the 18 execution skills even with hooks off. When enabled, the matcher intercepts all MCP tool calls and checks:
 1. Is this a WRITE operation? (READ operations pass through immediately)
 2. Has the user explicitly approved this specific action?
 3. Has content passed brand compliance review?
@@ -948,17 +948,17 @@ Guidelines for new skills:
 - Keep under 60 characters
 - Show the most common usage pattern
 
-### disable-model-invocation
+### disable-model-invocation + Execution gates
 
-Prevents Claude from auto-triggering a skill. The user must explicitly type `/digital-marketing-pro:skill-name`. Required on all 18 execution skills that write to external platforms.
+All 18 execution skills that write to external platforms ship `disable-model-invocation: false` (so Claude can route to them in conversation) paired with a mandatory typed-yes **"## Execution gate"** block: the skill must present a full Execution Summary (recipients / spend / changes / compliance), the user must explicitly type `yes` (any other input cancels), failed executions are never auto-retried, and the approval is recorded via `approval-manager.py` before anything touches a live system.
 
 ```yaml
-disable-model-invocation: true
+disable-model-invocation: false
 ```
 
 **Execution skills (18):** publish-blog, send-email-campaign, launch-ad-campaign, schedule-social, send-report, send-sms, send-notification, data-export, data-import, crm-sync, lead-import, pipeline-update, segment-audience, seo-implement, launch-plan, live-dashboard, credential-switch, redirect-manager
 
-This is a defense-in-depth measure alongside the MCP write approval hook (Section 7). The hook catches MCP writes at the tool level; `disable-model-invocation` catches them at the skill level.
+This is a defense-in-depth measure alongside the MCP write approval hook (Section 7). The hook catches MCP writes at the tool level; the Execution gate catches them at the skill level.
 
 ### evals/evals.json
 
@@ -1163,7 +1163,7 @@ The LIF is auto-updated when:
 1. A source document version is bumped (any v1.X -> v2.0 -> v2.X)
 2. An Update-Back action completes
 3. An engagement part is marked completed or started
-4. A compliance violation is detected (existing PreToolUse hook integration)
+4. A compliance violation is detected (via the reference PreToolUse hook if the user re-enables it, or per-agent compliance checks)
 5. The optional daily background pull updates health indicators
 
 Skills should never hand-edit the LIF body. Always go through `engagement-state.py lif-log-change` for change-log entries; the LIF body sections are auto-maintained by the engagement-state script.

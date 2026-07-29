@@ -2,9 +2,12 @@
 """
 roi-calculator.py
 =================
-Campaign ROI calculator with multi-touch attribution models. Computes ROI,
-ROAS, CPA, and contribution metrics per channel, applies attribution models
-across multi-channel data, and generates optimisation recommendations.
+Campaign ROI calculator. Computes ROI, ROAS, CPA, and contribution metrics
+per channel from each channel's raw reported revenue, and generates
+optimisation recommendations. Attribution weights (last_touch, first_touch,
+linear, time_decay, position_based) are advisory per-channel metadata only —
+input order is treated as touch order — and do NOT redistribute revenue in
+the computed metrics.
 
 Dependencies: none (stdlib only)
 
@@ -16,7 +19,6 @@ Usage:
 
 import argparse
 import json
-import math
 import sys
 from pathlib import Path
 

@@ -3,8 +3,8 @@
 gsc-ai-performance.py — read and summarize Google Search Console's new
 AI Performance Report (rolled out 3 June 2026).
 
-Today (June 2026) Google ships this report UI-only with no public API
-surface. This script handles the realistic path: the user exports a CSV
+As of the June 2026 rollout, Google ships this report UI-only with no
+public API surface. This script handles the realistic path: the user exports a CSV
 from Search Console and points this script at it.
 
 When Google adds the report to the Search Analytics API
@@ -33,7 +33,7 @@ Reads / writes
 --------------
 
 Reads CSV. Optionally archives a copy under
-${CLAUDE_PLUGIN_DATA}/{brand}/gsc-ai/{YYYY-MM-DD}.csv for trend tracking.
+<workspace>/brands/{brand}/gsc-ai/{YYYY-MM-DD}.csv for trend tracking.
 
 Exit codes
 ----------
@@ -200,7 +200,7 @@ def main() -> int:
     p.add_argument("--api", action="store_true", help="Try the API path (currently not supported by Google)")
     p.add_argument("--site", help="Site URL for --api mode")
     p.add_argument("--format", choices=["text", "json"], default="text")
-    p.add_argument("--archive", action="store_true", help="Archive the CSV under ${CLAUDE_PLUGIN_DATA}/{brand}/gsc-ai/")
+    p.add_argument("--archive", action="store_true", help="Archive the CSV under <workspace>/brands/{brand}/gsc-ai/")
     args = p.parse_args()
 
     if args.api:
@@ -226,6 +226,8 @@ def main() -> int:
         print(json.dumps(summary, indent=2, ensure_ascii=False))
     else:
         print(_format_text(summary))
+    if args.api:
+        return 4
     return 0
 
 

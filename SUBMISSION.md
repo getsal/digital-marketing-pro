@@ -1,9 +1,9 @@
 # Anthropic Software Directory — Submission Packet
 
-> **⚠️ Historical snapshot.** This packet was first drafted for the **v3.4.0** submission (May 2026). The current shipping release is **v3.15.0** with **158 skills, 24 specialist agents, 18 top-level commands, and ~86 Python scripts**. The counts and agent list below have been refreshed to the current release; treat CHANGELOG.md + README.md as the authoritative source for exact numbers before any re-submission.
+> **⚠️ Historical snapshot.** This packet was first drafted for the **v3.4.0** submission (May 2026). The current shipping release is **v3.17.0** with **158 skills, 24 specialist agents, 18 top-level commands, and ~86 Python scripts**. The counts and agent list below have been refreshed to the current release; treat CHANGELOG.md + README.md as the authoritative source for exact numbers before any re-submission.
 
 **Plugin:** Digital Marketing Pro
-**Current version:** 3.15.0 (originally submitted at 3.4.0)
+**Current version:** 3.17.0 (originally submitted at 3.4.0)
 **Submitter:** Indranil Banerjee — neel@neelverse.com
 **Repository:** https://github.com/indranilbanerjee/digital-marketing-pro
 **Marketplace:** https://github.com/indranilbanerjee/neels-plugins

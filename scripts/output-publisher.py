@@ -4,10 +4,9 @@ output-publisher.py
 ===================
 Dual-copy publisher for DMP workflow outputs.
 
-Same pattern as ContentForge v3.12.3 ``local-tracker.py``: any file produced
-by a DMP workflow gets copied to TWO locations:
+Any file produced by a DMP workflow gets copied to TWO locations:
 
-1. **Internal tracking copy** at ``~/.claude-marketing/{brand}/output/{workflow}/{run_id}/``
+1. **Internal tracking copy** at ``~/.claude-marketing/brands/{brand}/output/{workflow}/{run_id}/``
    — system-of-record for ``/digital-marketing-pro:status``, audit history,
    the checkpoint manager.
 2. **User-visible published copy** at
@@ -16,10 +15,10 @@ by a DMP workflow gets copied to TWO locations:
    default. Override with ``$DIGITAL_MARKETING_PRO_PUBLISH_DIR`` env var or
    ``--publish-dir <path>``.
 
-This exists because user-team feedback flagged the same symptom CF had:
-ContentForge's hidden ``~/.claude-marketing/`` dotfolder made finished
-files "feel" unsaved. DMP produces 50-60 files per engagement; without a
-visible publish path, the same confusion compounds.
+This exists because user-team feedback flagged that the hidden
+``~/.claude-marketing/`` dotfolder made finished files "feel" unsaved.
+DMP produces 50-60 files per engagement; without a visible publish path,
+that confusion compounds.
 
 Subcommands
 -----------
@@ -33,7 +32,7 @@ Usage
 -----
     # Copy a single file
     python3 output-publisher.py publish --brand acme --workflow engagement \\
-        --file ~/.claude-marketing/acme/runs/engagement-.../part-8-growth-plan.md
+        --file ~/.claude-marketing/brands/acme/runs/engagement-.../part-8-growth-plan.md
 
     # Bulk-publish a whole run after it finishes
     python3 output-publisher.py publish-run --brand acme \\
@@ -225,7 +224,7 @@ def open_folder(args) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Dual-copy publisher for DMP outputs (mirrors CF v3.12.3 pattern)")
+    parser = argparse.ArgumentParser(description="Dual-copy publisher for DMP outputs (internal tracking copy + user-visible published copy)")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     common_pub_args = lambda p: (

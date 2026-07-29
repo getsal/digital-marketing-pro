@@ -30,7 +30,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -130,6 +129,8 @@ def scan(slug, competitor, data):
         return {"error": "Invalid JSON in --data"}
 
     baseline = _load_json_obj(comp_dir / "baseline.json")
+    if not baseline:
+        return {"error": f"No baseline found for '{competitor}'. Run --action save-baseline first."}
     baseline_data = baseline.get("data", {})
 
     # Calculate diff
@@ -313,6 +314,17 @@ def track_pricing(slug, competitor, data):
     }
     _save_json(pricing_path, record)
 
+    # Persist detected price changes so alert-summary can surface them
+    if changes:
+        history_path = comp_dir / "pricing-history.json"
+        history = _load_json(history_path)
+        history.append({
+            "recorded_at": record["recorded_at"],
+            "competitor": competitor,
+            "changes": changes,
+        })
+        _save_json(history_path, history)
+
     return {
         "status": "recorded",
         "competitor": competitor,
@@ -358,6 +370,11 @@ def alert_summary(slug, since):
                 rec = _load_json_obj(fp)
                 if rec.get("recorded_at", "") >= since:
                     results["ads"].append(rec)
+
+        # Pricing changes
+        for rec in _load_json(comp_dir / "pricing-history.json"):
+            if rec.get("recorded_at", "") >= since:
+                results["pricing"].append(rec)
 
     # Win/loss
     wl_dir = comp_root / "win-loss"

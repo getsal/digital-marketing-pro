@@ -55,8 +55,7 @@ def _load_json(path, default=None):
 
 
 def _save_json(path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    _common.atomic_write_json(path, data)
 
 
 def _narrative_dir(slug):
@@ -68,9 +67,9 @@ def _euclidean(a, b, dims):
 
 
 def _brand_check(slug):
-    brand_dir = BRANDS_DIR / slug
-    if not brand_dir.exists():
-        return {"error": f"Brand '{slug}' not found. Run /digital-marketing-pro:brand-setup first."}
+    _, err = _common.get_brand_dir(slug)
+    if err:
+        return {"error": err}
     return None
 
 
@@ -523,6 +522,7 @@ def main():
     parser.add_argument("--since", help="Filter snapshots since date (narrative-trend)")
 
     args = parser.parse_args()
+    args.brand = _common.slugify_brand(args.brand)
 
     if args.action == "map-landscape":
         if not args.data:

@@ -74,11 +74,11 @@ PLATFORM_SPECS = {
     "bluesky": {
         "name": "Bluesky",
         "limits": {
-            "post": {"chars": 300, "hashtags": 0, "links": 1},
+            "post": {"chars": 300, "hashtags": 3, "links": 1},
         },
         "mention_format": "@handle.bsky.social",
         "features": ["custom feeds", "starter packs"],
-        "notes": ["300 character limit", "No native hashtag support — uses facets for links/mentions"],
+        "notes": ["300 character limit", "Hashtags supported via tag facets and count toward the 300-char limit — keep them few"],
     },
     "pinterest": {
         "name": "Pinterest",
@@ -154,8 +154,12 @@ def split_thread(text, char_limit=280):
             else:
                 # Force-split long sentences
                 while len(sentence) > char_limit:
-                    tweets.append(truncate_text(sentence, char_limit))
-                    sentence = sentence[char_limit - 3:].lstrip()
+                    chunk = truncate_text(sentence, char_limit)
+                    tweets.append(chunk)
+                    # Resume from where the chunk actually cut (minus the "..." suffix),
+                    # not a fixed position — truncate_text may break at an earlier space.
+                    consumed = len(chunk) - 3 if chunk.endswith("...") else len(chunk)
+                    sentence = sentence[consumed:].lstrip()
                 current = sentence
 
     if current:

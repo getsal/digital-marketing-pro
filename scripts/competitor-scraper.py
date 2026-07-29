@@ -9,7 +9,6 @@ import time
 import random
 from urllib.parse import urlparse, urljoin
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 

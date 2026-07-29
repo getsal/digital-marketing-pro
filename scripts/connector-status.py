@@ -186,12 +186,20 @@ def setup_guide(name):
             if conn["transport"] == "http":
                 guide["transport"] = "http"
                 guide["url"] = conn.get("url", "")
-                guide["steps"] = [
-                    f"This connector is already in .mcp.json as an HTTP connector.",
-                    f"When you first use a skill that needs {name}, Claude will prompt you to authorize via OAuth.",
-                    f"No API keys or environment variables needed — authentication is handled by the platform.",
-                    f"Works in both Claude Code and Cowork.",
-                ]
+                if configured:
+                    guide["steps"] = [
+                        f"This connector is already in .mcp.json as an HTTP connector.",
+                        f"When you first use a skill that needs {name}, Claude will prompt you to authorize via OAuth.",
+                        f"No API keys or environment variables needed — authentication is handled by the platform.",
+                        f"Works in both Claude Code and Cowork.",
+                    ]
+                else:
+                    guide["steps"] = [
+                        f"1. Copy the {name} entry from .mcp.json.connectors-reference into your .mcp.json.",
+                        f"2. When you first use a skill that needs {name}, Claude will prompt you to authorize via OAuth.",
+                        f"No API keys or environment variables needed — authentication is handled by the platform.",
+                        f"Works in both Claude Code and Cowork.",
+                    ]
                 if configured:
                     guide["status_message"] = (
                         f"{name} is configured. Use any of these skills to activate it: "
@@ -235,13 +243,14 @@ def setup_guide(name):
 
 
 def _probe_only(name, brand):
-    """Make a credential-safe reachability + auth probe of a single connector.
-    Returns one of: OK / UNAUTHENTICATED / RATE_LIMITED / NOT_FOUND / NETWORK_ERROR /
-    NOT_CONFIGURED, NEVER the credential value itself. Used by /validate-profile.
+    """Credential-safe config-presence check of a single connector — does NOT
+    test network reachability or authentication. Returns one of:
+    CONNECTED / NOT_CONNECTED / UNKNOWN_CONNECTOR, NEVER the credential value
+    itself. Used by /validate-profile.
 
-    Implementation note: this delegates to check_connector(name) for the actual
-    call, then re-shapes the response to a credential-safe summary suitable for
-    logging."""
+    Implementation note: this delegates to check_connector(name), which only
+    inspects the local .mcp.json and environment variables, then re-shapes the
+    response to a credential-safe summary suitable for logging."""
     raw = check_connector(name)
     if isinstance(raw, dict) and "error" in raw and "Unknown connector" in str(raw["error"]):
         return {"connector": name, "status": "UNKNOWN_CONNECTOR", "brand": brand}
@@ -285,7 +294,7 @@ def main():
     parser.add_argument("--brand", help="Brand slug (context for probes; never written to output unless --probe-only)")
     parser.add_argument("--connectors", help="Comma-separated connector subset (with --probe-only)")
     parser.add_argument("--probe-only", action="store_true",
-                        help="Credential-safe reachability probe for /validate-profile. Returns status (OK / UNAUTHENTICATED / RATE_LIMITED / NOT_FOUND / NETWORK_ERROR / NOT_CONFIGURED) per connector without echoing credential values.")
+                        help="Credential-safe config-presence check for /validate-profile — does not test network reachability. Returns status (CONNECTED / NOT_CONNECTED / UNKNOWN_CONNECTOR) per connector without echoing credential values.")
     parser.add_argument("--no-secrets", action="store_true",
                         help="Walk the response object and redact any key that looks like a credential before printing. Use with any --action when the output may be logged or shared.")
     args = parser.parse_args()

@@ -3,7 +3,7 @@
 
   "_fallback_model_comment": "fallbackModel was added in Claude Code v2.1.152 (May 27, 2026) and expanded in v2.1.166 (Jun 6, 2026). Up to 3 models tried in order when the primary model is overloaded or returns a non-retryable API error. Choosing models from different vendors removes single-vendor outage risk. DMP itself does not pin a model — it follows the session model — so this setting is purely for resilience.",
   "fallbackModel": [
-    "claude-sonnet-4-7",
+    "claude-sonnet-5",
     "claude-sonnet-4-6",
     "claude-haiku-4-5-20251001"
   ],

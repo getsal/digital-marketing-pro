@@ -45,7 +45,7 @@ logger = logging.getLogger("digital-marketing-pro")
 
 PLUGIN_ROOT = Path(__file__).resolve().parent
 SKILLS_DIR = PLUGIN_ROOT / "skills"
-PLUGIN_VERSION = "3.16.0"
+PLUGIN_VERSION = "3.17.0"
 
 
 def _parse_skill_frontmatter(skill_md_path: Path) -> dict:
@@ -155,7 +155,7 @@ def register(ctx) -> None:
 
 
 # Lightweight introspection so a user can sanity-check the adapter outside
-# of Hermes by running:  python -c "from digital_marketing_pro import audit; audit()"
+# of Hermes by running:  python __init__.py  (from the plugin root)
 def audit() -> dict:
     """Return a summary of what register() would do, without calling Hermes."""
     skills = _walk_skills()

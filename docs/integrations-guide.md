@@ -1,6 +1,6 @@
 # Integrations & CRM Guide
 
-> **Digital Marketing Pro** v3.15.0 | For marketing operations managers
+> **Digital Marketing Pro** v3.17.0 | For marketing operations managers
 >
 > This guide covers the 68-server MCP connector catalog shipped in `.mcp.json.example` (the live `.mcp.json` ships **empty** — nothing auto-connects), how to configure them, how to manage credentials across multiple clients, and what the plugin can do with or without live connections.
 
@@ -52,7 +52,7 @@ In practical terms: instead of you manually pulling a GA4 report, pasting it int
 
 The plugin ships an **empty** `.mcp.json` (`{"mcpServers":{}}`) — nothing is pre-configured and nothing auto-connects. A catalog of 68 MCP server definitions is provided in `.mcp.json.example` (npx/stdio transports), and an HTTP-connector catalog in `.mcp.json.connectors-reference`. You opt in by copying the entries you want into `.mcp.json` (or renaming the example file). Each one maps to a marketing platform or productivity tool and activates only when you set the required environment variables for that service.
 
-This is the key design principle: **the plugin works fully without any integrations enabled.** All 16 skill modules, 169 reference knowledge files (including the v3.0 methodology + framework refs), scoring scripts, brand voice analysis, compliance checking, campaign planning features, and the v3.0 12-Part engagement methodology + v3.2 quality gates operate entirely offline using built-in benchmarks and reference data. MCP integrations layer real data on top of that foundation.
+This is the key design principle: **the plugin works fully without any integrations enabled.** All 158 skills, 169 reference knowledge files (including the v3.0 methodology + framework refs), scoring scripts, brand voice analysis, compliance checking, campaign planning features, and the v3.0 12-Part engagement methodology + v3.2 quality gates operate entirely offline using built-in benchmarks and reference data. MCP integrations layer real data on top of that foundation.
 
 ### What Happens Under the Hood
 
@@ -1712,7 +1712,7 @@ Closed Won       | 8     | $27,000   | 31
 Analyze this pipeline and create a nurture campaign targeting deals stuck in Negotiation for more than 20 days.
 ```
 
-**Best for:** Clients on CRMs that do not have MCP server support (Salesforce, Pipedrive, Zoho, Close, Monday CRM, etc.). Also useful when a client is unwilling to provide API credentials and prefers to share exports.
+**Best for:** Clients unwilling to grant credential access, or CRMs without a configured MCP server (Salesforce, Pipedrive, Zoho, Close, Monday CRM, etc.). Also useful when a client prefers to share exports rather than API credentials.
 
 **Trade-off:** You lose the real-time query capability (Claude cannot pull fresh data mid-conversation), but all analysis, planning, and content creation modules work the same way once the data is in the session.
 
@@ -1766,7 +1766,7 @@ The plugin is designed to be fully functional with zero MCP connections enabled.
 
 | Capability | What Powers It |
 |---|---|
-| Content creation (briefs, calendars, social posts, email sequences) | 16 skill modules + `platform-specs.md` (format specs for 15+ platforms) |
+| Content creation (briefs, calendars, social posts, email sequences) | 158 skills + `platform-specs.md` (format specs for 15+ platforms) |
 | Brand voice scoring | `brand-voice-scorer.py` + local brand profile |
 | Content quality scoring | `content-scorer.py` + `scoring-rubrics.md` |
 | Campaign planning and strategy | Skill modules + `industry-profiles.md` (22 industries) |
@@ -1916,4 +1916,4 @@ When connecting MCP integrations that access personal data (especially GA4, HubS
 
 ---
 
-*Digital Marketing Pro v3.15.0 -- Integrations & CRM Guide*
+*Digital Marketing Pro v3.17.0 -- Integrations & CRM Guide*

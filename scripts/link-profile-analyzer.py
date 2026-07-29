@@ -16,7 +16,6 @@ import json
 import sys
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -204,49 +203,6 @@ def analyze_anchors(links, brand_domain):
 
     result["distribution_status"] = dist_status
     return result
-
-
-# ---------------------------------------------------------------------------
-# Link quality scoring
-# ---------------------------------------------------------------------------
-
-def score_link(link, unique_domains, total_links):
-    """Score an individual link 0-100."""
-    score = 0
-
-    # DA component (0-40)
-    da = link["da"]
-    if da >= 80:
-        score += 40
-    elif da >= 60:
-        score += 32
-    elif da >= 40:
-        score += 24
-    elif da >= 20:
-        score += 14
-    else:
-        score += 5
-
-    # Follow status (0-20)
-    score += 20 if link["follow"] else 8
-
-    # Anchor text variety bonus (0-20)
-    anchor = link["anchor_text"].lower().strip()
-    if anchor and anchor not in GENERIC_ANCHORS:
-        score += 15
-    elif anchor:
-        score += 10
-    else:
-        score += 5
-
-    # Domain uniqueness bonus (0-20)
-    domain = link["domain"]
-    if domain:
-        domain_count = sum(1 for _ in range(total_links))  # placeholder
-        # Give bonus for domains that appear fewer times
-        score += 15  # default bonus; adjusted below in profile score
-
-    return min(100, score)
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # Roadmap — Multiagent Sessions API + Memory API integration
 
-**Status:** Planning document (not yet implemented). Targets DMP v3.5 / v4.0.
+**Status:** Planning document (not yet implemented). Targets a future v3.x / v4.0 release.
 **Anthropic feature status (May 2026):** Both APIs are in **public beta** under the `managed-agents-2026-04-01` Messages API beta header.
 
 ## What Anthropic shipped (April–May 2026)
@@ -61,7 +61,7 @@ Persistent memory across agent invocations within a managed session. Today DMP u
 
 - Anthropic beta header: `managed-agents-2026-04-01`
 - Anthropic docs (when published): platform.claude.com → Messages API → Managed Agents section
-- Relevant DMP files when implementation begins: `skills/engagement-workflow/SKILL.md` (dispatch sites), `scripts/engagement-state.py` (persistence), `config/brand-registry-template.json` (config flag)
+- Relevant DMP files when implementation begins: `skills/engagement-workflow/SKILL.md` (dispatch sites), `scripts/engagement-state.py` (persistence), `config/brand-registry-template.json` (to be created — config flag)
 
 ## When to revisit this doc
 
@@ -72,4 +72,4 @@ Persistent memory across agent invocations within a managed session. Today DMP u
 
 ---
 
-**This is a planning document.** No code in DMP v3.15.0 implements anything in this doc — the managed-agents path remains unadopted and engagement state still persists to local JSON files. It exists so the team knows the direction and can evaluate whether to start Phase A in a future release.
+**This is a planning document.** No code in DMP v3.17.0 implements anything in this doc — the managed-agents path remains unadopted and engagement state still persists to local JSON files. It exists so the team knows the direction and can evaluate whether to start Phase A in a future release.

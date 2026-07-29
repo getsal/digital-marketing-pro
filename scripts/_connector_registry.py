@@ -13,7 +13,7 @@ by every action that needs it.
 Three responsibilities:
   1. CONNECTOR_REGISTRY — the full catalog grouped by category
   2. _load_mcp_json + is_connector_configured — probe whether a connector is reachable
-  3. _redact_secrets — credential-safe response filter
+  3. redact_secrets — credential-safe response filter
 
 No network calls happen here. All probes are local (env vars + .mcp.json).
 """
@@ -330,7 +330,7 @@ CONNECTOR_REGISTRY = {
                 "url": "https://calendarmcp.googleapis.com/mcp/v1",
                 "description": "Google Calendar — schedule events, deadlines, launches",
                 "env_vars": [],
-                "skills_unlocked": ["schedule-launch", "deadline-tracker"],
+                "skills_unlocked": ["campaign-plan", "launch-plan"],
             },
         },
     },
@@ -356,14 +356,14 @@ CONNECTOR_REGISTRY = {
                 "note": "No verified MCP package on npm — use /digital-marketing-pro:add-integration to wire a custom server. npx runs remote code; verify any package before use.",
                 "description": "Cision — press release distribution, journalist database",
                 "env_vars": ["CISION_API_KEY"],
-                "skills_unlocked": ["pr-pitch", "press-release-send"],
+                "skills_unlocked": ["pr-pitch", "digital-pr"],
             },
             "muckrack": {
                 "transport": "npx",
                 "package": "mcp-muckrack",
                 "description": "Muck Rack — journalist database, pitch tracking",
                 "env_vars": ["MUCKRACK_API_KEY"],
-                "skills_unlocked": ["pr-pitch", "journalist-discovery"],
+                "skills_unlocked": ["pr-pitch", "digital-pr"],
             },
         },
     },

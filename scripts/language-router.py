@@ -26,8 +26,6 @@ Usage:
 import argparse
 import io
 import json
-import math
-import os
 import re
 import sys
 import unicodedata
@@ -37,8 +35,6 @@ from pathlib import Path
 # Force UTF-8 stdout on Windows (avoids cp1252 encoding errors)
 if sys.stdout.encoding != "utf-8":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-
-BRANDS_DIR = Path.home() / ".claude-marketing" / "brands"
 
 # ── Unicode Script Ranges ──────────────────────────────────────────────────
 

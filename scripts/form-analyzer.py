@@ -210,6 +210,7 @@ def score_form(fields, field_analysis, form_type):
         "field_count_score": field_count_score,
         "required_ratio_score": required_ratio_score,
         "friction_score": friction_score,
+        "high_friction_score": high_friction_score,
         "high_friction_penalty": -high_friction_penalty,
         "mobile_score": mobile_score,
         "progressive_disclosure_score": progressive_score,

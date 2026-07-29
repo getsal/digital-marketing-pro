@@ -13,14 +13,10 @@ import json
 import os
 import sys
 from datetime import datetime
-from pathlib import Path
-import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
 # Curator: resolve model aliases / validate user-supplied model ids
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 try:
     from resolve_model import resolve as _resolve_model, check as _check_model
 except ImportError:  # pragma: no cover — curator should always be present
@@ -78,7 +74,7 @@ SCORING_TEMPLATE = {
 }
 
 AI_PLATFORMS = [
-    {"name": "ChatGPT", "url": "https://chat.openai.com", "note": "Test with GPT-5 for most accurate results"},
+    {"name": "ChatGPT", "url": "https://chat.openai.com", "note": "Test with the current default ChatGPT model (GPT-5.6 family as of July 2026)"},
     {"name": "Claude", "url": "https://claude.ai", "note": "Anthropic's AI assistant"},
     {"name": "Perplexity", "url": "https://perplexity.ai", "note": "AI search engine with citations"},
     {"name": "Google AI Overview", "url": "https://google.com", "note": "Look for AI-generated summaries in search results"},
@@ -273,6 +269,7 @@ def main():
     parser.add_argument("--industry", default="", help="Industry for query generation")
     parser.add_argument("--product-type", default="", help="Product type for query generation")
     parser.add_argument("--use-case", default="", help="Use case for query generation")
+    parser.add_argument("--pain-point", default="", help="Customer pain point for query generation")
     parser.add_argument("--openai-model", default=None,
                         help="Override OpenAI model (default: registry alias `latest-balanced-openai`). "
                              "Deprecated ids auto-fall-forward to their replacement.")
@@ -312,6 +309,7 @@ def main():
         industry=args.industry,
         product_type=args.product_type,
         use_case=args.use_case,
+        pain_point=args.pain_point,
     )
 
     if args.mode == "manual":

@@ -8,8 +8,6 @@ Scores creative health from performance metrics, predicts fatigue dates using
 trend analysis, generates refresh briefs, scans content libraries for decay,
 and prioritizes refresh work by business impact.
 
-Storage: ~/.claude-marketing/brands/{slug}/creative/
-
 Dependencies: none (stdlib only)
 
 Usage:
@@ -31,8 +29,6 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
-
-BRANDS_DIR = _common.brands_root()
 
 
 def _clamp(val, lo=0.0, hi=100.0):

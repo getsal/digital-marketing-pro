@@ -39,13 +39,13 @@ POWER_WORDS = {
     "amazing", "astonishing", "backed", "breakthrough", "captivating",
     "compelling", "confidential", "crush", "cutting-edge", "daring",
     "discover", "dominate", "effortless", "elite", "epic", "essential",
-    "exclusive", "extraordinary", "eye-opening", "forbidden", "genius",
-    "guaranteed", "hidden", "insider", "instant", "jaw-dropping",
-    "legendary", "life-changing", "limited", "massive", "mind-blowing",
+    "extraordinary", "eye-opening", "forbidden", "genius",
+    "hidden", "insider", "instant", "jaw-dropping",
+    "legendary", "life-changing", "massive", "mind-blowing",
     "proven", "rare", "remarkable", "revolutionary", "secret", "sensational",
     "shocking", "skyrocket", "stunning", "supercharge", "surprising",
     "ultimate", "unconventional", "unexpected", "unleash", "unprecedented",
-    "unstoppable", "urgent", "vital",
+    "unstoppable", "vital",
 }
 
 PERSONALIZATION_TOKENS = {
@@ -210,7 +210,7 @@ def generate_recommendations(breakdown, spam_found, power_found, subject):
         recs.append(f"Remove spam triggers ({', '.join(spam_found[:3])}). These hurt deliverability.")
 
     if breakdown["power_word_score"] == 0:
-        recs.append("Add a power word (e.g., 'exclusive', 'proven', 'secret') to boost curiosity.")
+        recs.append("Add a power word (e.g., 'proven', 'secret', 'insider') to boost curiosity.")
 
     if breakdown["emoji_score"] == 0:
         recs.append("Too many emojis. Limit to 1 emoji per subject line.")

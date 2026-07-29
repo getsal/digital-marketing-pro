@@ -241,8 +241,10 @@ def generate_recommendations(channels, opt_channels, test_budget):
         )
 
     if test_budget > 0:
+        total_budget = sum(c["optimized_spend"] for c in opt_channels) + test_budget
+        test_pct = (test_budget / total_budget * 100) if total_budget > 0 else 0
         recs.append(
-            f"Reserve ${test_budget:,.0f} ({test_budget / sum(c['optimized_spend'] for c in opt_channels) * 100 if sum(c['optimized_spend'] for c in opt_channels) > 0 else 0:.0f}%) "
+            f"Reserve ${test_budget:,.0f} ({test_pct:.0f}%) "
             f"for testing new channels"
         )
 

@@ -3,7 +3,6 @@
 
 import argparse
 import json
-import math
 import re
 import sys
 from pathlib import Path

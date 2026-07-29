@@ -298,7 +298,7 @@ def execute_manifest(http_request: dict, env: dict | None = None,
             "status": "missing_credential",
             "error": f"Unresolved placeholders after substitution: {sorted(set(unresolved))}",
             "hint": "Set the missing env vars (or pass --data for body fields) "
-                    "and retry. Use --dry-run to see the substituted request without firing.",
+                    "and retry. Omit --execute to see the substituted request without firing.",
             "method": method,
             "url": url,
             "elapsed_ms": 0,

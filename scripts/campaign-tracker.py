@@ -25,7 +25,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -74,13 +73,21 @@ def save_campaign(slug, data):
         except json.JSONDecodeError:
             index = []
 
-    index.append({
+    entry = {
         "campaign_id": campaign_id,
         "name": data.get("name", "Untitled"),
         "status": data.get("status", "planned"),
         "channels": data.get("channels", []),
         "created_at": campaign["created_at"],
-    })
+    }
+    # Same name saved on the same day produces the same id — replace the
+    # existing index row instead of duplicating it
+    for i, existing in enumerate(index):
+        if existing.get("campaign_id") == campaign_id:
+            index[i] = entry
+            break
+    else:
+        index.append(entry)
     index_path.write_text(json.dumps(index, indent=2))
 
     return {

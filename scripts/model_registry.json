@@ -2,7 +2,7 @@
   "$comment": "Canonical model registry for the Neelverse Marketing Suite (DMP / ContentForge / SocialForge). Update this file then run scripts/sync_model_registry.sh to distribute. The resolver consults this registry to map human-readable aliases to concrete model IDs and to warn when a deprecated model is being used. See refresh_models.py to poll provider APIs for drift.",
   "schema_version": "1.0",
   "last_updated": "2026-07-12",
-  "last_updated_by": "manual curation — June 2026 market-refresh sweep (verified against platform.claude.com, developers.openai.com, ai.google.dev primary docs)",
+  "last_updated_by": "manual curation — July 2026 market refresh (2026-07-12)",
   "next_review_due": "2026-09-10",
   "stewardship_policy": "Re-validate at least quarterly OR whenever a script call returns a 404 / deprecation warning. Frontier model landscape shifts every ~6 weeks; treat any entry older than 3 months as suspect. Verify the next time `refresh_models.py` reports drift, or before any new feature ship.",
   "param_compatibility_notes": {
@@ -110,7 +110,7 @@
       "released": "2025-08",
       "deprecation_date": "2026-06-05",
       "shutdown_date": "2026-08-05",
-      "replacement_id": "claude-opus-4-8",
+      "replacement_id": "claude-opus-5",
       "notes": "RETIRES 2026-08-05 per Anthropic model deprecations — migrate to claude-opus-5 before that date."
     },
     {

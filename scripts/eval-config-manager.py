@@ -34,7 +34,12 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-BRANDS_DIR = Path.home() / ".claude-marketing" / "brands"
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
+
+BRANDS_DIR = _common.brands_root()
 
 # ---------------------------------------------------------------------------
 # Valid dimensions
@@ -152,8 +157,8 @@ def resolve_brand(slug: str | None) -> str:
 
 
 def _config_path(slug: str) -> Path:
-    """Return the config file path for a brand."""
-    return BRANDS_DIR / slug / "quality" / "_config.json"
+    """Return the config file path for a brand (legacy raw-name dirs honoured)."""
+    return _common.brand_dir(slug) / "quality" / "_config.json"
 
 
 def load_config(slug: str) -> dict:
@@ -399,7 +404,7 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
-    slug = resolve_brand(args.brand)
+    slug = _common.slugify_brand(resolve_brand(args.brand))
 
     # --- get-config ---
     if args.action == "get-config":

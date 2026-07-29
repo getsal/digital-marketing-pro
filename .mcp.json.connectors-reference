@@ -109,7 +109,7 @@
       "url": "https://mcp.pipedream.com/app/google_ads",
       "_auth": "OAuth on first connect (free Pipedream account required)",
       "_purpose": "Cowork-compatible Google Ads — campaign performance, keyword data, bid optimization.",
-      "_api_version_note": "Google Ads API v24 (released 2026-04-22) is the current production version — videos+logo_images are now REQUIRED in DemandGenVideoResponsiveAdInfo and VideoResponsiveAdInfo; Campaign.video_brand_safety_suitability removed (moved to Customer level). v23.1 (2026-02-25) added text_guidelines.term_exclusions and messaging_restrictions for AI-generated PMax/Search assets. See skills/paid-advertising/google-ads.md."
+      "_api_version_note": "DMP pins Google Ads API v24.2 (deliberate stable target; v25 released July 2026 — see skills/paid-advertising/google-ads.md) — videos+logo_images are now REQUIRED in DemandGenVideoResponsiveAdInfo and VideoResponsiveAdInfo; Campaign.video_brand_safety_suitability removed (moved to Customer level). v23.1 (2026-02-25) added text_guidelines.term_exclusions and messaging_restrictions for AI-generated PMax/Search assets. See skills/paid-advertising/google-ads.md."
     },
     "pipedream-google-sheets": {
       "type": "http",

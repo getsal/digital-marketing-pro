@@ -18,7 +18,6 @@ Usage:
 """
 
 import argparse
-import hashlib
 import json
 import random
 import sys
@@ -29,8 +28,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
-BRANDS_DIR = _common.brands_root()
-
 # Default dwell time (days) per state when not specified
 DEFAULT_DWELL_DAYS = 3
 # Max steps before a simulated customer is considered "stuck"
@@ -38,10 +35,9 @@ MAX_SIM_STEPS = 50
 
 
 def _get_brand_dir(slug):
-    brand_dir = BRANDS_DIR / slug
-    if not brand_dir.exists():
-        return None, f"Brand '{slug}' not found. Run /digital-marketing-pro:brand-setup first."
-    return brand_dir, None
+    """Resolve + validate the brand directory via _common (slug normalised,
+    legacy raw-name dirs honoured, standard not-found message)."""
+    return _common.get_brand_dir(slug)
 
 
 def _journeys_dir(brand_dir):
@@ -476,6 +472,7 @@ def main():
     if not args.brand:
         print(json.dumps({"error": "Provide --brand slug"}))
         sys.exit(1)
+    args.brand = _common.slugify_brand(args.brand)
 
     if args.action == "create-journey":
         if not args.name:

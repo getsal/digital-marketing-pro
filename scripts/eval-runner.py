@@ -8,8 +8,8 @@ Runs the full eval pipeline via subprocess, calling sibling scripts for each
 scoring dimension, then produces a unified composite report with weighted
 scores, letter grades, and pass/fail gate checks.
 
-Dependencies: stdlib only (json, re, sys, argparse, pathlib, datetime,
-              subprocess, os, math, tempfile, uuid)
+Dependencies: stdlib only (json, sys, argparse, pathlib, datetime,
+              subprocess, os, tempfile)
 
 Usage:
     python eval-runner.py --action run-full --text "Your marketing copy..."
@@ -32,20 +32,23 @@ Scoring:
 
 import argparse
 import json
-import math
 import os
 import subprocess
 import sys
 import tempfile
-import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-BRANDS_DIR = Path.home() / ".claude-marketing" / "brands"
+BRANDS_DIR = _common.brands_root()
 ACTIVE_BRAND_FILE = BRANDS_DIR / "_active-brand.json"
 SCRIPTS_DIR = Path(__file__).resolve().parent
 SUBPROCESS_TIMEOUT = 30  # seconds
@@ -381,8 +384,27 @@ def _load_eval_config(brand_slug):
 # Dimension runner definitions
 # ---------------------------------------------------------------------------
 
+# Map eval-runner --content-type labels to content-scorer.py --type choices
+# (blog / email / ad / landing_page / social). Unknown types fall back to blog.
+CONTENT_SCORER_TYPE_MAP = {
+    "blog": "blog",
+    "blog_post": "blog",
+    "email": "email",
+    "ad": "ad",
+    "ad_copy": "ad",
+    "landing_page": "landing_page",
+    "social": "social",
+    "social_post": "social",
+}
+
+
+def _map_content_scorer_type(content_type):
+    """Map the user's --content-type to a content-scorer.py --type choice."""
+    return CONTENT_SCORER_TYPE_MAP.get((content_type or "").lower(), "blog")
+
+
 def _build_dimension_runners(content_file, brand_slug, evidence_path,
-                             schema_name):
+                             schema_name, content_type=None):
     """Build a dict mapping dimension name -> (script, args, extractor, skip_reason).
 
     If a dimension should be conditionally skipped (e.g., no evidence file),
@@ -393,7 +415,8 @@ def _build_dimension_runners(content_file, brand_slug, evidence_path,
     # Content quality
     runners["content_quality"] = {
         "script": "content-scorer.py",
-        "args": ["--file", content_file, "--type", "blog"],
+        "args": ["--file", content_file,
+                 "--type", _map_content_scorer_type(content_type)],
         "extractor": _extract_content_quality_score,
         "skip_reason": None,
     }
@@ -499,7 +522,7 @@ def _run_eval(dimensions_to_run, base_weights, content, brand_slug,
 
     try:
         all_runners = _build_dimension_runners(
-            tmp_path, brand_slug, evidence_path, schema_name,
+            tmp_path, brand_slug, evidence_path, schema_name, content_type,
         )
 
         # Filter to only requested dimensions
@@ -884,6 +907,8 @@ ACTION_DISPATCH = {
 def main():
     parser = build_parser()
     args = parser.parse_args()
+    if args.brand:
+        args.brand = _common.slugify_brand(args.brand)
 
     handler = ACTION_DISPATCH.get(args.action)
     if not handler:

@@ -27,6 +27,7 @@ Usage:
 
 import argparse
 import json
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -57,6 +58,19 @@ def resolve_brand(slug):
             pass
 
     return None
+
+
+def sanitize_test_name(name):
+    """Slugify a test name for safe filename use. Returns (slug, error)."""
+    raw = (name or "").strip()
+    if not raw or ".." in raw or "/" in raw or "\\" in raw:
+        return None, ("Invalid --test-name: must be non-empty and must not "
+                      "contain path separators or '..'.")
+    slug = re.sub(r"[^a-z0-9-]+", "-", raw.lower()).strip("-")
+    if not slug:
+        return None, ("Invalid --test-name: no usable characters after "
+                      "slugifying (use letters, digits, hyphens).")
+    return slug, None
 
 
 def get_tests_dir(slug):
@@ -399,6 +413,13 @@ def main():
                      "Use --brand <slug> or run /digital-marketing-pro:brand-setup first."
         }))
         sys.exit(1)
+
+    # Sanitize --test-name before it is used to build file paths
+    if args.test_name:
+        args.test_name, name_err = sanitize_test_name(args.test_name)
+        if name_err:
+            print(json.dumps({"error": name_err}))
+            sys.exit(1)
 
     # Parse --data if provided
     data = {}

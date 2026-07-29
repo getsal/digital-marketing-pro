@@ -333,7 +333,7 @@ def main():
             sys.stdout, indent=2,
         )
         print()
-        sys.exit(0)
+        sys.exit(1)
 
     historical = None
     if args.file:
@@ -341,60 +341,60 @@ def main():
         if not path.exists():
             json.dump({"error": f"File not found: {args.file}"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         try:
             content = path.read_text(encoding="utf-8")
             historical = json.loads(content)
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid JSON in file: {exc}"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         except Exception as exc:
             json.dump({"error": f"Could not read file: {exc}"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
     else:
         try:
             historical = json.loads(args.historical)
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid JSON in --historical: {exc}"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
 
     if not isinstance(historical, list):
         json.dump({"error": "Historical data must be a JSON array"}, sys.stdout, indent=2)
         print()
-        sys.exit(0)
+        sys.exit(1)
 
     if len(historical) < 2:
         json.dump({"error": "At least 2 months of historical data are required for forecasting"}, sys.stdout, indent=2)
         print()
-        sys.exit(0)
+        sys.exit(1)
 
     # Validate each entry
     for i, entry in enumerate(historical):
         if not isinstance(entry, dict):
             json.dump({"error": f"Entry {i} is not a JSON object"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         if "month" not in entry:
             json.dump({"error": f"Entry {i} missing 'month' field"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         if "revenue" not in entry:
             json.dump({"error": f"Entry {i} missing 'revenue' field"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         try:
             entry["revenue"] = float(entry["revenue"])
         except (ValueError, TypeError):
             json.dump({"error": f"Entry {i} has invalid revenue value"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         if entry["revenue"] < 0:
             json.dump({"error": f"Entry {i} has negative revenue"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         if "spend" in entry and entry["spend"] is not None:
             try:
                 entry["spend"] = float(entry["spend"])
@@ -405,11 +405,11 @@ def main():
     if args.forecast_months < 1:
         json.dump({"error": "forecast-months must be at least 1"}, sys.stdout, indent=2)
         print()
-        sys.exit(0)
+        sys.exit(1)
     if args.forecast_months > 24:
         json.dump({"error": "forecast-months cannot exceed 24"}, sys.stdout, indent=2)
         print()
-        sys.exit(0)
+        sys.exit(1)
 
     # Parse seasonality
     seasonality = None
@@ -419,23 +419,23 @@ def main():
             if not isinstance(seasonality, dict):
                 json.dump({"error": "Seasonality must be a JSON object"}, sys.stdout, indent=2)
                 print()
-                sys.exit(0)
+                sys.exit(1)
             # Validate keys are 1-12
             for k, v in seasonality.items():
                 ki = int(k)
                 if ki < 1 or ki > 12:
                     json.dump({"error": f"Seasonality month index {k} must be 1-12"}, sys.stdout, indent=2)
                     print()
-                    sys.exit(0)
+                    sys.exit(1)
                 float(v)  # validate multiplier is numeric
         except json.JSONDecodeError as exc:
             json.dump({"error": f"Invalid seasonality JSON: {exc}"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
         except (ValueError, TypeError) as exc:
             json.dump({"error": f"Invalid seasonality values: {exc}"}, sys.stdout, indent=2)
             print()
-            sys.exit(0)
+            sys.exit(1)
 
     # Validate growth assumption
     if args.growth_assumption is not None:
@@ -445,7 +445,7 @@ def main():
                 sys.stdout, indent=2,
             )
             print()
-            sys.exit(0)
+            sys.exit(1)
 
     # Sort historical data by month
     historical.sort(key=lambda h: h["month"])
@@ -462,6 +462,7 @@ def main():
     except Exception as exc:
         json.dump({"error": f"Forecasting failed: {exc}"}, sys.stdout, indent=2)
         print()
+        sys.exit(1)
 
 
 if __name__ == "__main__":

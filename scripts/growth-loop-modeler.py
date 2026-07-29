@@ -71,19 +71,26 @@ def _model_single_loop(name, loop_type, input_metric, amplification, cycle_days,
     cumulative_output = 0.0
     current_input = initial
 
-    is_sustainable = amplification > (1.0 + decay)
+    # Recurrence: input *= (1 + amplification - decay) each cycle, so input
+    # grows without bound whenever amplification > decay and decays toward
+    # zero otherwise — there is no finite non-zero fixed point.
+    is_sustainable = amplification > decay
     net_growth = amplification - decay
-
-    # Steady state: when new_input = lost_input => input * amplification = input * (1 + decay)
-    # If not sustainable, steady state value exists
-    if not is_sustainable and decay > 0:
-        steady_state = initial * amplification / decay if decay > 0 else 0
+    if is_sustainable:
+        projected_note = (
+            "Input compounds without bound (amplification > decay); "
+            "external limits will cap real-world growth."
+        )
     else:
-        steady_state = None  # Grows indefinitely (or until external limits)
+        projected_note = (
+            "Input decays toward zero (amplification <= decay); "
+            "loop is not self-sustaining."
+        )
 
     break_even_month = None
 
     for month in range(1, MONTHS_PROJECTION + 1):
+        input_start = current_input
         month_output = 0.0
         for _ in range(int(cycles_per_month)):
             new_generated = current_input * amplification
@@ -109,7 +116,7 @@ def _model_single_loop(name, loop_type, input_metric, amplification, cycle_days,
 
         monthly_projections.append({
             "month": month,
-            "input_start": round(current_input, 1),
+            "input_start": round(input_start, 1),
             "output": round(month_output, 1),
             "cumulative_output": round(cumulative_output, 1),
         })
@@ -125,7 +132,8 @@ def _model_single_loop(name, loop_type, input_metric, amplification, cycle_days,
         "monthly_projections": monthly_projections,
         "is_sustainable": is_sustainable,
         "break_even_month": break_even_month,
-        "steady_state_value": round(steady_state, 1) if steady_state is not None else None,
+        "net_growth_per_cycle": round(net_growth, 4),
+        "projected_note": projected_note,
         "total_output_12_months": round(cumulative_output, 1),
     }
 

@@ -1,6 +1,6 @@
 # The Engagement Methodology Guide
 
-**Plugin version: 3.15.0 | Methodology version: 3.2** | A user-facing guide to running marketing engagements with Digital Marketing Pro
+**Plugin version: 3.17.0 | Methodology version: 3.2** | A user-facing guide to running marketing engagements with Digital Marketing Pro
 
 > The 12-Part methodology itself was introduced in v3.0 and remains structurally unchanged through v3.15. v3.2 adds two adjacent commands that pair well with the engagement workflow: **`/digital-marketing-pro:check`** (pre-publish quality gate for any deliverable produced inside an engagement) and **`/digital-marketing-pro:status`** (engagement progress + brand snapshot). See [docs/v3.2-opt-ins.md](v3.2-opt-ins.md) for the full v3.2 additions.
 
@@ -317,7 +317,7 @@ Each channel doc has 4 components: Media (platform strategy), KPIs (measurement 
 
 The actual ad copy, post copy, headlines, CTAs. Per channel doc from Part 9.
 
-Uses existing skills: `content-engine` (in execution mode), `copy-adapter` (cross-channel), `headline-analyzer` (validation), platform-specific ad creative skills.
+Uses existing skills: `content-engine` (in execution mode), `content-repurpose` (cross-channel adaptation), the `headline-analyzer.py` script (validation), and the `ad-creative` skill for platform-specific creative.
 
 ### Part 11 — AI Creative Instructions
 

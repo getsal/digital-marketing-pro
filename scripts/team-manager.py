@@ -433,9 +433,10 @@ def get_assignments(slug, member_filter=None, status_filter=None, limit=50):
 
     # Sort by assigned_at descending (most recent first)
     assignments.sort(key=lambda a: a.get("assigned_at", ""), reverse=True)
+    total = len(assignments)
     assignments = assignments[:limit]
 
-    return {"assignments": assignments, "total": len(assignments)}
+    return {"assignments": assignments, "returned": len(assignments), "total": total}
 
 
 def main():

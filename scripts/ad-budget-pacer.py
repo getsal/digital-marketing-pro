@@ -221,9 +221,14 @@ def generate_recommendations(pacing, remaining, projection, trend, channels):
             recs.append(
                 f"Slightly over-pacing. Reduce daily spend by {abs(adj):.0f}% to stay on track."
             )
+        current_daily_avg = remaining["current_daily_average"]
+        days_to_exhaustion = (
+            remaining["budget"] / current_daily_avg if current_daily_avg > 0 else remaining["days"]
+        )
+        days_early = max(0, round(remaining["days"] - days_to_exhaustion))
         recs.append(
             f"At current rate, budget will be exhausted "
-            f"{remaining['days']} days before period ends. Apply daily budget caps."
+            f"{days_early} days before period ends. Apply daily budget caps."
         )
 
     else:

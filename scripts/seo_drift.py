@@ -40,11 +40,15 @@ only for metrics present in BOTH files.
 
 Drift classification per row
 ----------------------------
-  growth:        gains in 2+ metrics, no metric declined > 10%
-  decline:       losses in 2+ metrics, no metric grew > 10%
+A metric move is "significant" when its absolute delta exceeds --noise
+(default 5%). Position is inverted (lower = better): a position drop
+counts as an improvement.
+
+  growth:        1+ significant improvements, no significant declines
+  decline:       1+ significant declines, no significant improvements
   reshuffle:     significant moves in opposite directions
-                 (e.g., impressions up, position down — common for AI Mode)
-  stable:        no metric moved more than --noise (default 5%)
+                 (e.g., impressions up, position worsened — common for AI Mode)
+  stable:        no metric moved more than --noise
   new:           absent in baseline, present in current
   lost:          present in baseline, absent in current
 
@@ -62,8 +66,9 @@ Usage
 
 Quality scorecard
 -----------------
-  date_range_distinct:  baseline and current cover non-overlapping windows
-                        (best-effort detect via 'date' column min/max)
+  date_range_distinct:  always "warn" — the script cannot verify that the
+                        two exports cover non-overlapping windows; confirm
+                        the date ranges manually
   sample_size:          each input has >=50 rows
   metric_compatibility: at least 1 numeric metric exists in BOTH inputs
   no_lookup_collisions: no duplicate keys within a single input
@@ -81,7 +86,6 @@ import csv
 import json
 import sys
 from collections import defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -277,11 +281,9 @@ def compute_drift(baseline_csv: Path, current_csv: Path, join_on: list[str] | No
     sample_ok = len(base_rows) >= 50 and len(cur_rows) >= 50
     metric_ok = len(shared_metrics) >= 1
     no_collisions = (not base_warn) and (not cur_warn)
-    # Heuristic for date_range_distinct: this script can't validate without
-    # date columns. We mark "warn" rather than fail when undetectable.
+    # date_range_distinct is always "warn": the script cannot verify that the
+    # two exports cover non-overlapping windows — confirm date ranges manually.
     date_distinct = "warn"
-    if "date" in [c.lower() for c in base_rows[next(iter(base_rows))]] if base_rows else False:
-        pass  # detailed date-range check would go here; omitted for simplicity
 
     scorecard = {
         "date_range_distinct": date_distinct,

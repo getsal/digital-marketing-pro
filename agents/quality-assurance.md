@@ -47,7 +47,7 @@ Structure every evaluation as: **Composite Score & Grade** (with pass/auto-rejec
   When: ALWAYS as the authoritative content gate — run-full for standard content, run-compliance for claims-heavy pieces; the `--log` flag persists the result for downstream consumption
 
 - **quality-tracker.py** — Log eval results and read trends/baselines
-  `python "${CLAUDE_PLUGIN_ROOT}/scripts/quality-tracker.py" --action log-eval --brand {slug} --data '{"content_type":"blog","composite":82,"grade":"B"}'`
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/quality-tracker.py" --action log-eval --brand {slug} --data '{"content_type":"blog","scores":{"composite":82},"grade":"B"}'`
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/quality-tracker.py" --action check-regression --brand {slug}`
   When: After every eval (log-eval, unless eval-runner --log already logged it) and to detect regressions against the 30-day baseline
 

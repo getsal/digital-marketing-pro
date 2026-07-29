@@ -1,6 +1,6 @@
 # Competitor Intelligence Guide
 
-**Digital Marketing Pro v3.15.0** | Turning publicly available data into strategic advantage
+**Digital Marketing Pro v3.17.0** | Turning publicly available data into strategic advantage
 
 Competitor intelligence is not about copying what others do. It is about understanding the market landscape well enough to make smarter decisions --- identifying gaps your competitors have missed, anticipating their next moves, and positioning your brand where competition is weakest and opportunity is highest.
 
@@ -108,7 +108,7 @@ Once you select competitors and dimensions, several things fire in sequence:
 1. **Brand context loads** --- your voice profile, industry, channels, goals, and compliance rules are pulled from `profile.json` so every comparison is anchored to your brand's strategic position.
 2. **competitive-intel agent activates** --- this specialist agent handles all competitive dimensions, benchmarking, gap analysis, and strategic recommendations.
 3. **competitor-scraper.py runs** --- the script extracts publicly available data from TrailPeak Gear's and REI's websites (page titles, meta descriptions, heading structure, tech stack, social links, schema markup). It respects robots.txt and never accesses restricted pages.
-4. **MCP integrations pull live data** --- if you have SEMrush or Ahrefs configured in your `.mcp.json`, the plugin pulls real-time keyword rankings, backlink profiles, and content gap data. These integrations are optional; the analysis works without them using the scraper data and the agent's reference knowledge.
+4. **MCP integrations pull live data** --- if you have SEMrush or Ahrefs configured in your `.mcp.json`, the plugin pulls real-time keyword rankings, backlink profiles, and content gap data. (Ahrefs has a verified MCP server; SEMrush has no verified MCP package --- wire it via `/digital-marketing-pro:add-integration` or an aggregator.) These integrations are optional; the analysis works without them using the scraper data and the agent's reference knowledge.
 5. **Analysis synthesizes all sources** --- the agent combines scraped data, MCP data (if available), reference frameworks from `competitive-intelligence.md`, and your brand context into a structured report.
 
 ### Example output: Full analysis
@@ -452,7 +452,7 @@ You: It's been a month — run a competitive check on TrailPeak Gear
 
 Plugin: Running Tier 1 monthly review for TrailPeak Gear...
         (competitor-scraper.py refreshes website data)
-        (SEMrush MCP pulls latest keyword and backlink changes)
+        (Ahrefs MCP pulls latest keyword and backlink changes)
 
         Changes since last review (January 15):
         - New blog section: "Trail Talk" podcast show notes (12 posts)
@@ -480,7 +480,7 @@ Plugin: Running Tier 1 monthly review for TrailPeak Gear...
 
 If you have either (or both) of these integrations configured, the plugin's competitive analysis gains access to real-time SEO and backlink data:
 
-**SEMrush MCP** (requires `SEMRUSH_API_KEY` in `.env`):
+**SEMrush MCP** (requires `SEMRUSH_API_KEY` in `.env`; no verified MCP package exists --- wire it via `/digital-marketing-pro:add-integration` or an aggregator):
 - Live keyword ranking positions for you and competitors
 - Keyword gap analysis showing terms they rank for and you do not
 - Domain-level traffic estimates and trends
@@ -623,4 +623,4 @@ Each cycle makes the system smarter. Insights saved today become context for tom
 
 ---
 
-*Digital Marketing Pro v3.15.0 --- Competitive intelligence that turns market awareness into strategic advantage.*
+*Digital Marketing Pro v3.17.0 --- Competitive intelligence that turns market awareness into strategic advantage.*

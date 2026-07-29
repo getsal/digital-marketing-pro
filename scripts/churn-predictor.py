@@ -376,12 +376,14 @@ def summary(brand_slug):
 
     segments = []
     all_scores = []
+    total_ltv_at_risk = 0.0
     for fp in churn_dir.glob("*.json"):
         history = _load_json(fp, [])
         if not history:
             continue
         name = fp.stem.replace("-", " ").title()
         latest = history[-1].get("score", 0)
+        total_ltv_at_risk += history[-1].get("ltv_at_risk", 0) or 0
         all_scores.append(latest)
         segments.append({"segment": name, "latest_score": latest, "data_points": len(history)})
 
@@ -410,6 +412,7 @@ def summary(brand_slug):
         "average_churn_score": avg_score,
         "highest_risk_segments": segments[:5],
         "trend_direction": overall,
+        "total_ltv_at_risk": round(total_ltv_at_risk, 2),
     }
 
 

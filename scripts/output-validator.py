@@ -9,7 +9,7 @@ word count bounds, format rules (headings, paragraphs, CTAs), placeholder
 text, and basic consistency. Returns a validation score (0-100) with
 per-check breakdown and actionable issues list.
 
-Dependencies: stdlib only (json, re, sys, argparse, pathlib, datetime, math)
+Dependencies: stdlib only (json, re, sys, argparse, pathlib)
 
 Usage:
     python output-validator.py --action validate --text "# My Post..." --schema blog_post
@@ -26,7 +26,6 @@ Actions:
 
 import argparse
 import json
-import math
 import re
 import sys
 from pathlib import Path

@@ -29,7 +29,6 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -140,9 +139,8 @@ def weather_report(slug):
     net_score = total_pos - total_neg
     overall = "green" if net_score > 0 else ("red" if net_score < -3 else "yellow")
 
-    # Top signals (sorted by severity desc, most recent first)
-    top = sorted(recent, key=lambda s: (-SEVERITY_WEIGHTS.get(s.get("severity", "low"), 1), s.get("recorded_at", "")), reverse=False)
-    top = sorted(top, key=lambda s: -SEVERITY_WEIGHTS.get(s.get("severity", "low"), 1))[:5]
+    # Top signals (sorted by severity desc, then recorded_at)
+    top = sorted(recent, key=lambda s: (-SEVERITY_WEIGHTS.get(s.get("severity", "low"), 1), s.get("recorded_at", "")))[:5]
     top_out = [{"signal_id": s["signal_id"], "category": s["category"], "signal": s["signal"], "impact": s["impact"], "severity": s["severity"]} for s in top]
 
     # Recommendations

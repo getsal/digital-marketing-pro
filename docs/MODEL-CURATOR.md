@@ -115,7 +115,7 @@ Frontier model landscape shifts roughly every 6 weeks. Treat any entry older tha
 ```bash
 # Check how stale the registry is
 python scripts/resolve_model.py --registry-age
-# -> last_updated: 2026-06-28 (0 days ago). next_review_due: 2026-09-28
+# -> last_updated: 2026-07-12. next_review_due: 2026-09-10
 
 # Poll the provider catalogs and report drift (no writes)
 ANTHROPIC_API_KEY=... OPENAI_API_KEY=... GEMINI_API_KEY=... EVOLINK_API_KEY=... python scripts/refresh_models.py
@@ -158,9 +158,9 @@ Change `status` to `"deprecated"` and add `replacement_id`. The resolver will au
 
 ```json
 {
-  "id": "claude-sonnet-4-6",
+  "id": "claude-sonnet-4-5-20250929",
   "vendor": "anthropic",
   "status": "deprecated",
-  "replacement_id": "claude-sonnet-4-7"
+  "replacement_id": "claude-sonnet-4-6"
 }
 ```

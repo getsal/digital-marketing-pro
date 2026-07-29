@@ -17,7 +17,6 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -160,21 +159,30 @@ def check_gaps(entries, start_date, end_date):
     current = start_date.date()
     end = end_date.date()
     consecutive_empty = 0
+    stretch_start = None
 
+    def _record_stretch(last_day):
+        gaps.append({
+            "start": stretch_start.strftime(DATE_FORMAT),
+            "end": last_day.strftime(DATE_FORMAT),
+            "days": consecutive_empty,
+            "note": f"No posts scheduled for {consecutive_empty} consecutive days",
+        })
+
+    # One entry per gap stretch (>=3 empty days), with start/end/days
     while current <= end:
         if current not in dates_with_posts:
+            if consecutive_empty == 0:
+                stretch_start = current
             consecutive_empty += 1
-            day_name = current.strftime("%A")
-            if consecutive_empty >= 3:
-                gaps.append({
-                    "date": current.strftime(DATE_FORMAT),
-                    "note": f"No posts scheduled ({day_name}) — gap of {consecutive_empty}+ days",
-                })
         else:
+            if consecutive_empty >= 3:
+                _record_stretch(current - timedelta(days=1))
             consecutive_empty = 0
         current += timedelta(days=1)
+    if consecutive_empty >= 3:
+        _record_stretch(end)
 
-    # Deduplicate: keep only the last day of each gap stretch
     span_days = (end_date.date() - start_date.date()).days + 1
     gap_days = span_days - len(dates_with_posts)
     gap_ratio = gap_days / max(span_days, 1)

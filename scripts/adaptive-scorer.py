@@ -15,7 +15,10 @@ import json
 import sys
 from pathlib import Path
 
-BRANDS_DIR = Path.home() / ".claude-marketing" / "brands"
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _common  # noqa: E402
 
 # Industry-specific weight adjustments
 # These modify the base content-scorer weights based on what matters most per industry
@@ -58,9 +61,9 @@ GOAL_WEIGHT_MODS = {
 
 def load_brand_context(slug):
     """Load brand profile and past insights for adaptive scoring."""
-    brand_dir = BRANDS_DIR / slug
-    if not brand_dir.exists():
-        return None, f"Brand '{slug}' not found."
+    brand_dir, err = _common.get_brand_dir(slug)
+    if err:
+        return None, err
 
     profile_path = brand_dir / "profile.json"
     if not profile_path.exists():
@@ -152,6 +155,7 @@ def main():
     parser.add_argument("--weights-only", action="store_true",
                         help="Only output the computed adaptive weights")
     args = parser.parse_args()
+    args.brand = _common.slugify_brand(args.brand)
 
     # Load brand context
     brand_context, err = load_brand_context(args.brand)

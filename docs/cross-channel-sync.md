@@ -212,7 +212,7 @@ Who's ready to lighten their load? Drop a comment below.
 40% lighter. 100% recycled. Pre-order now
 ```
 
-**Adaptation notes:** 42 characters (close to the 40-character mobile-preview target). Front-loads the two strongest differentiators. Ends with clear CTA. No hashtags, no emojis, no brand name (the "From" field already shows who sent it).
+**Adaptation notes:** 41 characters (close to the 40-character mobile-preview target). Front-loads the two strongest differentiators. Ends with clear CTA. No hashtags, no emojis, no brand name (the "From" field already shows who sent it).
 
 ### Google Ads RSA Headlines (30 characters each, max)
 
@@ -467,4 +467,4 @@ Start with `/digital-marketing-pro:campaign-plan` to build your next cross-chann
 
 ---
 
-*This guide is part of the Digital Marketing Pro plugin (v3.15.0). For channel selection matrices and synergy maps, see `skills/campaign-orchestrator/channel-strategy.md`. For platform specifications and character limits, see `skills/context-engine/platform-specs.md`. For UTM naming conventions, see `skills/campaign-orchestrator/utm-tracking.md`.*
+*This guide is part of the Digital Marketing Pro plugin (v3.17.0). For channel selection matrices and synergy maps, see `skills/campaign-orchestrator/channel-strategy.md`. For platform specifications and character limits, see `skills/context-engine/platform-specs.md`. For UTM naming conventions, see `skills/campaign-orchestrator/utm-tracking.md`.*

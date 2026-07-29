@@ -305,7 +305,7 @@ def main():
         "industry_notes": industry_note,
         "avoid_times": avoid_times,
         "methodology_note": "Based on aggregated engagement data from industry benchmarks",
-        "data_last_updated": "2026-Q1",
+        "data_last_updated": "2026-Q1 (curated); re-verify against current platform data",
     }
 
     json.dump(output, sys.stdout, indent=2)

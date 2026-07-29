@@ -1,17 +1,17 @@
 # How to Get a Production C2PA Signing Certificate
 
 **Audience:** Brand operators preparing to sign AI-generated marketing assets for EU markets ahead of EU AI Act Article 50 enforcement on **2 August 2026**.
-**Applies to:** DMP `/digital-marketing-pro:c2pa-metadata` + `scripts/embed-c2pa.py`, SocialForge `/socialforge:c2pa-sign` + `scripts/c2pa_sign.py`, ContentForge `scripts/generate-docx.py --c2pa-sign`.
+**Applies to:** `/digital-marketing-pro:c2pa-metadata` + `scripts/embed-c2pa.py`.
 
 ## Why this matters
 
-All three plugins ship with a **dev path** that auto-generates a self-signed 90-day certificate so you can test the signing flow without any external setup. Assets signed with the dev cert sign successfully and round-trip-verify locally, but at [contentcredentials.org/verify](https://contentcredentials.org/verify) they show as **"Signature present, signer not in trust list"**. EU AI Act Article 50 requires the marking to be "in a machine-readable format using open, interoperable standards" — a self-signed signature is technically machine-readable but won't pass any practical compliance review or third-party verification.
+The plugin ships with a **dev path** that auto-generates a self-signed 90-day certificate so you can test the signing flow without any external setup. Assets signed with the dev cert sign successfully and round-trip-verify locally, but at [contentcredentials.org/verify](https://contentcredentials.org/verify) they show as **"Signature present, signer not in trust list"**. EU AI Act Article 50 requires the marking to be "in a machine-readable format using open, interoperable standards" — a self-signed signature is technically machine-readable but won't pass any practical compliance review or third-party verification.
 
 For production deployment, you need a certificate from a **CAI-recognized signing authority**. Here is how.
 
-## Recognized authorities (May 2026)
+## Recognized authorities (July 2026)
 
-The [Content Authenticity Initiative (CAI)](https://contentauthenticity.org/) maintains a trust list of issuers. The four practical paths as of May 2026:
+The [Content Authenticity Initiative (CAI)](https://contentauthenticity.org/) maintains a trust list of issuers. The four practical paths as of July 2026:
 
 ### Option A — Adobe Content Credentials (easiest for content brands)
 
@@ -23,7 +23,7 @@ The [Content Authenticity Initiative (CAI)](https://contentauthenticity.org/) ma
 
 ### Option B — Truepic (best for high-volume / API-first brands)
 
-- **Who it's for:** Brands signing many assets programmatically (e.g. a SocialForge production pipeline generating 500+ posts/month).
+- **Who it's for:** Brands signing many assets programmatically (e.g. a production content pipeline generating 500+ posts/month).
 - **How:** Truepic operates a commercial C2PA signing service. Sign up at https://www.truepic.com, get an API key, configure the signing endpoint. Their service can either issue you a certificate to use locally OR sign on your behalf via API.
 - **Cost:** Tiered SaaS pricing; contact for enterprise quote.
 - **Cert format:** PEM-encoded ECDSA P-256.
@@ -49,11 +49,9 @@ Each path produces (or hosts) a pair of files:
 
 The certificate is what verifiers check against the CAI trust list. The private key never leaves your machine (or your KMS — see "Production key management" below).
 
-## How to use the production cert in our plugins
+## How to use the production cert
 
 Once you have `cert.pem` and `key.pem` from any of the four authorities above:
-
-### DMP
 
 ```
 /digital-marketing-pro:c2pa-metadata \
@@ -67,34 +65,10 @@ Once you have `cert.pem` and `key.pem` from any of the four authorities above:
 
 `--ai-disclosure` adds the **C2PA 2.4 `c2pa.ai-disclosure` assertion** alongside the IPTC digital-source-type claim — the machine-readable marking the EU AI Act Article 50 deployer pathway relies on. Include it on every production sign of AI-generated assets bound for EU markets.
 
-### SocialForge
-
-```
-python scripts/c2pa_sign.py \
-    --input asset.png --output signed.png \
-    --brand "Acme Corp" --generator "Vertex AI Nano Banana Pro" \
-    --platform instagram \
-    --signing-cert /secure/c2pa-prod-cert.pem \
-    --signing-key /secure/c2pa-prod-key.pem
-```
-
-Or pass the flags to `generate_image.py --c2pa-sign --c2pa-signing-cert ... --c2pa-signing-key ...` so the auto-sign hook uses them.
-
-### ContentForge
-
-```
-python scripts/generate-docx.py \
-    --content humanized.md --output article.docx \
-    --reports reports.json --brand "Acme Corp" --content-type article \
-    --c2pa-sign \
-    --c2pa-signing-cert /secure/c2pa-prod-cert.pem \
-    --c2pa-signing-key /secure/c2pa-prod-key.pem
-```
-
 ## Production key management — do this right
 
 1. **Never commit cert + key to git.** Put them outside the repo, in a path only the production signing user can read (e.g. `/secure/c2pa/` with mode `400` on Unix or restricted ACL on Windows).
-2. **Don't bake the key path into agent files / scripts.** Pass it via the `--c2pa-signing-key` flag at runtime, or read it from an environment variable in your own wrapper script.
+2. **Don't bake the key path into agent files / scripts.** Pass it via the `--signing-key` flag (paired with `--signing-cert`) at runtime, or read it from an environment variable in your own wrapper script.
 3. **Use a secret store for team environments.** AWS Secrets Manager, GCP Secret Manager, HashiCorp Vault, Azure Key Vault — fetch the cert + key at signing time, don't persist them on disk where multiple users can reach them.
 4. **Rotate annually.** Most CAI-recognized certs have a 1-year validity period. Set a calendar reminder; rotation is just "swap the file, signed assets going forward use the new key, previously signed assets stay verifiable because the old cert's signature is preserved in the manifest".
 5. **If the key is ever compromised, revoke immediately** via the issuing authority's process and re-issue.
@@ -102,7 +76,7 @@ python scripts/generate-docx.py \
 ## What you still need a human for (even with a production cert)
 
 - **Deepfake disclosure overlay** — Article 50 requires synthetic audio/image/video of real persons/places/objects to additionally carry a *visible* disclosure. C2PA manifest alone is not enough for deepfakes.
-- **AI-text editorial responsibility claim** — Article 50 allows you to skip AI-generated-text disclosure for matters of public interest IF a human reviewer assumes editorial responsibility. ContentForge's Phase 7 reviewer scorecard is the human-review record; your brand still needs an internal sign-off process.
+- **AI-text editorial responsibility claim** — Article 50 allows you to skip AI-generated-text disclosure for matters of public interest IF a human reviewer assumes editorial responsibility. Keep a documented human-review record (reviewer name, date, scope) for each piece; your brand still needs an internal sign-off process.
 - **Legal sign-off per jurisdiction** — C2PA is the technical mechanism. Whether your specific deployment satisfies Article 50 in your specific EU market is your counsel's call.
 
 ## Verification testing
@@ -122,13 +96,10 @@ After production signing, verify before publishing:
 | Before 2 Aug 2026 | Cert in hand, key-management in place, production-signing tested end-to-end against [contentcredentials.org/verify](https://contentcredentials.org/verify) |
 | After 2 Aug 2026 | EU AI Act Article 50 enforcement active. Penalties up to €15M / 3% global turnover. |
 
-There are ~76 days from 17 May 2026 to 2 Aug 2026 — plenty of runway if you start this week, tight if you wait until late July.
+Article 50 applies on **2 August 2026 — days away**. If you don't yet have a production cert, start today: Truepic's onboarding (account → API key → certificate) is the fastest path, and the dev-cert flow keeps your pipeline testable while you wait.
 
 ## Related plugin references
 
-- DMP `skills/context-engine/compliance-rules.md` Section 1.1b — EU AI Act Article 50 regulatory rule pack
-- DMP `skills/c2pa-metadata/SKILL.md` — DMP signing skill
-- SocialForge `references/eu-ai-act-article50.md` — regulatory context
-- SocialForge `skills/c2pa-sign/SKILL.md` — SF signing skill
-- ContentForge `agents/06-seo-geo-optimizer.md` — May 2026 AEO reality update
-- ContentForge `scripts/generate-docx.py` — `--c2pa-sign` flag
+- `skills/context-engine/compliance-rules.md` Section 1.1b — EU AI Act Article 50 regulatory rule pack
+- `skills/context-engine/eu-code-of-practice.md` — final Code of Practice on Transparency of AI-Generated Content (10 June 2026)
+- `skills/c2pa-metadata/SKILL.md` — the signing skill this guide supports

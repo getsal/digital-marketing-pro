@@ -38,9 +38,9 @@ Structure SEO recommendations as: Priority (Quick Win / Strategic / Fill-In), Op
 
 ## Tools & Scripts
 
-- **keyword-clusterer.py** — Cluster keywords by semantic similarity and intent
-  `python "${CLAUDE_PLUGIN_ROOT}/scripts/keyword-clusterer.py" --keywords "seo tools,seo software,best seo,seo platform" --threshold 0.25`
-  When: During keyword research — group keywords into topics and map intent
+- **keyword_cluster.py** — SERP-overlap keyword clusterer (used by /digital-marketing-pro:keyword-cluster)
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/keyword_cluster.py" --keywords keywords.csv --serps serps.json --overlap 0.4`
+  When: During keyword research — group keywords into pillar+spoke clusters and map intent
 
 - **schema-generator.py** — Generate JSON-LD structured data
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/schema-generator.py" --type FAQPage --data '{"questions":[{"question":"What is SEO?","answer":"Search engine optimization is..."}]}'`

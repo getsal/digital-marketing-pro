@@ -19,7 +19,10 @@ score) and spokes (long-tail or question variants). Computes priority score:
 
 Quality scorecard gates ALL must pass for status=ready:
 
-  - cannibalisation: no two clusters share the same primary intent + pillar URL target
+  - cannibalisation: "warn" when two clusters' pillar keywords share >= 60%
+    of their token sets (Jaccard) AND have the same primary intent — those
+    pillars will likely compete for the same SERP; the offending pairs are
+    listed in cannibalisation_pairs. "pass" otherwise.
   - orphan: every cluster has >= 1 spoke (or it's marked pillar-only)
   - coverage: >= 80% of input seeds assigned to a cluster
   - anchor_diversity: each cluster has >= 2 anchor-text variants suggested
@@ -66,7 +69,8 @@ Output JSON shape
       ...
     ],
     "quality_scorecard": {
-      "cannibalisation": "pass" | "fail",
+      "cannibalisation": "pass" | "warn",
+      "cannibalisation_pairs": [...],
       "orphan": "pass" | "fail",
       "coverage": "pass" | "fail",
       "anchor_diversity": "pass" | "fail",
@@ -323,8 +327,23 @@ def _build_internal_link_map(clusters: list[dict]) -> None:
 
 def _quality_scorecard(clusters: list[dict], n_input_seeds: int, n_clustered: int) -> dict:
     coverage_pct = (n_clustered / n_input_seeds * 100) if n_input_seeds else 0
-    pillar_intent_targets = [(c["pillar"].lower(), c["primary_intent"]) for c in clusters]
-    cannibalisation = "pass" if len(pillar_intent_targets) == len(set(pillar_intent_targets)) else "fail"
+
+    # Cannibalisation: two clusters whose pillar keywords share >=60% of their
+    # token sets (Jaccard) AND have the same primary intent will likely compete
+    # for the same SERP. Reported as "warn" with the offending pairs listed.
+    cannibalisation_pairs = []
+    for i, a in enumerate(clusters):
+        a_tokens = _tokenize(a["pillar"])
+        for b in clusters[i + 1:]:
+            if a["primary_intent"] != b["primary_intent"]:
+                continue
+            if _jaccard(a_tokens, _tokenize(b["pillar"])) >= 0.6:
+                cannibalisation_pairs.append({
+                    "cluster_ids": [a["id"], b["id"]],
+                    "pillars": [a["pillar"], b["pillar"]],
+                    "primary_intent": a["primary_intent"],
+                })
+    cannibalisation = "warn" if cannibalisation_pairs else "pass"
 
     # Multi-keyword clusters must have >=1 spoke (else they should have merged).
     # Single-keyword clusters are pillar_only and exempt — they represent
@@ -347,6 +366,7 @@ def _quality_scorecard(clusters: list[dict], n_input_seeds: int, n_clustered: in
     all_pass = all(v == "pass" for v in [cannibalisation, orphan, coverage, anchor_diversity])
     return {
         "cannibalisation": cannibalisation,
+        "cannibalisation_pairs": cannibalisation_pairs,
         "orphan": orphan,
         "coverage": coverage,
         "anchor_diversity": anchor_diversity,

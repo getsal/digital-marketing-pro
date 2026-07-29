@@ -63,9 +63,8 @@ def _load_json(path):
 
 
 def _save_json(path, data):
-    """Write JSON data to file, creating parent dirs as needed."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    """Write JSON data to file atomically, creating parent dirs as needed."""
+    _common.atomic_write_json(path, data)
 
 
 def update_meta(slug, url, title=None, description=None,

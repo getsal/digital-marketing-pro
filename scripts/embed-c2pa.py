@@ -83,6 +83,15 @@ AI_CLAIM_TO_C2PA_TYPE = {
 }
 
 
+def plugin_version():
+    """Read the plugin version from .claude-plugin/plugin.json at runtime."""
+    try:
+        manifest_path = Path(__file__).parent.parent / ".claude-plugin" / "plugin.json"
+        return json.loads(manifest_path.read_text(encoding="utf-8")).get("version", "unknown")
+    except Exception:
+        return "unknown"
+
+
 def ensure_c2pa():
     """Install c2pa-python if missing. Returns the module."""
     try:
@@ -144,7 +153,7 @@ def build_manifest_json(brand, generator, ai_claim, created, prompt, reviewer,
     manifest = {
         "claim_generator_info": [{
             "name": "DigitalMarketingPro",
-            "version": "3.4.1",
+            "version": plugin_version(),
         }],
         "title": f"{brand} — AI-generated marketing asset",
         "format": SUPPORTED_FORMATS[asset_format],

@@ -17,6 +17,8 @@ Usage:
     python crm-sync.py --brand acme --action log-synced --data '{"record_type": "contact", "crm_platform": "hubspot", "crm_record_id": "hs_123", "local_id": "abc123"}'
     python crm-sync.py --brand acme --action get-sync-history --platform hubspot --type contact --limit 50
     python crm-sync.py --brand acme --action get-crm-status
+    python crm-sync.py --brand acme --action audit-workflows
+    python crm-sync.py --brand acme --action create-campaign --plan /path/to/plan.json
 """
 
 import argparse
@@ -70,7 +72,7 @@ def _load_json(path, default=None):
 
 def _save_json(path, data):
     """Atomically write JSON to a file."""
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    _common.atomic_write_json(path, data)
 
 
 def _validate_email(email):

@@ -19,7 +19,6 @@ import re
 import sys
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -91,9 +90,21 @@ def scan_spam_triggers(text):
     findings = []
     total_penalty = 0
 
-    for tier, phrases in SPAM_TIERS.items():
-        for phrase in phrases:
-            if phrase in text_lower:
+    # Longest phrases first, masking matched spans so each text span is
+    # penalized once (e.g. "free money" does not also count "free")
+    masked = [False] * len(text_lower)
+    tiered_phrases = [
+        (tier, phrase)
+        for tier, phrases in SPAM_TIERS.items()
+        for phrase in phrases
+    ]
+    tiered_phrases.sort(key=lambda tp: len(tp[1]), reverse=True)
+
+    for tier, phrase in tiered_phrases:
+        start = text_lower.find(phrase)
+        while start != -1:
+            end = start + len(phrase)
+            if not any(masked[start:end]):
                 penalty = TIER_SCORES[tier]
                 total_penalty += penalty
                 findings.append({
@@ -101,6 +112,10 @@ def scan_spam_triggers(text):
                     "severity": tier,
                     "detail": f"'{phrase}' (+{penalty} risk)",
                 })
+                for i in range(start, end):
+                    masked[i] = True
+                break  # each phrase counts at most once
+            start = text_lower.find(phrase, start + 1)
 
     return total_penalty, findings
 

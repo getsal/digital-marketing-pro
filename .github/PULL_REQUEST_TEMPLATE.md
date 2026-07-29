@@ -17,6 +17,7 @@
 
 - [ ] Claude Code (CLI + IDE extensions) via `.claude-plugin/plugin.json`
 - [ ] Anthropic Cowork (same `.claude-plugin/` files)
+- [ ] Other native platform manifests (Codex / Cursor / Copilot / Antigravity / Hermes / OpenClaw)
 - [ ] Both / either (text-only docs change)
 
 ## Checklist

@@ -28,7 +28,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
-BRANDS_DIR = _common.brands_root()
 NUM_SIMULATIONS = 10000
 
 
@@ -303,7 +302,7 @@ def main():
                         choices=["simulate", "what-if", "sensitivity",
                                  "channel-interaction", "saturation-check"],
                         help="Action to perform")
-    parser.add_argument("--brand", help="Brand slug (optional, for saving results)")
+    parser.add_argument("--brand", help="Brand slug (reserved)")
     parser.add_argument("--scenarios", help="JSON array of scenario objects (for simulate)")
     parser.add_argument("--current", help="JSON current allocation (for what-if)")
     parser.add_argument("--base-scenario", dest="base_scenario",

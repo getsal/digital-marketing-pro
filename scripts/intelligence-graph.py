@@ -31,7 +31,6 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -451,11 +450,11 @@ def main():
     parser.add_argument("--learning-id", help="Learning ID (for update-confidence)")
     parser.add_argument("--direction", choices=["up", "down"],
                         help="Confidence direction (for update-confidence)")
-    parser.add_argument("--dimension", choices=["channel", "audience", "objective"],
+    parser.add_argument("--dimension", choices=CONTEXT_DIMENSIONS,
                         help="Grouping dimension (for get-patterns)")
     parser.add_argument("--max-age-days", type=int, default=180,
                         help="Max age in days for archive-stale (default: 180)")
-    parser.add_argument("--min-confidence", type=float, default=0.3,
+    parser.add_argument("--min-confidence", type=float, default=None,
                         help="Min confidence threshold (default: 0.3 for archive, 0.6 for playbook)")
     parser.add_argument("--channel", help="Filter by channel (for export-playbook)")
     parser.add_argument("--audience", help="Filter by audience (for export-playbook)")
@@ -463,6 +462,11 @@ def main():
                         help="Decay rate per month (default: 0.01)")
 
     args = parser.parse_args()
+
+    # Resolve per-action --min-confidence defaults (None = not provided, so an
+    # explicit 0.3 is no longer mistaken for "use the playbook default").
+    if args.min_confidence is None:
+        args.min_confidence = 0.6 if args.action == "export-playbook" else 0.3
 
     def _parse_json(raw, label):
         try:
@@ -504,8 +508,7 @@ def main():
         result = archive_stale(args.brand, args.max_age_days, args.min_confidence)
 
     elif args.action == "export-playbook":
-        min_conf = args.min_confidence if args.min_confidence != 0.3 else 0.6
-        result = export_playbook(args.brand, args.channel, args.audience, min_conf)
+        result = export_playbook(args.brand, args.channel, args.audience, args.min_confidence)
 
     elif args.action == "apply-time-decay":
         result = apply_time_decay(args.brand, args.decay_rate)

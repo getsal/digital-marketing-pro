@@ -466,8 +466,8 @@ def test_pricing(slug, panel_id, price_points_str, product_description):
     w_expensive = sum(e * w for e, w in zip(all_expensive, weights))
 
     optimal = round((w_good + w_expensive) / 2, 2)
-    acceptable_low = round(sum(tc * w for tc, w in zip(all_good_deal, weights)), 2)
-    acceptable_high = round(sum(te * w for te, w in zip(all_expensive, weights)), 2)
+    acceptable_low = round(sum(tc * w for tc, w in zip(all_too_cheap, weights)), 2)
+    acceptable_high = round(sum(te * w for te, w in zip(all_too_expensive, weights)), 2)
 
     # Revenue vs volume: higher price = more revenue per unit, lower price = more volume
     viable = [p for p in price_points if acceptable_low <= p <= acceptable_high]
@@ -647,11 +647,22 @@ def calibrate(slug, panel_id, test_type, predicted_str, actual_str):
 
     if accuracy >= 0.7:
         direction = "well-calibrated"
-    elif sum(1 for v in per_segment_acc.values() if v < 0.5) > total_fields / 2:
-        # Check if predictions were generally too optimistic or pessimistic
-        direction = "over-predicted"
     else:
-        direction = "under-predicted"
+        # Signed mean error over numeric fields: positive => over-predicted
+        signed_errors = [
+            p_v - a_v
+            for p_v, a_v in (
+                (predicted.get(k), actual.get(k))
+                for k in set(list(predicted.keys()) + list(actual.keys()))
+            )
+            if isinstance(p_v, (int, float)) and isinstance(a_v, (int, float))
+        ]
+        if not signed_errors:
+            direction = "poorly-calibrated"
+        elif sum(signed_errors) / len(signed_errors) > 0:
+            direction = "over-predicted"
+        else:
+            direction = "under-predicted"
 
     calibration_record = {
         "test_type": test_type,

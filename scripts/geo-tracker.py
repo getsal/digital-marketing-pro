@@ -32,7 +32,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 

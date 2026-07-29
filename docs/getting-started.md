@@ -1,6 +1,6 @@
 # Getting Started with Digital Marketing Pro
 
-**Version 3.15.0** | A plugin for Claude Code and Claude Cowork
+**Version 3.17.0** | A plugin for Claude Code and Claude Cowork
 
 Digital Marketing Pro transforms Claude into a marketing command center that knows your brand, understands your industry, and produces strategy and content that sounds like you wrote it. v3.0 adds a **12-Part Engagement Methodology** that orchestrates the plugin into a sequential workflow producing ~50–60 traceable files per engagement. This guide walks you through installation, brand setup, your first marketing task, and your first full engagement.
 
@@ -14,6 +14,8 @@ Digital Marketing Pro transforms Claude into a marketing command center that kno
 4. [Your First Brand Profile](#4-your-first-brand-profile)
 5. [Importing Your Brand Guidelines (Optional)](#5-importing-your-brand-guidelines-optional)
 6. [Your First Marketing Task](#6-your-first-marketing-task)
+   - [Evaluation & Quality Assurance](#evaluation--quality-assurance)
+   - [Multilingual Support](#multilingual-support)
 7. [Your First Full Engagement (v3.0)](#7-your-first-full-engagement-v30)
 8. [Understanding the Session Lifecycle](#8-understanding-the-session-lifecycle)
 9. [Python Dependencies (Optional)](#9-python-dependencies-optional)
@@ -35,7 +37,7 @@ That is it. Everything else is optional.
 **Optional but nice to have:**
 
 - **Python 3.8 or newer** --- unlocks advanced scoring features like brand voice analysis and content readability. The plugin works perfectly without Python; you just get bonus capabilities if it is installed.
-- **No API keys required** --- the plugin ships with 169 reference knowledge files that power all 16 marketing modules (including the v3.0 methodology and framework reference docs). The optional MCP integrations (14 HTTP connectors that work in Cowork, plus 68 npx integrations for Claude Code) use your own account credentials and can be configured later. Run `/digital-marketing-pro:integrations` to see which connectors are available and `/digital-marketing-pro:connect <name>` for step-by-step setup.
+- **No API keys required** --- the plugin ships with 169 reference knowledge files that power all 16 marketing modules (including the v3.0 methodology and framework reference docs). The optional MCP integrations (10 registry-backed HTTP connectors that work in Cowork, plus a 68-server opt-in catalog for Claude Code) use your own account credentials and can be configured later. Run `/digital-marketing-pro:integrations` to see which connectors are available and `/digital-marketing-pro:connect <name>` for step-by-step setup.
 
 > **Bottom line:** If you can run Claude Code or Claude Cowork, you can use this plugin right now.
 
@@ -88,11 +90,11 @@ For full details on Cowork capabilities (document creation, visual review, app i
 After running either command, you should see output similar to this:
 
 ```
-Installing plugin: digital-marketing-pro v3.15.0
+Installing plugin: digital-marketing-pro v3.17.0
   - 16 marketing modules loaded
   - 158 skills + 18 top commands registered (/digital-marketing-pro:*)
   - 24 specialist agents available
-  - 14 HTTP connectors + 68 npx integrations configured
+  - 10 HTTP connectors + a 68-server opt-in catalog available
   - Hooks ship empty (opt-in SessionStart/PreToolUse/SessionEnd reference config in hooks/hooks-reference.example.json)
   - 12-Part Engagement Methodology available (run /digital-marketing-pro:engagement to start)
 
@@ -661,7 +663,7 @@ Example output:
 
  ...
 
-Connected: 14 HTTP | Available: 68 npx
+Connected: 10 HTTP | Available: 68-server catalog
 Skills fully unlocked: 87/158 | Skills with enhanced capabilities: **158/158**
 ```
 
@@ -695,7 +697,7 @@ Digital Marketing Pro provides 158 skills + 18 top-level commands, all prefixed 
 | `/digital-marketing-pro:status` | Unified snapshot: brand profile + engagements + insights + compliance + deps |
 | `/digital-marketing-pro:status --quiet` | One-line compact summary |
 | `/digital-marketing-pro:status --json` | Machine-readable JSON for downstream skills |
-| `/digital-marketing-pro:status --section <brand|engagements|insights|compliance|deps>` | Single section only |
+| `/digital-marketing-pro:status --section <brand\|engagements\|insights\|compliance\|deps>` | Single section only |
 
 ### Engagement Workflow (v3.0)
 
@@ -889,11 +891,11 @@ You are set up and ready to go. Here are some resources for when you want to go 
 
 - **Memory & RAG** --- Store and retrieve brand knowledge across sessions using Pinecone, Qdrant, or Supermemory vector databases. See the Memory & Knowledge commands above.
 
-- **Connecting your marketing tools** --- The plugin supports 14 HTTP MCP connectors + 68 npx integrations spanning analytics, advertising, CRM, email, social publishing, memory/RAG, and more. See [docs/integrations-guide.md](integrations-guide.md) to connect your accounts.
+- **Connecting your marketing tools** --- The plugin supports 10 registry-backed HTTP MCP connectors + a 68-server opt-in catalog spanning analytics, advertising, CRM, email, social publishing, memory/RAG, and more. See [docs/integrations-guide.md](integrations-guide.md) to connect your accounts.
 
 - **KPI-driven strategy** --- Learn how to set up marketing KPI frameworks, build reporting dashboards, and track campaign performance over time in [docs/strategy-and-kpis.md](strategy-and-kpis.md).
 
-- **Understanding the architecture** --- For a technical deep dive into how the 16 modules, 24 agents, context engine, hook system, and v3.0 methodology layer work together, see [docs/architecture.md](architecture.md).
+- **Understanding the architecture** --- For a technical deep dive into how the 158 skills, 24 agents, context engine, hook system, and v3.0 methodology layer work together, see [docs/architecture.md](architecture.md).
 
 - **Using Cowork** --- If you are using Claude Cowork (or considering it), see [docs/claude-interfaces.md](claude-interfaces.md) for Cowork-specific capabilities like document creation, visual page review, and a comparison with other marketing plugins.
 
@@ -931,4 +933,4 @@ If something is not working as expected:
 
 ---
 
-*Digital Marketing Pro v3.15.0 --- Built for marketing professionals who want strategy, execution, and publishing that stays on-brand, every time. v3.0 added the 12-Part Engagement Methodology with traceable rationale, version-controlled deliverables, and the Two-Views Model. v3.2 adds /digital-marketing-pro:check (pre-publish gate), /digital-marketing-pro:status (on-demand snapshot), and embedded mandatory hallucination checks in 4 content-producer agents — closing the gaps from the v3.1 multi-plugin hook removal. Plan it, approve it, execute it, monitor it --- all from Claude Code and Claude Cowork. Built by [Indranil Banerjee](https://github.com/indranilbanerjee).*
+*Digital Marketing Pro v3.17.0 --- Built for marketing professionals who want strategy, execution, and publishing that stays on-brand, every time. v3.0 added the 12-Part Engagement Methodology with traceable rationale, version-controlled deliverables, and the Two-Views Model. v3.2 adds /digital-marketing-pro:check (pre-publish gate), /digital-marketing-pro:status (on-demand snapshot), and embedded mandatory hallucination checks in 4 content-producer agents — closing the gaps from the v3.1 multi-plugin hook removal. Plan it, approve it, execute it, monitor it --- all from Claude Code and Claude Cowork. Built by [Indranil Banerjee](https://github.com/indranilbanerjee).*

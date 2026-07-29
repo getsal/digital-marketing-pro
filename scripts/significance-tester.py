@@ -250,7 +250,7 @@ def main():
     if c_rate < 0.005 or v_rate < 0.005:
         warnings.append("Very low conversion rates may reduce test reliability.")
     if abs(c_vis - v_vis) / max(c_vis, v_vis) > 0.2:
-        warnings.append("Unbalanced group sizes detected (>20%% difference). Results are valid but power may be reduced.")
+        warnings.append("Unbalanced group sizes detected (>20% difference). Results are valid but power may be reduced.")
     if z_significant != chi2_significant:
         warnings.append("Z-test and Chi-squared test disagree on significance. The result is borderline; collect more data.")
 

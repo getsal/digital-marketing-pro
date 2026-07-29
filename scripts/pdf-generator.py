@@ -70,8 +70,7 @@ def _load_json(path, default=None):
 
 
 def _save_json(path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    _common.atomic_write_json(path, data)
 
 
 def _build_markdown(report_type, title, data, theme):
@@ -417,8 +416,8 @@ def main():
         if not args.report_id:
             print(json.dumps({"error": "Provide --report-id"}))
             sys.exit(1)
-        export_markdown(args.brand, args.report_id)
-        sys.exit(0)
+        ok = export_markdown(args.brand, args.report_id)
+        sys.exit(0 if ok else 1)
 
     if result is not None:
         _common.finish(result)

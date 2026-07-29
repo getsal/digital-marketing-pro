@@ -507,7 +507,7 @@ def main():
     parser.add_argument("--gbp", default=None,
                         help="JSON object with GBP profile fields for completeness check")
     parser.add_argument("--industry", default=None,
-                        help="Industry for industry-specific scoring adjustments")
+                        help="Industry for industry-specific recommendations")
     args = parser.parse_args()
 
     # --- Validate at least one mode ---

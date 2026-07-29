@@ -34,13 +34,8 @@ Every skill directory must contain a `SKILL.md` file with YAML frontmatter:
 ```markdown
 ---
 name: skill-name
-description: One sentence describing when this skill should be used.
-user-invocable: true
-triggers:
-  - natural language phrase 1
-  - natural language phrase 2
-  - 6-8 phrases that should trigger this skill
-allowed-tools: Read Write Edit Bash Glob Grep
+description: "One sentence describing when this skill should be used. Use when: ... (quote the description — it often contains colons)."
+argument-hint: "[primary-input --option1 --option2]"
 ---
 
 # /digital-marketing-pro:skill-name
@@ -80,7 +75,7 @@ view-preference: v2-primary   # v1-only / v1-primary / v2-only / v2-primary / bo
 
 These fields are **optional** for skills that do not participate in the engagement workflow. Existing v2.x skills continue to work without them.
 
-For methodology skills, follow the conventions in section 12.11 of [docs/architecture.md](docs/architecture.md). The canonical examples are:
+For methodology skills, follow the conventions in Section 18 (the v3.0 Engagement Methodology Layer) of [docs/architecture.md](docs/architecture.md). The canonical examples are:
 
 - `skills/engagement-workflow/SKILL.md`
 - `skills/four-core-documents/SKILL.md`
@@ -108,7 +103,7 @@ Before producing any marketing output from this module:
 Do not ask the user for information that already exists in their brand profile.
 ```
 
-**Command skills** (102 slash commands) must have an explicit brand loading step as Process step 1:
+**Command skills** (158 skills, 18 top-level commands) must have an explicit brand loading step as Process step 1:
 
 ```markdown
 1. **Load brand context**: Read `~/.claude-marketing/brands/_active-brand.json` for the active slug, then load `~/.claude-marketing/brands/{slug}/profile.json`. Apply brand voice, compliance rules for target markets (`skills/context-engine/compliance-rules.md`), and industry context. If no brand exists, ask: "Set up a brand first (/digital-marketing-pro:brand-setup)?" — or proceed with defaults.
@@ -299,7 +294,7 @@ All GEO scripts must use these exact values. Do not create alternative scoring s
 - [ ] Scripts exit with code 0 (even on missing optional deps)
 - [ ] Brand context loading path is explicit in all command skills
 - [ ] No hardcoded file paths (use `~/.claude-marketing/` for data, `scripts/` for script calls)
-- [ ] File count hasn't changed unexpectedly (currently ~410 files including docs)
+- [ ] File count hasn't changed unexpectedly (currently ~530 files including docs)
 
 ## Code of Conduct
 

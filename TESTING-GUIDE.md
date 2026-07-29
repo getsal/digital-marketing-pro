@@ -1,4 +1,4 @@
-# Digital Marketing Pro Testing Guide — v3.15.0
+# Digital Marketing Pro Testing Guide — v3.17.0
 
 Complete testing guide for the Digital Marketing Pro plugin, including the v3.0 12-Part engagement methodology.
 
@@ -68,7 +68,7 @@ rm -rf ~/.claude-marketing/
 
 **Expected Results:**
 - [ ] Marketplace loads without errors
-- [ ] DM Pro listed with version 3.15.0
+- [ ] DM Pro listed with version 3.17.0
 - [ ] Description mentions "24 specialist agents, 18 commands, 158 skills"
 - [ ] Installation completes without rollback
 - [ ] No "Host key verification failed" error (uses HTTPS, not SSH)
@@ -123,7 +123,7 @@ DM Pro ships 18 top-level commands (all prefixed `/digital-marketing-pro:`). Thi
 
 **Expected:**
 - [ ] Brand profile created with voice, audience, competitors
-- [ ] Files saved to `~/.claude-marketing/TestBrand Alpha/`
+- [ ] Files saved to `~/.claude-marketing/brands/testbrand-alpha/`
 - [ ] Context engine loads brand for subsequent commands
 - [ ] Industry mapped correctly
 
@@ -208,7 +208,7 @@ DM Pro has 158 skills. Test a representative sample from each module.
 | Skill | Test Prompt | Key Checks |
 |-------|-------------|------------|
 | `/digital-marketing-pro:help` | (no args) | Shows getting started guide, commands by category, examples, troubleshooting |
-| `/digital-marketing-pro:integrations` | (no args) | Shows all 14 HTTP connectors + available connectors by category |
+| `/digital-marketing-pro:integrations` | (no args) | Shows the 10 registry-backed HTTP connectors + available connectors by category |
 | `/digital-marketing-pro:connect notion` | "Set up Notion" | Step-by-step OAuth instructions |
 | `/digital-marketing-pro:switch-brand` | "Switch to HealthFirst" | Brand context changes, subsequent commands use new brand |
 | `/digital-marketing-pro:context-engine` | "Load TestBrand Alpha" | Brand profile loaded, context confirmed |
@@ -367,7 +367,7 @@ DM Pro has ~86 Python scripts. Test key scripts that are critical to plugin oper
 | Script | Trigger | Test | Expected |
 |--------|---------|------|----------|
 | `setup.py` | manual / optional | `python scripts/setup.py --check-deps --summary` | Checks dependencies, prints summary, no errors |
-| `connector-status.py` | `/digital-marketing-pro:integrations` | Run integrations command | Lists 14 HTTP + available connectors by category |
+| `connector-status.py` | `/digital-marketing-pro:integrations` | Run integrations command | Lists 10 registry-backed HTTP + available connectors by category |
 | `campaign-tracker.py` | skill-invoked (e.g. sync-memory) | Save an insight | Session insights saved |
 | `guidelines-manager.py` | Brand compliance | Set up brand with guidelines | Rules stored and enforced |
 
@@ -387,7 +387,7 @@ DM Pro has ~86 Python scripts. Test key scripts that are critical to plugin oper
 | `content-scorer.py` | Score content quality | Multi-dimension scoring |
 | `brand-voice-scorer.py` | Score brand voice alignment | Voice deviation detection |
 | `headline-analyzer.py` | Analyze headline effectiveness | Emotional, power, uncommon word scores |
-| `keyword-clusterer.py` | Cluster keywords | Groups by intent and topic |
+| `keyword_cluster.py` | Cluster keywords | Groups by SERP overlap and intent |
 | `schema-generator.py` | Generate schema markup | Valid JSON-LD output |
 | `readability-analyzer.py` | Check readability grade | Flesch-Kincaid, grade level |
 
@@ -460,7 +460,7 @@ Users who *want* the former lifecycle behavior can copy `hooks/hooks-reference.e
 
 ## 8. MCP Connector Tests
 
-### 8.1 All 14 HTTP Connectors
+### 8.1 The 10 Registry-Backed HTTP Connectors (+ 4 catalog-only servers)
 
 | # | Connector | URL | Test Action | Expected |
 |---|-----------|-----|------------|----------|
@@ -479,7 +479,7 @@ Users who *want* the former lifecycle behavior can copy `hooks/hooks-reference.e
 | 13 | **Asana** | `mcp.asana.com/sse` | List tasks | Task list returned |
 | 14 | **Webflow** | `mcp.webflow.com/sse` | Publish content | Content appears in CMS |
 
-**Note:** Each connector requires OAuth authorization on first use. The Claude platform handles this. Not all testers will have accounts for all services.
+**Note:** Rows 1-5, 7-11 are the 10 registry-backed HTTP connectors (`scripts/_connector_registry.py`). Notion, Stripe, Asana, and Webflow (rows 6, 12-14) are catalog-only servers configured directly from `.mcp.json.connectors-reference` — they have no `/doctor` / `connector-status` support. Each connector requires OAuth authorization on first use. The Claude platform handles this. Not all testers will have accounts for all services.
 
 ### 8.2 Connector Categories
 
@@ -582,7 +582,7 @@ Run this after any changes to verify nothing is broken.
 ### Core Functionality
 
 - [ ] No auto-firing hook on session start (hooks ship empty); `python scripts/setup.py --check-deps` runs cleanly when invoked
-- [ ] Brand setup creates profile at `~/.claude-marketing/{brand}/`
+- [ ] Brand setup creates profile at `~/.claude-marketing/brands/{brand}/`
 - [ ] Context engine loads brand correctly
 - [ ] Brand switch works between profiles
 
@@ -600,7 +600,7 @@ Run this after any changes to verify nothing is broken.
 ### Skills
 
 - [ ] `/digital-marketing-pro:help` shows complete, accurate information
-- [ ] `/digital-marketing-pro:integrations` shows 14 HTTP connectors with correct status
+- [ ] `/digital-marketing-pro:integrations` shows the 10 registry-backed HTTP connectors with correct status
 - [ ] All 158 skills respond to invocation (spot check at minimum)
 - [ ] Skills handle missing connectors gracefully
 
@@ -622,15 +622,15 @@ Run this after any changes to verify nothing is broken.
 
 ### Versioning Consistency
 
-- [ ] `plugin.json` version = 3.15.0
+- [ ] `plugin.json` version = 3.17.0
 - [ ] `hooks/hooks.json` ships `{"hooks":{}}` (empty; no version string to sync)
-- [ ] `README.md` version = 3.15.0
-- [ ] Marketplace entry version for `digital-marketing-pro` = 3.15.0
+- [ ] `README.md` version = 3.17.0
+- [ ] Marketplace entry version for `digital-marketing-pro` = 3.17.0
 - [ ] `24 agents` in all descriptions
 - [ ] `158 skills` in all descriptions
 - [ ] `18 commands` in all descriptions
 - [ ] `~86 scripts` in all descriptions
-- [ ] `14 HTTP connectors` in all descriptions
+- [ ] `10 registry-backed HTTP connectors` (+ 4 catalog-only servers) in all descriptions
 
 ---
 

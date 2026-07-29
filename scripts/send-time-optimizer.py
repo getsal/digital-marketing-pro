@@ -16,7 +16,6 @@ import argparse
 import json
 import sys
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -297,7 +296,7 @@ def get_recommendations(industry, audience_type, tz_offset=None):
             "list demographics, geography, and content type. A/B test send "
             "times with your own audience for best results."
         ),
-        "data_last_updated": "2025-Q4",
+        "data_last_updated": "2025-Q4 (curated); re-verify against current platform data",
     }
 
 

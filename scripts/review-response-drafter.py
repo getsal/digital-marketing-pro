@@ -14,10 +14,8 @@ Usage:
 
 import argparse
 import json
-import re
 import sys
 import os
-import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
 
@@ -62,14 +60,6 @@ ESCALATION_TRIGGERS = {
         "racist", "racism", "sexist", "discrimination", "discriminated",
         "homophobic", "bigot", "harassment", "harassed",
     ],
-}
-
-PLATFORM_MAX_LENGTHS = {
-    "google": 4096,
-    "yelp": 5000,
-    "g2": 5000,
-    "capterra": 5000,
-    "trustpilot": 5000,
 }
 
 PLATFORM_WORD_RECOMMENDATIONS = {

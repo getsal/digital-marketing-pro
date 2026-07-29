@@ -4,6 +4,21 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.17.0] — 2026-07-29
+
+### Changed — The Line-by-Line Audit
+
+Every file in the repo (530 files, ~162K lines — all 158 skills, 24 agents, 18 commands, 86 scripts, tests, docs, manifests) was read end-to-end by a 16-reader audit fleet, cross-checked against primary-source July-2026 ground truth and against the code itself, then fixed by an 8-worker fix fleet with disjoint file ownership. ~250 corrections in ~150 files:
+
+- **Truth pass on the long tail.** Dead or retired products removed from live recommendations: Google Podcasts, Stitcher, Chartable/Podsights, Google Assistant Actions, Instagram Live Shopping/Guides, Starbucks Odyssey, Oracle BlueKai/MOAT/Contextual, Amazon Freevee, Netflix-via-Xandr, CareDash, HARO, giropay/SOFORT, Curalate, Hootsuite Insights, GARM (wound down), Zapier NLA, GSC legacy tools (robots.txt Tester, crawl-rate limiter, sitemap ping, International Targeting), FID, ZestMoney, JioCinema/Disney+ Hotstar (→ JioHotstar), E3, TrueView. Chrome third-party-cookie deprecation corrected to CANCELLED across 5 files; ePrivacy Regulation marked withdrawn (Feb 2025); COPPA amended rule (2025); LinkedIn Ad Library documented; WhatsApp per-message pricing aligned; Meta Special Ad Audiences removal noted; platform video limits updated (Shorts/Reels 3 min).
+- **EU compliance currency.** All remaining draft-guidance and pre-22-July language moved to final-Code, post-deadline state; Article 50 applicability (2 Aug 2026) called out at every disclosure decision point.
+- **Doc↔script contract repair.** Every documented flag, payload shape, storage path, threshold, and taxonomy now matches the code (validate-profile storage layout, approval-manager/quality-tracker/memory-manager/crm-sync/team-manager payloads, creative-health weights+risk levels, churn tiers, eval run-quick scope, --schema vs --custom-schema, connector counts 10 registry-backed + catalog-only extras, and more).
+- **Script hardening.** Trustworthy exit codes (revenue-forecaster, pdf-generator, gsc-ai-performance), atomic writes everywhere, storage split-brain fully closed (adaptive-scorer, eval-runner, eval-config-manager, brand-voice-scorer, journey-engine, narrative-mapper now on `_common`), real quality gates (keyword-cluster cannibalisation, calendar gap dedup), input sanitization (prompt-ab-tester), sentinel/zip/formula bugs fixed (intelligence-graph --min-confidence, audience-simulator Van Westendorp, ad-budget-pacer exhaustion math, growth-loop-modeler sustainability), embed-c2pa now stamps the live plugin version, eval-runner scores by actual content type, subset-safe registry sync, thread-splitter no longer drops words, Bluesky tag facets supported.
+- **Statistical integrity.** A/B and personalization sample-size tables regenerated from `sample-size-calculator.py` (previous tables were ~5× inflated); absolute-vs-relative MDE factor corrected (~200×, not 40×); test-velocity math fixed.
+- **Discoverability.** Reference-file indexes completed — context-engine now indexes all 56 reference docs (grouped), and 14 other skills list every reference file they ship.
+- **Self-containment, everywhere.** Guard test extended beyond skills/agents/commands to docs/, scripts/, and root docs (cross-promo and shared-registry infra allowlisted); remaining leaks in AGENTS.md, engagement-methodology, the C2PA cert guide, and output-publisher removed. Retired `competitor-intelligence` agent references renamed to `competitive-intel` across 6 skills.
+- Tests 208 → **209**; suite green.
+
 ## [3.16.0] — 2026-07-12
 
 ### Changed — July 2026 Market Refresh
@@ -17,6 +32,7 @@ All claims below verified against primary sources on 2026-07-12 (vendor docs, EU
 - **Google Ads API v25** (July 2026 major: legacy lifecycle-goal resources removed → unified `Goal`/`CampaignGoalConfig`; loyalty-retention goal; Shorts social metrics) documented with a deliberate-adoption note; v24.2 remains the stable target. **LinkedIn 202607** documented (auto Not-Interested CTA on Message Ads; `SHA256_IP_ADDRESS` in Conversions API).
 - **`gsc-ai-performance`**: report family now covers **Discover** generative surfaces; data backfilled from 18 May 2026; access expanded July 2026; API surface still unpublished.
 - **README rotation**: hero/cost/examples reference Opus-class models (measured on 4.8, Opus 5 current at the same price); What's-new intro reframed to the July 2026 state.
+- **Test suite 207 → 208** — new self-containment guard test locks the v3.15.1 rule (no cross-plugin capability references in the skill surface).
 
 ## [3.15.1] — 2026-07-12
 

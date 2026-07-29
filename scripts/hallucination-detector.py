@@ -40,8 +40,6 @@ import re
 import sys
 from pathlib import Path
 
-BRANDS_DIR = Path.home() / ".claude-marketing" / "brands"
-
 # ---------------------------------------------------------------------------
 # Detection patterns
 # ---------------------------------------------------------------------------
@@ -251,11 +249,15 @@ def check_urls(text, brand_domain=None):
     # Check inline placeholder patterns (e.g. [link], [URL])
     for pattern in PLACEHOLDER_TEXT_PATTERNS:
         for match in re.finditer(pattern, text, re.IGNORECASE):
+            context = text[max(0, match.start() - 40):match.end() + 40].strip()
+            # Placeholder in a CTA/link context is the worst case: the reader
+            # is being asked to act on a link that does not exist.
+            severity = "critical" if _is_in_headline_or_cta(context) else "high"
             flags.append({
                 "type": "placeholder_text",
                 "value": match.group(0),
-                "context": text[max(0, match.start() - 40):match.end() + 40].strip(),
-                "severity": "high",
+                "context": context,
+                "severity": severity,
                 "reason": "Placeholder text found that should be replaced with actual content.",
             })
 
@@ -271,11 +273,15 @@ def check_urls(text, brand_domain=None):
 
         for placeholder_pat in PLACEHOLDER_URL_PATTERNS:
             if re.search(placeholder_pat, url_lower):
+                context = text[max(0, match.start() - 40):match.end() + 40].strip()
+                # A placeholder URL inside a CTA/link context is critical:
+                # publishing it ships a broken call to action.
+                severity = "critical" if _is_in_headline_or_cta(context) else "high"
                 flags.append({
                     "type": "suspicious_url",
                     "value": url,
-                    "context": text[max(0, match.start() - 40):match.end() + 40].strip(),
-                    "severity": "high",
+                    "context": context,
+                    "severity": severity,
                     "reason": (
                         f"URL matches placeholder pattern. Replace with "
                         f"a real, verified link before publishing."

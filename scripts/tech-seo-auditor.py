@@ -16,11 +16,10 @@ Usage:
 
 import argparse
 import gzip
-import io
 import json
 import sys
 import time
-import ssl
+import zlib
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.request import Request, urlopen
@@ -84,19 +83,28 @@ class MetaParser(HTMLParser):
 # HTTP helpers
 # ---------------------------------------------------------------------------
 
-def _build_request(url, timeout):
+def _build_request(url):
     """Build a urllib Request with standard headers."""
-    return Request(url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip, br"})
+    return Request(url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"})
 
 
 def _decompress_body(body, headers):
     """Decompress gzip/deflate body if Content-Encoding indicates compression."""
     encoding = headers.get("content-encoding", "").lower()
-    if "gzip" in encoding or "deflate" in encoding:
+    if "gzip" in encoding:
         try:
             return gzip.decompress(body)
         except Exception:
             return body
+    if "deflate" in encoding:
+        try:
+            return zlib.decompress(body)
+        except Exception:
+            try:
+                # Some servers send raw deflate streams without zlib headers
+                return zlib.decompress(body, -zlib.MAX_WBITS)
+            except Exception:
+                return body
     return body
 
 
@@ -114,7 +122,7 @@ def follow_redirects(url, timeout):
             return current_url, None, hops, {}, b"", 0, "Redirect loop detected"
         visited.add(current_url)
 
-        req = _build_request(current_url, timeout)
+        req = _build_request(current_url)
         try:
             # Use a custom opener that does NOT auto-follow redirects
             import urllib.request as _ur
@@ -162,7 +170,6 @@ def follow_redirects(url, timeout):
 
 def fetch_url(url, timeout):
     """Fetch a URL with redirect tracking and return all audit data."""
-    req = _build_request(url, timeout)
     # First pass: follow redirects manually
     final_url, status, hops, headers, body, ttfb_ms, error = follow_redirects(url, timeout)
     if error and status is None:

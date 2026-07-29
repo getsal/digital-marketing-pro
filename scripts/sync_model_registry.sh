@@ -2,13 +2,18 @@
 # sync_model_registry.sh
 # ======================
 # Distributes the canonical Neelverse Marketing Suite model registry from this
-# repo (Digital Marketing Pro) to the sibling ContentForge / SocialForge repos.
+# repo (Digital Marketing Pro) to the sibling content-plugin repos.
 #
 # DMP's model_registry.json is the canonical superset: it carries every entry
-# ContentForge/SocialForge use PLUS a handful of marketing-suite-specific model
+# the sibling plugins use PLUS a handful of marketing-suite-specific model
 # families (deepseek / doubao / minimax / evolink / gpt-5.1 / gpt-5.2) that the
-# content plugins do not need. Running this script copies the canonical file
-# outward so the SHARED entries never drift between plugins.
+# content plugins do not need. Siblings deliberately keep a SUBSET registry,
+# so this script never copies the whole file. Instead it performs a surgical
+# by-id update: for each sibling it refreshes ONLY the entries whose ids
+# already exist in that sibling's registry, and always refreshes `aliases`
+# values for alias keys the sibling shares with the canonical file. Entries
+# and alias keys that exist only in the sibling are left untouched; canonical-
+# only entries are never added.
 #
 # This resolves the ghost referenced by model_registry.json's "$comment"
 # ("Update this file then run scripts/sync_model_registry.sh to distribute").
@@ -17,8 +22,8 @@
 # It is idempotent and skips any sibling repo that is not checked out.
 #
 # Usage:
-#   sh scripts/sync_model_registry.sh            # distribute to siblings
-#   sh scripts/sync_model_registry.sh --check    # report drift, copy nothing
+#   sh scripts/sync_model_registry.sh            # surgical update of siblings
+#   sh scripts/sync_model_registry.sh --check    # report drift in SHARED entries only, copy nothing
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -36,6 +41,12 @@ if [ ! -f "$SRC" ]; then
     exit 1
 fi
 
+PY=$(command -v python3 || command -v python || true)
+if [ -z "$PY" ]; then
+    echo "ERROR: python not found on PATH (needed for subset-safe merge)" >&2
+    exit 1
+fi
+
 status=0
 for sibling in contentforge socialforge; do
     dest="$PARENT/$sibling/scripts/model_registry.json"
@@ -43,17 +54,64 @@ for sibling in contentforge socialforge; do
         echo "SKIP  $sibling (not checked out at $dest)"
         continue
     fi
-    if cmp -s "$SRC" "$dest"; then
-        echo "OK    $sibling registry already in sync"
-        continue
-    fi
-    if [ "$CHECK_ONLY" -eq 1 ]; then
-        echo "DRIFT $sibling registry differs from canonical DMP copy"
-        status=1
-    else
-        cp "$SRC" "$dest"
-        echo "SYNC  copied canonical registry -> $sibling"
-    fi
+    result=$("$PY" - "$SRC" "$dest" "$CHECK_ONLY" <<'PYEOF'
+import json
+import sys
+
+src_path, dest_path, check_only = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
+
+with open(src_path, encoding="utf-8") as f:
+    src = json.load(f)
+with open(dest_path, encoding="utf-8") as f:
+    dest = json.load(f)
+
+# Surgical by-id update: refresh only entries whose ids already exist in the
+# sibling's (deliberately subset) registry.
+canon = {m.get("id"): m for m in src.get("models", [])}
+models_changed = 0
+dest_models = dest.get("models", [])
+for i, entry in enumerate(dest_models):
+    cid = entry.get("id")
+    if cid in canon and entry != canon[cid]:
+        dest_models[i] = canon[cid]
+        models_changed += 1
+
+# Always refresh shared alias keys; sibling-only alias keys stay untouched.
+src_aliases = src.get("aliases", {})
+dest_aliases = dest.get("aliases", {})
+aliases_changed = 0
+for key in dest_aliases:
+    if key in src_aliases and dest_aliases[key] != src_aliases[key]:
+        dest_aliases[key] = src_aliases[key]
+        aliases_changed += 1
+
+if models_changed + aliases_changed == 0:
+    print("in-sync")
+elif check_only:
+    print(f"drift models={models_changed} aliases={aliases_changed}")
+else:
+    with open(dest_path, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(dest, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    print(f"synced models={models_changed} aliases={aliases_changed}")
+PYEOF
+)
+    case "$result" in
+        in-sync)
+            echo "OK    $sibling shared entries already in sync"
+            ;;
+        drift*)
+            echo "DRIFT $sibling shared entries differ from canonical DMP copy ($result)"
+            status=1
+            ;;
+        synced*)
+            echo "SYNC  $sibling updated in place ($result)"
+            ;;
+        *)
+            echo "ERROR $sibling: unexpected merge output: $result" >&2
+            status=1
+            ;;
+    esac
 done
 
 exit $status

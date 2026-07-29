@@ -1,6 +1,6 @@
 # Claude Interface Compatibility Guide
 
-**Digital Marketing Pro v3.15.0**
+**Digital Marketing Pro v3.17.0**
 
 This plugin works in both **Claude Code** and **Claude Cowork** with full feature support. Some components also work in Claude Desktop (without Cowork) and Claude.ai Web, but with significant limitations. This guide is honest about what works where, what degrades, and what you lose entirely.
 

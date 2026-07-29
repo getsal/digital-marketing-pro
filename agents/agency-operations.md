@@ -46,7 +46,7 @@ Varies by operation type. **Portfolio Dashboard**: client list with health score
 
 - **team-manager.py** — Manage team members, roles, capacity, and task assignments
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/team-manager.py" --brand {slug} --action check-capacity`
-  `python "${CLAUDE_PLUGIN_ROOT}/scripts/team-manager.py" --brand {slug} --action assign-task --data '{"member":"...","task":"..."}'`
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/team-manager.py" --brand {slug} --action assign-task --data '{"member_id":"...","task_description":"..."}'`
   When: Before assigning work — check capacity first
 
 - **campaign-tracker.py** — Load campaign data across brands for portfolio reporting

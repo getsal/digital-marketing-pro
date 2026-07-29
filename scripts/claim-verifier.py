@@ -7,9 +7,10 @@ Cross-check marketing claims against user-provided evidence files.
 Extracts verifiable claims (statistics, percentages, specific numbers, awards,
 certifications) from marketing content, then fuzzy-matches them against an
 evidence file to classify each claim as verified, partially verified,
-unverified, or contradicted.
+unverified, evidence_unverified (matched an evidence item whose verified flag
+is false), or contradicted (numbers conflict with the evidence).
 
-Dependencies: stdlib only (json, re, sys, argparse, pathlib, difflib, math)
+Dependencies: stdlib only (json, re, sys, argparse, pathlib, difflib)
 
 Usage:
     python claim-verifier.py --action verify --text "50% increase in conversions" --evidence evidence.json
@@ -41,13 +42,10 @@ Scoring:
 
 import argparse
 import json
-import math
 import re
 import sys
 from difflib import SequenceMatcher
 from pathlib import Path
-
-BRANDS_DIR = Path.home() / ".claude-marketing" / "brands"
 
 # ---------------------------------------------------------------------------
 # Claim extraction patterns
@@ -226,6 +224,7 @@ def verify_claims(text, evidence_data):
                 "verified": 0,
                 "partially_verified": 0,
                 "unverified": 0,
+                "evidence_unverified": 0,
                 "contradicted": 0,
                 "total": 0,
             },
@@ -236,6 +235,7 @@ def verify_claims(text, evidence_data):
         "verified": 0,
         "partially_verified": 0,
         "unverified": 0,
+        "evidence_unverified": 0,
         "contradicted": 0,
         "total": len(claims),
     }
@@ -255,20 +255,18 @@ def verify_claims(text, evidence_data):
 
         # Classify the claim
         if best_score >= 0.6 and best_evidence is not None:
-            # Check for contradiction
+            # Check for contradiction (numeric conflict with the evidence)
             ev_claim = best_evidence.get("claim", "")
             ev_verified = best_evidence.get("verified", False)
-            is_contradicted = (
-                _numbers_contradict(claim_text, ev_claim)
-                or (not ev_verified and best_score >= 0.6)
-            )
 
-            if is_contradicted and _numbers_contradict(claim_text, ev_claim):
+            if _numbers_contradict(claim_text, ev_claim):
                 status = "contradicted"
                 summary["contradicted"] += 1
             elif not ev_verified:
-                status = "contradicted"
-                summary["contradicted"] += 1
+                # Evidence item matched but its verified flag is false —
+                # the claim rests on unverified evidence, not a contradiction.
+                status = "evidence_unverified"
+                summary["evidence_unverified"] += 1
             elif best_score >= 0.8:
                 status = "verified"
                 summary["verified"] += 1
