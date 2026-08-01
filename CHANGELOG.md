@@ -4,6 +4,12 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.17.1] - 2026-07-30
+
+### Fixed
+
+- **Model registry reconciled with current truth.** The canonical registry lagged the sibling ContentForge registry that was corrected in its July-29 audit: `latest-fast-openai` still pointed at `gpt-5.4-nano` (now `gpt-5.6-luna`), `latest-balanced-openai` at `gpt-5.4-mini` (now `gpt-5.6-terra`), and `latest-balanced-anthropic` at `claude-sonnet-4-6` (now `claude-sonnet-5`). The GPT-5.5/5.4 family moved `current` -> `supported` with `replacement_id`s targeting GPT-5.6 (GA 2026-07-09), and the `balanced-video` tier was added. Caught by this repo's own cross-registry drift tests — which is exactly what they exist for.
+- **Source-anonymity guard test added** (`tests/test_source_anonymity.py`). The rule that the methodology's source organization is never named anywhere in the repo was previously enforced only by hand; the guard scans every text file on every run, with the forbidden strings assembled at runtime so the test itself keeps the repo grep-clean. Verified to fire on a planted needle. Tests 209 -> **210**.
 ## [3.17.0] — 2026-07-29
 
 ### Changed — The Line-by-Line Audit
