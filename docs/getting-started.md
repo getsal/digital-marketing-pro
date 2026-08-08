@@ -1,6 +1,6 @@
 # Getting Started with Digital Marketing Pro
 
-**Version 3.17.0** | A plugin for Claude Code and Claude Cowork
+**Version 3.17.1** | A plugin for Claude Code and Claude Cowork
 
 Digital Marketing Pro transforms Claude into a marketing command center that knows your brand, understands your industry, and produces strategy and content that sounds like you wrote it. v3.0 adds a **12-Part Engagement Methodology** that orchestrates the plugin into a sequential workflow producing ~50–60 traceable files per engagement. This guide walks you through installation, brand setup, your first marketing task, and your first full engagement.
 
@@ -90,7 +90,7 @@ For full details on Cowork capabilities (document creation, visual review, app i
 After running either command, you should see output similar to this:
 
 ```
-Installing plugin: digital-marketing-pro v3.17.0
+Installing plugin: digital-marketing-pro v3.17.1
   - 16 marketing modules loaded
   - 158 skills + 18 top commands registered (/digital-marketing-pro:*)
   - 24 specialist agents available
@@ -351,6 +351,12 @@ Every response is automatically shaped by your brand profile. You never have to 
 ### SEO Execution
 
 Use `/digital-marketing-pro:seo-implement` to update meta tags, deploy schema, and create redirects directly on WordPress or Webflow. `/digital-marketing-pro:rank-monitor` sets up ongoing keyword tracking, and `/digital-marketing-pro:rank-monitor --features` monitors SERP features including AI Overviews (the former `serp-tracker` skill merged into it).
+
+For planning rather than execution: `/digital-marketing-pro:keyword-cluster` turns seed keywords into a pillar-and-spokes content plan with SERP-overlap clustering and an internal-link map, `/digital-marketing-pro:backlink-gap` finds domains linking to your competitors but not to you (ranked by a four-gate quality scorecard), and `/digital-marketing-pro:seo-drift` compares two snapshots and classifies what moved — growth, decline, reshuffle, new, or lost. If you have Search Console access, `/digital-marketing-pro:gsc-ai-performance` reads the AI Performance Report export so you can see AI Overviews and AI Mode impressions alongside classic search.
+
+### Checking what's actually wired up
+
+Not every action can run everywhere — some need credentials that only you can supply. `/digital-marketing-pro:doctor` reports, per action, what is live versus blocked in your current environment and gives a one-step setup hint for anything blocked. When you are ready to fire a real API call rather than review a plan, `/digital-marketing-pro:execute-action` does that: read operations run with `--execute`, write operations additionally require `--confirm`, and every execution is written to the audit trail.
 
 ### Competitor Monitoring
 
