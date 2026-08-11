@@ -69,7 +69,7 @@ rm -rf ~/.claude-marketing/
 **Expected Results:**
 - [ ] Marketplace loads without errors
 - [ ] DM Pro listed with version 3.17.0
-- [ ] Description mentions "24 specialist agents, 18 commands, 162 skills"
+- [ ] Description mentions "24 specialist agents, 18 commands, 163 skills"
 - [ ] Installation completes without rollback
 - [ ] No "Host key verification failed" error (uses HTTPS, not SSH)
 
@@ -95,7 +95,7 @@ rm -rf ~/.claude-marketing/
 - [ ] Plugin loads with NO auto-firing hook (hooks ship empty); optionally run `python scripts/setup.py --check-deps --summary` yourself
 - [ ] No Python errors or tracebacks
 - [ ] 18 top-level commands visible in the Customize panel (all prefixed `/digital-marketing-pro:`)
-- [ ] 162 skills visible in Skills section
+- [ ] 163 skills visible in Skills section
 - [ ] 24 agents registered (check for no frontmatter errors in logs)
 
 ### 2.4 Plugin Structure Verification
@@ -201,7 +201,7 @@ DM Pro ships 18 top-level commands (all prefixed `/digital-marketing-pro:`). Thi
 
 ## 4. Skill Tests
 
-DM Pro has 162 skills. Test a representative sample from each module.
+DM Pro has 163 skills. Test a representative sample from each module.
 
 ### Context & Setup Module
 
@@ -601,7 +601,7 @@ Run this after any changes to verify nothing is broken.
 
 - [ ] `/digital-marketing-pro:help` shows complete, accurate information
 - [ ] `/digital-marketing-pro:integrations` shows the 10 registry-backed HTTP connectors with correct status
-- [ ] All 162 skills respond to invocation (spot check at minimum)
+- [ ] All 163 skills respond to invocation (spot check at minimum)
 - [ ] Skills handle missing connectors gracefully
 
 ### Skill Platform Features
@@ -627,7 +627,7 @@ Run this after any changes to verify nothing is broken.
 - [ ] `README.md` version = 3.17.0
 - [ ] Marketplace entry version for `digital-marketing-pro` = 3.17.0
 - [ ] `24 agents` in all descriptions
-- [ ] `162 skills` in all descriptions
+- [ ] `163 skills` in all descriptions
 - [ ] `18 commands` in all descriptions
 - [ ] `~86 scripts` in all descriptions
 - [ ] `10 registry-backed HTTP connectors` (+ 4 catalog-only servers) in all descriptions

@@ -4,6 +4,45 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.19.0] - 2026-08-12
+
+Video discovery and packaging craft, extracted from the same 17-skill reference
+study as 3.18.0 — the YouTube-specific skills were initially set aside as
+"wrong surface", then quarried properly: the craft transfers even where the
+surface does not.
+
+### Added
+
+- **`/video-packaging`** (163rd skill) — generate or critique title +
+  thumbnail-text pairs under the pairing principle: the title carries context
+  and keywords (what the platform's systems read), the thumbnail text carries
+  the tension (what a human reacts to), and they never say the same thing —
+  any thumb word already in the title is rejected as wasted real estate,
+  checked word by word. Every package is tagged with its discovery intent
+  (search / browse / both), because the two are found differently and reward
+  different structures. Critique mode gives PASS/FIX/FAIL on an existing
+  video's packaging with three fixed pairs — the "strong content nobody
+  clicks" entry point a channel audit produces. Packaging never outpromises
+  the video; titles pass the same claims gate as any other copy.
+
+### Changed
+
+- **`/video-script`**: declares discovery intent before structure (a video
+  with no search or browse logic has no discovery reason — the topic goes back
+  to development rather than into production); long-form body sections carry
+  the payoff rule (no section ends on setup — that is where viewers leave);
+  the output gains **retention notes** naming the 2-3 likely drop points and
+  the hold at each; the thumbnail step adopts the pairing rule and tightens
+  overlay text to 1-3 words.
+- **`/content-repurpose`**: gains the standalone test — every derivative piece
+  works for someone who will never see the source, with its own hook and
+  payoff. Not every section of a source is repurposable; what fails the test
+  is cut and listed, and the cut list ships as evidence the filter ran. The
+  10+ pieces target no longer overrides quality — eight strong beat twelve
+  where four are filler.
+
+---
+
 ## [3.18.0] - 2026-08-12
 
 Four skills (158 → 162) closing a shared gap: DMP could execute any marketing
