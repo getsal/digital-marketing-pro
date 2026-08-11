@@ -4,6 +4,42 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.18.0] - 2026-08-12
+
+Four skills (158 → 162) closing a shared gap: DMP could execute any marketing
+plan but had nothing that filtered work against the objective, and nothing that
+turned lived experience or raw industry material into brand-safe content
+angles. Patterns extracted from a study of 17 third-party creator skills —
+taken as reference, reimplemented fresh against DMP's brand-profile and
+compliance machinery, nothing copied.
+
+### Added
+
+- **`/goal-filter`** — locks ONE primary goal per brand
+  (`goal-lock.json` in the brand workspace) and judges any idea, draft, or
+  plan against it: ON GOAL / PARTIAL / OFF GOAL, always with the fix or the
+  sharper version, never just a grade. Verdict history is kept and patterns
+  are named across checks — three OFF verdicts in a week is a drift, not three
+  ideas. Inside a 12-Part engagement it locks Part 1's primary objective
+  rather than inventing a parallel one.
+- **`/story-mine`** — a real experience in, 3-5 distinct content angles out
+  (the lesson, the contrarian take, the framework, the proof, the relatable
+  moment), each with format, pillar, and a draft opening that leads with the
+  interesting part. `--client-safe` anonymisation defaults ON for client
+  stories; fabricating story details is banned outright; a strong proof angle
+  routes to case-study-plan.
+- **`/signal-mine`** — a raw dump of news, threads, competitor moves, or call
+  notes in; only the angles the brand has *standing* to make out, each mapped
+  to a pillar with a timeliness window. The dropped list always ships, with
+  reasons — authority beats relevance, and pasted claims stay unverified until
+  routed through verify-claims.
+- **`/lead-magnet-ideas`** — topic or campaign in, specific lead-magnet ideas
+  out, each cut from IP the brand already owns and graded on **lead-gen power
+  × build effort** with reasons. Every idea names what it qualifies the lead
+  for; power-C × effort-C ideas are flagged as not worth building.
+
+---
+
 ## [3.17.1] - 2026-07-30
 
 ### Fixed

@@ -1,6 +1,6 @@
 # Getting Started with Digital Marketing Pro
 
-**Version 3.17.1** | A plugin for Claude Code and Claude Cowork
+**Version 3.18.0** | A plugin for Claude Code and Claude Cowork
 
 Digital Marketing Pro transforms Claude into a marketing command center that knows your brand, understands your industry, and produces strategy and content that sounds like you wrote it. v3.0 adds a **12-Part Engagement Methodology** that orchestrates the plugin into a sequential workflow producing ~50–60 traceable files per engagement. This guide walks you through installation, brand setup, your first marketing task, and your first full engagement.
 
@@ -90,9 +90,9 @@ For full details on Cowork capabilities (document creation, visual review, app i
 After running either command, you should see output similar to this:
 
 ```
-Installing plugin: digital-marketing-pro v3.17.1
+Installing plugin: digital-marketing-pro v3.18.0
   - 16 marketing modules loaded
-  - 158 skills + 18 top commands registered (/digital-marketing-pro:*)
+  - 162 skills + 18 top commands registered (/digital-marketing-pro:*)
   - 24 specialist agents available
   - 10 HTTP connectors + a 68-server opt-in catalog available
   - Hooks ship empty (opt-in SessionStart/PreToolUse/SessionEnd reference config in hooks/hooks-reference.example.json)
@@ -575,7 +575,7 @@ printed                  (just ask for things)        session
 
 ## 9. Python Dependencies (Optional)
 
-Digital Marketing Pro is designed to work at full capability without Python. All 24 specialist agents, 18 top-level commands, and 158 skills function using the plugin's built-in reference knowledge (169 reference files). Python adds bonus scoring and automation features (and the engagement-state, dm-status, auto-save-insight, and eval scripts that power the v3.0 methodology + v3.2 quality gates — install Python if you plan to use the engagement workflow or the /digital-marketing-pro:check + /digital-marketing-pro:status commands).
+Digital Marketing Pro is designed to work at full capability without Python. All 24 specialist agents, 18 top-level commands, and 162 skills function using the plugin's built-in reference knowledge (169 reference files). Python adds bonus scoring and automation features (and the engagement-state, dm-status, auto-save-insight, and eval scripts that power the v3.0 methodology + v3.2 quality gates — install Python if you plan to use the engagement workflow or the /digital-marketing-pro:check + /digital-marketing-pro:status commands).
 
 ### Three dependency modes
 
@@ -591,7 +591,7 @@ This is what you get out of the box. No setup required.
 
 You have access to:
 - All 16 marketing modules with 169 reference knowledge files (including the v3.0 methodology references)
-- All 158 skills + 18 top-level `/digital-marketing-pro:` commands (including the v3.0 engagement workflow)
+- All 162 skills + 18 top-level `/digital-marketing-pro:` commands (including the v3.0 engagement workflow)
 - All 24 specialist agents
 - Brand profiling and campaign tracking (session hooks are opt-in — see the Session Lifecycle section)
 - Industry benchmarks, compliance rules, and platform specifications
@@ -691,7 +691,7 @@ To check platform-level integrations: Open Claude Desktop → Settings → Integ
 
 ## 11. Available Commands
 
-Digital Marketing Pro provides 158 skills + 18 top-level commands, all prefixed with `/digital-marketing-pro:`. You can type these directly in your Claude Code session.
+Digital Marketing Pro provides 162 skills + 18 top-level commands, all prefixed with `/digital-marketing-pro:`. You can type these directly in your Claude Code session.
 
 ### Pre-Publish Quality + Status (v3.2)
 
@@ -875,7 +875,7 @@ Slash commands are useful for structured, templated outputs. But you can also ju
 "I need to respond to negative reviews on Google"
 ```
 
-The plugin's skills will activate based on the intent of your request, whether or not you use a slash command. The 158 skills + 18 top commands simply give you a direct shortcut to a specific workflow.
+The plugin's skills will activate based on the intent of your request, whether or not you use a slash command. The 162 skills + 18 top commands simply give you a direct shortcut to a specific workflow.
 
 ---
 
@@ -901,7 +901,7 @@ You are set up and ready to go. Here are some resources for when you want to go 
 
 - **KPI-driven strategy** --- Learn how to set up marketing KPI frameworks, build reporting dashboards, and track campaign performance over time in [docs/strategy-and-kpis.md](strategy-and-kpis.md).
 
-- **Understanding the architecture** --- For a technical deep dive into how the 158 skills, 24 agents, context engine, hook system, and v3.0 methodology layer work together, see [docs/architecture.md](architecture.md).
+- **Understanding the architecture** --- For a technical deep dive into how the 162 skills, 24 agents, context engine, hook system, and v3.0 methodology layer work together, see [docs/architecture.md](architecture.md).
 
 - **Using Cowork** --- If you are using Claude Cowork (or considering it), see [docs/claude-interfaces.md](claude-interfaces.md) for Cowork-specific capabilities like document creation, visual page review, and a comparison with other marketing plugins.
 
