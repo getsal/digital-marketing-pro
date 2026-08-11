@@ -16,7 +16,7 @@ The user must provide (or will be prompted for):
 
 - **Product/service**: What is being advertised
 - **Platform(s)**: Google Ads, Meta (Facebook/Instagram), LinkedIn, TikTok, X, Pinterest
-- **Ad format**: RSA, single image, carousel, video script, story, etc.
+- **Ad format**: RSA, single image, carousel, video script, story, etc. For video ad scripts (6s bumper, 15s skippable, 30s spot, UGC-style), route to /digital-marketing-pro:video-script — its step 2.4 carries the per-format structural rules (the 5-second skip deadline, one-message bumpers, native-style disclosure) and its output passes the /check gate. This skill owns the copy layer around the video: headlines, descriptions, and CTAs.
 - **Campaign objective**: Awareness, traffic, leads, conversions, app installs
 - **Target audience**: Who the ads are for
 - **Key offer/CTA**: Promotion, value prop, or desired action

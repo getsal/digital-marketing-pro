@@ -4,6 +4,40 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.20.0] - 2026-08-12
+
+Video ad scripting, campaign linkage, and the unified quality gate — video
+scripts were a standalone content skill with no connection to the campaign
+machinery or to /check, and no ad-format craft at all.
+
+### Changed
+
+- **`/video-script` step 2.4 — organic or ad, and campaign context first.**
+  Organic content earns its audience; ads buy theirs, so the craft is what
+  happens inside a paid, often skippable slot. Campaign scripts read the
+  campaign brief from the brand workspace so they inherit the objective,
+  funnel stage, audience, and offer instead of inventing parallel ones — a
+  mid-funnel retargeting ad and a cold-audience awareness ad are different
+  scripts for the same product, and the campaign brief decides which this is.
+  Per-format structural rules: **6s bumper** — one message, no arc, brand by
+  second 2, two messages means two bumpers; **15s skippable** — the skip
+  button at 5s is the real deadline, hook and core message land before it, and
+  a script that saves its point for second 9 was a 5-second logo exposure for
+  most of its audience; **30s spot** — one front-loaded arc, pay off early and
+  again late; **UGC-style** — native-feeling is a style, not a disclosure
+  exemption (FTC/ASA rules apply in full).
+- **`/video-script` step 11 — the unified gate.** Every finished script's
+  narration and on-screen text routes through /digital-marketing-pro:check,
+  the same hallucination + brand-voice + claims gate every other deliverable
+  passes. For ad scripts it is non-negotiable: paid distribution multiplies
+  whatever the script gets wrong, and platforms adjudicate claims complaints
+  against the advertiser.
+- **`/ad-creative`** routes video ad scripts to video-script's format rules
+  and keeps ownership of the copy layer around the video — headlines,
+  descriptions, CTAs.
+
+---
+
 ## [3.19.0] - 2026-08-12
 
 Video discovery and packaging craft, extracted from the same 17-skill reference
