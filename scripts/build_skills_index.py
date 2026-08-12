@@ -83,7 +83,12 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 
 def analyze_skill(skill_dir: Path, skill_names: set[str]) -> dict:
     files = sorted(skill_dir.rglob("*.md"))
-    all_text = "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in files)
+    # Normalize line endings before measuring: git converts LF<->CRLF per
+    # checkout config, so on-disk sizes differ between a dev clone and an
+    # installed copy of the SAME commit. The contract must not care.
+    texts = [f.read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n")
+             for f in files]
+    all_text = "\n".join(texts)
     skill_md = skill_dir / "SKILL.md"
     front = parse_frontmatter(
         skill_md.read_text(encoding="utf-8", errors="replace")) if skill_md.exists() else {}
@@ -111,7 +116,7 @@ def analyze_skill(skill_dir: Path, skill_names: set[str]) -> dict:
         "gates": gates,
         "cross_refs": cross,
         "doc_files": len(files),
-        "bytes": sum(f.stat().st_size for f in files),
+        "bytes": sum(len(t.encode("utf-8")) for t in texts),
     }
 
 

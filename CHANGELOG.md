@@ -4,6 +4,22 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.21.1] - 2026-08-12
+
+Patch caught by the ship ritual's verify-from-installed-copy step, minutes
+after 3.21.0.
+
+### Fixed
+
+- **`build_skills_index.py` measured environment, not content.** The index's
+  per-skill `bytes` came from on-disk file size, which git's LF↔CRLF
+  conversion changes per checkout — so `--check` reported DRIFT on an
+  installed copy of the very commit that generated the index. Byte counts are
+  now computed from newline-normalized text; the depth contract compares
+  content, never checkout configuration.
+
+---
+
 ## [3.21.0] - 2026-08-12
 
 The Flagship Contract — three invisible risks made visible and machine-enforced:
