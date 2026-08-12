@@ -91,9 +91,10 @@ Structure email outputs as: Email Type (campaign, automation, transactional), Su
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/spam-score-checker.py" --content "email body text" --subject "Subject line"`
   When: Before finalizing any email — assess deliverability risk from spam signals
 
-- **send-time-optimizer.py** — Suggest candidate send windows from a static industry heuristic
+- **send-time-optimizer.py** — Send windows via the measurement ladder: ESP per-recipient STO above all, then first-party send log, then a dated population baseline
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/send-time-optimizer.py" --industry saas --audience-type b2b --history sends.json`
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/send-time-optimizer.py" --industry saas --audience-type b2b`
-  When: Designing email sequences — treat the output as a static, industry-level heuristic (a fixed best-times table, ~2024-era), NOT a data-driven prediction. Always condition the final recommendation on the brand's own historical engagement data and add a folklore disclaimer ("industry heuristic — validate against your own open/click-by-hour data; universal 'best send times' are largely folklore").
+  When: Designing email sequences. If the connected ESP offers per-recipient send-time optimization, recommend THAT over any global window (the output's `sto_note` carries the doctrine and current lift range). Otherwise prefer `--history` (the list's send log — ranked by measured open rate with sample sizes). The baseline path is stamped, capped at medium, and refuses when stale; treat its windows as A/B starting points judged on clicks/conversions, not opens alone.
 
 ## MCP Integrations
 

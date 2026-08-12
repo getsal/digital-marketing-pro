@@ -1,19 +1,51 @@
 #!/usr/bin/env python3
-"""Recommend optimal social media posting times by platform, industry, and audience.
+"""Recommend social posting times — the brand's own data first, dated population
+baselines second, never a timeless table.
 
-Combines platform-specific engagement benchmarks with industry modifiers and
-audience type filters to produce ranked posting-time recommendations with
-confidence levels, rationale, and avoidance windows.
+THE LADDER
+----------
+1. FIRST-PARTY (--history): the brand's own posts with timestamps and
+   engagement. Population averages describe everyone's audience, which is no
+   one's audience; only the brand's history can earn "high" confidence. The
+   aggregation is honest statistics: minimum sample sizes per bucket, sample
+   counts in the output, and a refusal to rank buckets it cannot support.
+2. SHIPPED BASELINE: curated population windows, stamped with BASELINE_AS_OF
+   and capped at MEDIUM confidence (a population average can never be high-
+   confidence for a specific audience). The stamp AGES: past 180 days every
+   output carries a re-verify warning; past 540 days the baseline REFUSES
+   (exit 3) and instructs a live refresh or --history. A timing table that
+   cannot expire is a 2024 opinion wearing a 2026 date.
+
+WHY TIMING STILL MATTERS (2026): every major feed uses recency as a ranking
+signal — engagement in the first 30-60 minutes seeds wider distribution — but
+interest-ranked feeds (TikTok especially) have made WHAT you post dominate
+WHEN you post it. Baseline windows are test starting points, not answers.
 
 Usage:
     python posting-time-analyzer.py --platform instagram
     python posting-time-analyzer.py --platform linkedin --industry saas --audience-type b2b
-    python posting-time-analyzer.py --platform tiktok --industry ecommerce --audience-type b2c
+    python posting-time-analyzer.py --platform instagram --history posts.json
+      history format: [{"posted_at": "2026-07-03T11:20:00", "engagement": 412}, ...]
+      (engagement = likes+comments+shares+saves, or any consistent metric)
 """
 
 import argparse
 import json
 import sys
+from collections import defaultdict
+from datetime import date, datetime
+from pathlib import Path
+
+# Population baselines below were last re-verified against current published
+# platform-engagement studies on this date. The suite fails when it ages out.
+BASELINE_AS_OF = "2026-08-12"
+BASELINE_WARN_DAYS = 180
+BASELINE_STALE_DAYS = 540
+
+# First-party statistical floors — below these the script says so rather than
+# dressing noise up as insight.
+MIN_TOTAL_POSTS = 30
+MIN_BUCKET_POSTS = 5
 
 # ---------------------------------------------------------------------------
 # Benchmark data: platform -> audience_type -> ranked time slots
@@ -32,7 +64,7 @@ PLATFORM_BENCHMARKS = {
             {"day": "Friday", "time": "11:00-13:00", "rationale": "Pre-weekend scrolling", "confidence": "medium"},
         ],
         "mixed": [
-            {"day": "Wednesday", "time": "11:00-13:00", "rationale": "Peak engagement across all audiences", "confidence": "high"},
+            {"day": "Wednesday", "time": "07:00-09:00", "rationale": "Early-morning velocity window — engagement in the first hour seeds distribution (2026 published data)", "confidence": "high"},
             {"day": "Tuesday", "time": "10:00-12:00", "rationale": "Strong weekday reach", "confidence": "high"},
             {"day": "Saturday", "time": "10:00-12:00", "rationale": "Weekend discovery window", "confidence": "medium"},
         ],
@@ -78,14 +110,14 @@ PLATFORM_BENCHMARKS = {
             {"day": "Wednesday", "time": "14:00-17:00", "rationale": "Mid-week engagement for educational content", "confidence": "medium"},
         ],
         "b2c": [
-            {"day": "Thursday", "time": "19:00-21:00", "rationale": "Prime evening scroll time", "confidence": "high"},
-            {"day": "Friday", "time": "17:00-19:00", "rationale": "After-work entertainment browsing", "confidence": "high"},
-            {"day": "Saturday", "time": "11:00-14:00", "rationale": "Weekend binge-scroll window", "confidence": "high"},
+            {"day": "Thursday", "time": "14:00-18:00", "rationale": "Weekday afternoon peak in 2026 published data", "confidence": "high"},
+            {"day": "Friday", "time": "15:00-18:00", "rationale": "Pre-weekend afternoon scroll window", "confidence": "high"},
+            {"day": "Saturday", "time": "11:00-14:00", "rationale": "Weekend binge-scroll window", "confidence": "medium"},
         ],
         "mixed": [
-            {"day": "Thursday", "time": "18:00-21:00", "rationale": "Evening peak across all demographics", "confidence": "high"},
-            {"day": "Friday", "time": "17:00-19:00", "rationale": "Start-of-weekend entertainment window", "confidence": "high"},
-            {"day": "Tuesday", "time": "10:00-12:00", "rationale": "Daytime discovery for diverse content", "confidence": "medium"},
+            {"day": "Thursday", "time": "14:00-18:00", "rationale": "Afternoon peak across demographics (2026 published data)", "confidence": "high"},
+            {"day": "Friday", "time": "15:00-18:00", "rationale": "Start-of-weekend afternoon window", "confidence": "high"},
+            {"day": "Tuesday", "time": "14:00-16:00", "rationale": "Weekday afternoon discovery", "confidence": "medium"},
         ],
     },
     "facebook": {
@@ -217,6 +249,118 @@ INDUSTRY_MODIFIERS = {
 
 
 # ---------------------------------------------------------------------------
+# 2026 platform timing mechanics — WHY a window works, so the advice survives
+# the next algorithm shift better than a bare table would.
+# ---------------------------------------------------------------------------
+
+ALGORITHM_NOTES = {
+    "tiktok": "Least time-sensitive major platform: the For You feed is interest-ranked and distributes content over days. Timing affects the initial velocity push only — content strength dominates.",
+    "instagram": "Ranking rewards engagement velocity in the first 30-60 minutes; posting when your audience is active seeds that velocity. Reels distribute over multiple days.",
+    "facebook": "Interest-ranked feed with multi-day distribution; timing mainly affects the initial engagement seed.",
+    "youtube": "Recommendation-driven; upload time matters mostly for subscriber-notification velocity in the first hours.",
+    "linkedin": "Recency carries more weight than on entertainment feeds; professional-hours posting retains genuine timing leverage.",
+    "twitter": "The most chronological major surface; timing retains the most leverage here.",
+    "pinterest": "Search-and-save driven; pins surface for months, making posting time the weakest lever of any platform.",
+    "threads": "Interest-ranked feed similar to Instagram; early velocity matters, exact hour less so.",
+}
+
+GLOBAL_TIMING_NOTE = (
+    "Population windows are TEST STARTING POINTS, not answers. Every feed uses "
+    "recency to seed early distribution, but your audience's rhythm is learnable "
+    "only from your own history — run 4-6 weeks of varied-time posting, then "
+    "re-run this script with --history.")
+
+BASELINE_CONFIDENCE_CEILING = (
+    "medium — a population average can never be high-confidence for a specific "
+    "audience; 'high' is reachable only via --history (first-party data).")
+
+
+def baseline_age_days(as_of=None):
+    d = datetime.strptime(as_of or BASELINE_AS_OF, "%Y-%m-%d").date()
+    return (date.today() - d).days
+
+
+def baseline_status(as_of=None):
+    """fresh | aging | stale for the shipped baseline tables."""
+    age = baseline_age_days(as_of)
+    if age > BASELINE_STALE_DAYS:
+        return "stale", age
+    if age > BASELINE_WARN_DAYS:
+        return "aging", age
+    return "fresh", age
+
+
+# ---------------------------------------------------------------------------
+# First-party analysis — the only path to "high" confidence
+# ---------------------------------------------------------------------------
+
+DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+             "Saturday", "Sunday"]
+
+
+def _hour_block(hour):
+    start = (hour // 3) * 3
+    return f"{start:02d}:00-{start + 3:02d}:00"
+
+
+def analyze_history(entries):
+    """Aggregate the brand's own posts into ranked day x 3-hour windows.
+
+    Refuses to rank what it cannot support: needs MIN_TOTAL_POSTS overall and
+    MIN_BUCKET_POSTS per bucket before a bucket may appear in the ranking.
+    Returns (payload, ok). ok=False payloads explain the shortfall instead of
+    dressing noise up as insight."""
+    parsed = []
+    for e in entries:
+        try:
+            ts = datetime.fromisoformat(str(e["posted_at"]).replace("Z", "+00:00"))
+            parsed.append((ts, float(e["engagement"])))
+        except (KeyError, ValueError, TypeError):
+            continue
+    if len(parsed) < MIN_TOTAL_POSTS:
+        return ({"first_party_insufficient":
+                 f"{len(parsed)} usable posts < {MIN_TOTAL_POSTS} minimum — "
+                 "keep posting at varied times and re-run; falling back to the "
+                 "population baseline."}, False)
+
+    buckets = defaultdict(list)
+    for ts, eng in parsed:
+        buckets[(ts.weekday(), _hour_block(ts.hour))].append(eng)
+
+    ranked = []
+    thin = 0
+    for (weekday, block), values in buckets.items():
+        if len(values) < MIN_BUCKET_POSTS:
+            thin += 1
+            continue
+        n = len(values)
+        confidence = "high" if n >= 15 else ("medium" if n >= 8 else "low")
+        ranked.append({
+            "day": DAY_NAMES[weekday],
+            "time_window": block,
+            "avg_engagement": round(sum(values) / n, 2),
+            "sample_size": n,
+            "confidence": confidence,
+        })
+    if not ranked:
+        return ({"first_party_insufficient":
+                 f"no day/time bucket reaches {MIN_BUCKET_POSTS} posts — "
+                 "history is too scattered to rank; falling back to the "
+                 "population baseline."}, False)
+
+    ranked.sort(key=lambda r: -r["avg_engagement"])
+    for i, r in enumerate(ranked):
+        r["rank"] = i + 1
+    return ({
+        "recommendations": ranked[:5],
+        "total_posts_analyzed": len(parsed),
+        "buckets_below_minimum": thin,
+        "note": "Ranked from THIS brand's engagement history — re-run monthly; "
+                "audience rhythms drift with platform changes and follower growth.",
+    }, True)
+
+
+# ---------------------------------------------------------------------------
 # Analysis
 # ---------------------------------------------------------------------------
 
@@ -291,26 +435,81 @@ def main():
         dest="audience_type",
         help="Audience type (default: mixed)",
     )
+    parser.add_argument(
+        "--history",
+        help="Path to a JSON file of the brand's own posts "
+             '([{"posted_at": ISO-8601, "engagement": number}, ...]) — '
+             "first-party data outranks every population baseline",
+    )
     args = parser.parse_args()
-
-    recommendations = build_recommendations(args.platform, args.audience_type, args.industry)
-    avoid_times = build_avoid_times(args.platform, args.industry)
-    industry_note = INDUSTRY_MODIFIERS[args.industry]["note"]
 
     output = {
         "platform": args.platform,
         "industry": args.industry,
         "audience_type": args.audience_type,
-        "recommendations": recommendations,
-        "industry_notes": industry_note,
-        "avoid_times": avoid_times,
-        "methodology_note": "Based on aggregated engagement data from industry benchmarks",
-        "data_last_updated": "2026-Q1 (curated); re-verify against current platform data",
+        "algorithm_note": ALGORITHM_NOTES.get(args.platform, ""),
+        "timing_note": GLOBAL_TIMING_NOTE,
     }
+
+    # ── Rung 1: the brand's own data ────────────────────────────────
+    if args.history:
+        path = Path(args.history)
+        if not path.exists():
+            print(json.dumps({"error": f"history file not found: {args.history}"}))
+            return 1
+        try:
+            entries = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            print(json.dumps({"error": f"history file is not valid JSON: {exc}"}))
+            return 1
+        fp, ok = analyze_history(entries)
+        if ok:
+            output.update(fp)
+            output["basis"] = "first-party"
+            json.dump(output, sys.stdout, indent=2)
+            print()
+            return 0
+        output.update(fp)  # carries first_party_insufficient explanation
+
+    # ── Rung 2: dated population baseline ───────────────────────────
+    status, age = baseline_status()
+    if status == "stale":
+        output.update({
+            "basis": "refused",
+            "error": (
+                f"Population baseline is {age} days old (as of {BASELINE_AS_OF}) "
+                "— refusing to recommend from it. Refresh the tables against "
+                "current published platform-engagement studies, or pass the "
+                "brand's own data via --history (which never goes stale)."),
+        })
+        json.dump(output, sys.stdout, indent=2)
+        print()
+        return 3
+
+    recommendations = build_recommendations(args.platform, args.audience_type, args.industry)
+    for rec in recommendations:
+        # Table values keep their RELATIVE ordering signal; absolute confidence
+        # is capped — population data cannot be "high" for a specific audience.
+        rec["relative_strength"] = rec.pop("confidence")
+
+    output.update({
+        "basis": "population-baseline",
+        "baseline_as_of": BASELINE_AS_OF,
+        "baseline_age_days": age,
+        "confidence_ceiling": BASELINE_CONFIDENCE_CEILING,
+        "recommendations": recommendations,
+        "industry_notes": INDUSTRY_MODIFIERS[args.industry]["note"],
+        "avoid_times": build_avoid_times(args.platform, args.industry),
+    })
+    if status == "aging":
+        output["warning"] = (
+            f"Baseline is {age} days old — re-verify against current published "
+            "platform data before building a posting schedule on it.")
 
     json.dump(output, sys.stdout, indent=2)
     print()
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

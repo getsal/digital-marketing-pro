@@ -740,7 +740,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 877388
+      "bytes": 877700
     },
     {
       "name": "continuous-improvement-loop",
@@ -2184,7 +2184,7 @@
     {
       "name": "schedule-social",
       "tier": "E",
-      "description": "Schedule social posts to Twitter/X, Instagram, LinkedIn, TikTok, YouTube, and Pinterest through connected platform MCPs — generating per-platform copy variations, hashtag mixes, media-spec validation, UTM-tagged links, and heuristic posting-time suggestions, then verifying each queued post and updating the content calendar. Nothing goes live without the mandatory execution gate: a full scheduling summary you must explicitly approve first. Triggers on \\\"/digital-marketing-pro:schedule-social\\\", \\\"schedule this post for Monday\\\", \\\"publish this across our social channels\\\", \\\"queue the launch announcement on LinkedIn and X\\\", \\\"post this everywhere at the best times\\\". Reads the brand profile, guidelines, and platform publishing specs.",
+      "description": "Schedule social posts to Twitter/X, Instagram, LinkedIn, TikTok, YouTube, and Pinterest through connected platform MCPs — generating per-platform copy variations, hashtag mixes, media-spec validation, UTM-tagged links, and posting-time analysis (the brand's own engagement history first, dated population baselines second), then verifying each queued post and updating the content calendar. Nothing goes live without the mandatory execution gate: a full scheduling summary you must explicitly approve first. Triggers on \\\"/digital-marketing-pro:schedule-social\\\", \\\"schedule this post for Monday\\\", \\\"publish this across our social channels\\\", \\\"queue the launch announcement on LinkedIn and X\\\", \\\"post this everywhere at the best times\\\". Reads the brand profile, guidelines, and platform publishing specs.",
       "scripts": [
         "approval-manager.py",
         "posting-time-analyzer.py"
@@ -2195,7 +2195,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 13131
+      "bytes": 13501
     },
     {
       "name": "search-knowledge",
@@ -2245,7 +2245,7 @@
         "brand-setup"
       ],
       "doc_files": 1,
-      "bytes": 12159
+      "bytes": 12387
     },
     {
       "name": "send-notification",

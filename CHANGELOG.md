@@ -4,6 +4,56 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.24.0] - 2026-08-12
+
+The timing ladder — the last "shipped table pretending to be timeless" in the
+plugin. posting-time-analyzer and send-time-optimizer were static best-times
+lookup tables: population averages describing everyone's audience (which is no
+one's audience), with no path to the brand's own data and no expiry.
+
+### Changed
+
+- **Both timing scripts rebuilt on the measurement ladder.**
+  - **Rung 1 — first-party (`--history`)**: the brand's own post/send log,
+    aggregated into ranked day × hour-block windows with honest statistics —
+    minimum sample floors (30 posts / 12 sends overall, 5 / 3 per bucket),
+    sample sizes in every recommendation, and an explicit refusal to rank what
+    the data cannot support. First-party is the ONLY path to "high" confidence.
+  - **Rung 2 — dated population baseline**: the curated tables remain as test
+    starting points, stamped `baseline_as_of` (re-verified against current
+    published studies 2026-08-12), with absolute confidence renamed
+    `relative_strength` and capped at medium — a population average can never
+    be high-confidence for a specific audience. The stamp AGES: >180 days
+    warns in every output; >540 days the baseline REFUSES (exit 3) and
+    instructs a live refresh or `--history`.
+  - **2026 mechanics in every output**: per-platform `algorithm_note` (feeds
+    use recency to seed early velocity, but interest-ranked distribution means
+    content strength dominates timing — TikTok least time-sensitive, X/Twitter
+    most); email outputs always carry the STO doctrine — per-recipient
+    send-time optimization from the connected ESP outperforms ANY global
+    window (current reports: 5-15% open-rate lift); A/B segment windows 4-6
+    weeks, then layer STO.
+  - Baseline rows that current published data clearly moved were refreshed
+    (TikTok's evening windows → weekday-afternoon; Instagram gains the
+    early-morning velocity window).
+- **Consumers updated to the ladder**: schedule-social and send-email-campaign
+  steps, social-media-manager and email-specialist tool entries,
+  execution-workflows, team-roles-framework — which was also documenting
+  `--brand/--region` flags the script never had (doc↔script contract bug,
+  fixed to the real interface).
+
+### Added
+
+- **`tests/test_timing_ladder.py`** (12): first-party finds a synthetic
+  engagement peak and reports sample sizes; thin history falls back WITH the
+  explanation attached; baseline outputs carry stamp + ceiling +
+  relative_strength (never absolute confidence); every platform has an
+  algorithm note; STO doctrine always present; timezone adjustment regression;
+  and self-aging release gates that fail the suite when a shipped baseline
+  stamp exceeds its window. Suite: 269 → 281.
+
+---
+
 ## [3.23.0] - 2026-08-12
 
 Translation goes capability-first — the last hardcoded-vendor surface in the

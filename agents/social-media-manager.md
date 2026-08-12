@@ -85,9 +85,10 @@ Structure social media outputs as: Platform (with format type), Content (formatt
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/hashtag-analyzer.py" --hashtags '["marketing","digitalmarketing","seo"]' --platform instagram`
   When: Before publishing social posts — validate hashtag count, quality, and platform compliance
 
-- **posting-time-analyzer.py** — Suggest candidate posting windows from a static heuristic
+- **posting-time-analyzer.py** — Posting windows via the measurement ladder: first-party history, then a dated population baseline
+  `python "${CLAUDE_PLUGIN_ROOT}/scripts/posting-time-analyzer.py" --platform instagram --history posts.json`
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/posting-time-analyzer.py" --platform instagram --industry saas --audience-type b2b`
-  When: Building content calendars — treat the output as a static, industry-level heuristic (a fixed best-times table), NOT a data-driven prediction. Condition the final recommendation on the brand's OWN engagement-by-hour data and add a folklore disclaimer ("industry heuristic — 'universal best times to post' are largely folklore; validate against your own audience's engagement data").
+  When: Building content calendars. ALWAYS prefer `--history` (the brand's post-level engagement export) — it is the only path to high confidence and returns sample sizes. The baseline path is stamped (`baseline_as_of`), capped at medium, refuses when stale, and ships an `algorithm_note` per platform — surface it: on interest-ranked feeds, content strength dominates timing, and population windows are test starting points.
 
 - **calendar-validator.py** — Validate content calendar structure
   `python "${CLAUDE_PLUGIN_ROOT}/scripts/calendar-validator.py" --calendar '[{"date":"2026-03-01","platform":"instagram","content_type":"reel","topic":"Product launch"}]'`

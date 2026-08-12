@@ -1,23 +1,150 @@
 #!/usr/bin/env python3
-"""Recommend optimal email send times based on industry benchmarks.
+"""Recommend email send times — the list's own history first, dated population
+baselines second, and the ESP's per-recipient optimization above both.
 
-Uses built-in lookup tables covering 10 industries and 3 audience types
-(B2B, B2C, mixed) to recommend the top 3 send windows. Supports timezone
-offset adjustment from the EST base. Each recommendation includes the day,
-time window, rationale, and confidence level.
+THE LADDER
+----------
+0. ESP SEND-TIME OPTIMIZATION: if the connected email platform offers
+   per-recipient STO, it outperforms ANY global window (current platform
+   reports: 5-15% open-rate lift) — every output says so. Global windows are
+   for platforms without STO, first sends to new lists, and A/B baselines.
+1. FIRST-PARTY (--history): the brand's own send log with opens. Only the
+   list's measured behavior can earn "high" confidence. Honest statistics:
+   minimum send counts per bucket, sample sizes in the output, refusal to
+   rank what the data cannot support.
+2. SHIPPED BASELINE: curated population windows, stamped with BASELINE_AS_OF,
+   capped at MEDIUM confidence, aging out (warn >180d, REFUSE >540d, exit 3).
 
 Usage:
     python send-time-optimizer.py --industry saas --audience-type b2b
     python send-time-optimizer.py --industry ecommerce --audience-type b2c --timezone "+0"
-    python send-time-optimizer.py --industry healthcare --audience-type mixed --timezone "-5"
+    python send-time-optimizer.py --industry saas --audience-type b2b --history sends.json
+      history format: [{"sent_at": ISO-8601, "opens": N, "recipients": N}, ...]
+      (clicks accepted in place of opens via "clicks"; recipients optional)
 """
 
 import argparse
 import json
 import sys
 import os
+from collections import defaultdict
+from datetime import date, datetime
+from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common  # noqa: E402
+
+# Population baselines below were last re-verified against current published
+# email-engagement studies on this date. The suite fails when it ages out.
+BASELINE_AS_OF = "2026-08-12"
+BASELINE_WARN_DAYS = 180
+BASELINE_STALE_DAYS = 540
+
+MIN_TOTAL_SENDS = 12
+MIN_BUCKET_SENDS = 3
+
+STO_NOTE = (
+    "If the connected email platform offers per-recipient send-time "
+    "optimization, use it ABOVE any global window here — per-recipient timing "
+    "currently reports 5-15% open-rate lift over batch windows. The doctrine: "
+    "A/B test segment-level windows for 4-6 weeks (judge on clicks/conversions, "
+    "not opens alone), then layer the ESP's STO for individual timing.")
+
+BASELINE_CONFIDENCE_CEILING = (
+    "medium — a population average can never be high-confidence for a specific "
+    "list; 'high' is reachable only via --history (the list's own send log).")
+
+
+def baseline_age_days(as_of=None):
+    d = datetime.strptime(as_of or BASELINE_AS_OF, "%Y-%m-%d").date()
+    return (date.today() - d).days
+
+
+def baseline_status(as_of=None):
+    """fresh | aging | stale for the shipped baseline tables."""
+    age = baseline_age_days(as_of)
+    if age > BASELINE_STALE_DAYS:
+        return "stale", age
+    if age > BASELINE_WARN_DAYS:
+        return "aging", age
+    return "fresh", age
+
+
+DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+             "Saturday", "Sunday"]
+
+
+def _hour_block(hour):
+    start = (hour // 2) * 2
+    return f"{start:02d}:00-{start + 2:02d}:00"
+
+
+def analyze_history(entries):
+    """Aggregate the list's own sends into ranked day x 2-hour windows by open
+    rate (or click rate when opens are absent). Returns (payload, ok)."""
+    parsed = []
+    for e in entries:
+        try:
+            ts = datetime.fromisoformat(str(e["sent_at"]).replace("Z", "+00:00"))
+            responses = float(e.get("opens", e.get("clicks")))
+            recipients = float(e.get("recipients", 0)) or None
+            parsed.append((ts, responses, recipients))
+        except (KeyError, ValueError, TypeError):
+            continue
+    if len(parsed) < MIN_TOTAL_SENDS:
+        return ({"first_party_insufficient":
+                 f"{len(parsed)} usable sends < {MIN_TOTAL_SENDS} minimum — "
+                 "keep varying send times and re-run; falling back to the "
+                 "population baseline."}, False)
+
+    buckets = defaultdict(lambda: {"responses": 0.0, "recipients": 0.0,
+                                   "sends": 0, "rates": []})
+    for ts, responses, recipients in parsed:
+        b = buckets[(ts.weekday(), _hour_block(ts.hour))]
+        b["sends"] += 1
+        if recipients:
+            b["responses"] += responses
+            b["recipients"] += recipients
+            b["rates"].append(responses / recipients)
+        else:
+            b["rates"].append(responses)
+
+    ranked = []
+    thin = 0
+    for (weekday, block), b in buckets.items():
+        if b["sends"] < MIN_BUCKET_SENDS:
+            thin += 1
+            continue
+        if b["recipients"]:
+            metric = round(b["responses"] / b["recipients"], 4)
+            metric_name = "open_rate"
+        else:
+            metric = round(sum(b["rates"]) / len(b["rates"]), 2)
+            metric_name = "avg_responses"
+        n = b["sends"]
+        confidence = "high" if n >= 8 else ("medium" if n >= 5 else "low")
+        ranked.append({
+            "day": DAY_NAMES[weekday],
+            "time_window": block,
+            metric_name: metric,
+            "sample_size": n,
+            "confidence": confidence,
+        })
+    if not ranked:
+        return ({"first_party_insufficient":
+                 f"no day/time bucket reaches {MIN_BUCKET_SENDS} sends — "
+                 "send log is too scattered to rank; falling back to the "
+                 "population baseline."}, False)
+
+    ranked.sort(key=lambda r: -(r.get("open_rate") or r.get("avg_responses") or 0))
+    for i, r in enumerate(ranked):
+        r["rank"] = i + 1
+    return ({
+        "recommendations": ranked[:5],
+        "total_sends_analyzed": len(parsed),
+        "buckets_below_minimum": thin,
+        "note": "Ranked from THIS list's send log — re-run quarterly; list "
+                "composition and inbox behavior drift.",
+    }, True)
 
 # ---------------------------------------------------------------------------
 # Benchmark data: industry -> audience_type -> top 3 send windows
@@ -271,7 +398,9 @@ def get_recommendations(industry, audience_type, tz_offset=None):
         sign = "+" if tz_offset >= 0 else ""
         timezone_label = f"EST {sign}{tz_offset}h (adjusted)"
 
-    # Build final output with rank
+    # Build final output with rank. Table values keep their RELATIVE ordering
+    # signal; absolute confidence is capped — population data cannot be "high"
+    # for a specific list.
     formatted = []
     for i, rec in enumerate(recs, 1):
         entry = {
@@ -279,24 +408,28 @@ def get_recommendations(industry, audience_type, tz_offset=None):
             "day": rec["day"],
             "time_window": rec["time_window"],
             "rationale": rec["rationale"],
-            "confidence": rec["confidence"],
+            "relative_strength": rec["confidence"],
         }
         if "day_note" in rec:
             entry["day_note"] = rec["day_note"]
         formatted.append(entry)
 
+    age = baseline_age_days()
     return {
         "industry": industry,
         "audience_type": audience_type,
         "timezone": timezone_label,
+        "basis": "population-baseline",
+        "baseline_as_of": BASELINE_AS_OF,
+        "baseline_age_days": age,
+        "confidence_ceiling": BASELINE_CONFIDENCE_CEILING,
+        "sto_note": STO_NOTE,
         "recommendations": formatted,
         "methodology_note": (
-            "Recommendations are based on aggregated industry benchmarks "
-            "from email marketing platforms. Actual optimal times vary by "
-            "list demographics, geography, and content type. A/B test send "
-            "times with your own audience for best results."
+            "Population windows from aggregated email-platform studies. "
+            "Actual optimal times vary by list demographics, geography, and "
+            "content type — these are A/B starting points, not answers."
         ),
-        "data_last_updated": "2025-Q4 (curated); re-verify against current platform data",
     }
 
 
@@ -322,7 +455,49 @@ def main():
         "--timezone", default=None,
         help='Timezone offset from EST base (e.g., "+5", "-3", "0")',
     )
+    parser.add_argument(
+        "--history",
+        help="Path to a JSON file of the list's own send log "
+             '([{"sent_at": ISO-8601, "opens": N, "recipients": N}, ...]) — '
+             "first-party data outranks every population baseline",
+    )
     args = parser.parse_args()
+
+    # ── Rung 1: the list's own send log ─────────────────────────────
+    if args.history:
+        path = Path(args.history)
+        if not path.exists():
+            _common.finish({"error": f"history file not found: {args.history}"})
+            sys.exit(1)
+        try:
+            entries = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            _common.finish({"error": f"history file is not valid JSON: {exc}"})
+            sys.exit(1)
+        fp, ok = analyze_history(entries)
+        if ok:
+            fp.update({"basis": "first-party", "sto_note": STO_NOTE,
+                       "industry": args.industry,
+                       "audience_type": args.audience_type})
+            _common.finish(fp)
+            return
+        # fall through to baseline, carrying the explanation
+        insufficiency = fp
+    else:
+        insufficiency = None
+
+    # ── Rung 2: dated population baseline (refuses when stale) ──────
+    status, age = baseline_status()
+    if status == "stale":
+        _common.finish({
+            "basis": "refused",
+            "error": (
+                f"Population baseline is {age} days old (as of {BASELINE_AS_OF}) "
+                "— refusing to recommend from it. Refresh the tables against "
+                "current published email-engagement studies, or pass the list's "
+                "own send log via --history (which never goes stale)."),
+        })
+        sys.exit(3)
 
     # Parse timezone offset
     tz_offset = None
@@ -342,6 +517,13 @@ def main():
     if "error" in result:
         _common.finish(result)
         sys.exit(1)
+
+    if insufficiency:
+        result.update(insufficiency)
+    if status == "aging":
+        result["warning"] = (
+            f"Baseline is {age} days old — re-verify against current published "
+            "email-engagement data before building a send calendar on it.")
 
     _common.finish(result)
 
