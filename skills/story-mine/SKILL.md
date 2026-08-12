@@ -1,6 +1,6 @@
 ---
 name: story-mine
-description: "Turn a real experience — a client win, a failed launch, a support ticket, a founder moment — into 3-5 distinct content angles, each with a format and a draft opening. Use when: something just happened worth telling, a case study feels too small for a full write-up, or lived experience needs to become publishable content. Triggers on \"/story-mine\", \"mine this story\", \"what content is in this\", \"we just had a client win\", \"turn this experience into content\", \"is there a post in this\"."
+description: "Turn a real experience — a client win, failed launch, support ticket, founder moment — into 3-5 distinct content angles from a five-type taxonomy (lesson, contrarian take, framework, proof, relatable moment), each with format, pillar, and a draft opening in brand voice, plus an honest list of angles the story does not support. Triggers on \"/digital-marketing-pro:story-mine\", \"mine this story\", \"we just had a client win\", \"is there a post in this\", \"turn this experience into content\". Client stories anonymise by default (--client-safe); reads the brand profile for voice, pillars, and compliance; angles route to /digital-marketing-pro:content-engine for drafting and strong proof angles to /digital-marketing-pro:case-study-plan."
 argument-hint: "[brand-name] [--story <what happened>] [--client-safe]"
 user-invocable: true
 ---

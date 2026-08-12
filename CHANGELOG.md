@@ -4,6 +4,45 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.22.0] - 2026-08-12
+
+The Routing Layer — all 163 skill descriptions rewritten to the trigger-dense
+house pattern, because for a model-invoked skill the frontmatter description
+IS the routing layer: it is the only thing the model reads when deciding
+whether a skill applies, and 163 skills with one-line descriptions meant wrong
+routing, not just thin docs.
+
+### Changed
+
+- **Every skill description (163/163) rewritten**: states what the skill does
+  and produces, then "Triggers on" with ≥4 quoted phrases a user would
+  actually type (the `/digital-marketing-pro:<name>` slash alias always
+  first), then what it reads or pairs with. Median length grew from a
+  one-liner to ~720 characters of routing signal.
+- **The rewrite doubled as an honesty audit.** Every description was written
+  against the full SKILL.md, and capabilities the file does not deliver were
+  deliberately NOT claimed — each agent-pass reported its refusals. Real
+  overclaims caught in the OLD descriptions: campaign-orchestrator advertised
+  "launching, managing" (it plans only); client-proposal advertised an SLA
+  document (the file has a terms outline); lead-magnet-ideas' alias was not
+  namespaced. Plan-only skills now say so ("it publishes nothing", "it sends
+  nothing"); every approval-gated execution skill names its gate in the
+  description; heuristic scripts are called heuristics (posting-time and
+  send-time suggestions are static heuristics, not engagement-learned).
+- **language-config description** no longer bakes in the four translation
+  vendor names (body enum unchanged pending the localization-cluster
+  vendor-neutrality rework, tracked as the next open item).
+
+### Added
+
+- **`tests/test_description_density.py`** — the guard that keeps the routing
+  layer dense: single-line double-quoted descriptions, ≥300 and ≤900 chars,
+  "Triggers on" + ≥4 quoted phrases + the namespaced slash alias per skill,
+  and a median floor (≥350) so the surface cannot slide back toward
+  one-liners one lazy rewrite at a time. Suite: 248 → 253.
+
+---
+
 ## [3.21.1] - 2026-08-12
 
 Patch caught by the ship ritual's verify-from-installed-copy step, minutes

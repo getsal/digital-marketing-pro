@@ -1,6 +1,6 @@
 ---
 name: signal-mine
-description: "Turn a raw dump of external material — news articles, social threads, community discussions, competitor moves, research, sales-call notes — into content angles mapped to the brand's pillars, with what didn't map listed and why. Use when: the user pastes industry material and asks what to do with it, a trend needs a brand-relevant take, or research needs converting into a content plan. Triggers on \"/signal-mine\", \"mine this\", \"what content is in here\", \"turn this into content ideas\", \"here's what's happening in the industry\", \"any angles in this\"."
+description: "Triage a raw dump of external material — news, social threads, community discussions, competitor moves, sales-call notes — into content angles the brand has authority to make, each mapped to a pillar with a format and timeliness window, plus an explicit dropped-signals list recording why the rest were rejected. Triggers on \"/digital-marketing-pro:signal-mine\", \"mine this\", \"what content is in here\", \"turn this industry news into ideas\", \"any angles for us in this thread\". Requires the brand profile (pillars, audience, competitors) and stops without one; unverified claims route to /digital-marketing-pro:verify-claims before anything cites them; surviving angles feed /digital-marketing-pro:content-engine."
 argument-hint: "[brand-name] [--signals <pasted material>]"
 user-invocable: true
 ---

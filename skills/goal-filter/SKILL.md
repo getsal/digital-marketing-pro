@@ -1,6 +1,6 @@
 ---
 name: goal-filter
-description: "Lock ONE primary marketing goal per brand, then judge any idea, draft, campaign, or plan against it — on-goal, partially, or off — with the fix that would make it pull harder. Use when: setting the quarter's focus, gut-checking whether work serves the objective, a shiny new idea appears mid-quarter, or reviewing a content plan before committing budget. Triggers on \"/goal-filter\", \"is this on goal\", \"goal check\", \"lock the goal\", \"keep me focused\", \"does this serve the objective\", \"what's our priority\"."
+description: "Lock ONE primary marketing goal per brand, then judge any idea, draft, campaign, or plan against it — ON GOAL, PARTIAL, or OFF — always returning the fix or a sharper version that pulls harder toward the metric, and naming drift patterns across the verdict history. Triggers on \"/digital-marketing-pro:goal-filter\", \"is this on goal\", \"lock the goal for this quarter\", \"does this serve the objective\", \"keep me focused\", \"what's our priority\". Stores the lock in the brand workspace (goal-lock.json) so every session reads the same goal; inside a 12-Part engagement it offers to lock Part 1's primary objective rather than inventing a parallel one."
 argument-hint: "[brand-name] [--set \"goal, metric, deadline\"] [--check <idea/draft/plan>] [--status]"
 user-invocable: true
 ---
