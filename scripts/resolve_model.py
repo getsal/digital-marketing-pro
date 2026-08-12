@@ -176,6 +176,59 @@ def registry_age_days() -> int | None:
     return (date.today() - d).days
 
 
+EXECUTION_AGE_WARN_DAYS = 7
+
+
+def resolve_for_execution(alias_or_id: str) -> tuple[dict[str, Any], int]:
+    """Resolution that carries its own provenance — the execution ladder.
+
+    A bare model id looks identical whether the registry was reviewed yesterday
+    or abandoned a year ago; this is how registries rot invisibly. This
+    resolver never returns a bare id: the payload always states the BASIS
+    (shipped-registry) and the registry's age, attaches a warning once the
+    registry is older than EXECUTION_AGE_WARN_DAYS, and REFUSES (exit 3) for
+    unknown inputs instead of letting a caller fall back to a memorized
+    literal. Callers about to make a hard commitment (spend, client
+    deliverable, published claim about a model) should treat the warning as an
+    instruction to live-verify first: refresh_models.py against provider APIs,
+    or the agent's own web tools.
+
+    Returns (payload, exit_code): 0 resolved, 3 unresolved.
+    """
+    ladder = (
+        f"{alias_or_id!r} is not in the registry. Do NOT guess a literal id. "
+        "Ladder: (1) live-check provider catalogs — refresh_models.py or the "
+        "agent's own web tools; (2) if the model is real, add it to "
+        "model_registry.json with status + as-of and re-resolve; (3) if it "
+        "cannot be verified, refuse and say what was tried."
+    )
+    try:
+        model_id = resolve(alias_or_id)
+    except (KeyError, ValueError) as exc:
+        return ({"input": alias_or_id, "status": "unresolved",
+                 "error": str(exc), "action_required": ladder}, 3)
+    reg = get_registry()
+    age = registry_age_days()
+    payload: dict[str, Any] = {
+        "input": alias_or_id,
+        "model_id": model_id,
+        "basis": "shipped-registry",
+        "registry_last_updated": reg.get("last_updated"),
+        "registry_age_days": age,
+    }
+    status, replacement = check(model_id)
+    payload["model_status"] = status
+    if replacement:
+        payload["replacement_id"] = replacement
+    if age is None or age > EXECUTION_AGE_WARN_DAYS:
+        payload["warning"] = (
+            f"Registry is {'undated' if age is None else f'{age} days old'} — "
+            "resolution reflects the last review, not today's provider catalog. "
+            "Live-verify (refresh_models.py or web lookup) before hard "
+            "commitments; a launch since the last review would be invisible here.")
+    return (payload, 0)
+
+
 def _print(obj: Any, as_json: bool) -> None:
     if as_json:
         print(json.dumps(obj, indent=2, ensure_ascii=False))
@@ -284,6 +337,9 @@ def main() -> int:
     group.add_argument("--registry-age", action="store_true", help="Print days since last_updated")
     group.add_argument("--registry-path", action="store_true", help="Print path to the loaded registry file")
     group.add_argument("--aliases", action="store_true", help="Print all aliases and their resolutions")
+    group.add_argument("--for-execution", metavar="ALIAS",
+                       help="Resolve with provenance attached: JSON carrying basis, registry age, "
+                            "and a staleness warning. Exits 3 (never guesses) for unknown input.")
     group.add_argument("--check-params", metavar="PATH",
                        help="Scan a Python file for calls that pass temperature/top_p/top_k alongside a Claude Opus 4.7+ target. Exits 1 if any unsafe call is found.")
 
@@ -353,6 +409,11 @@ def main() -> int:
                 for alias, target in aliases.items():
                     print(f"{alias:42s}  ->  {target}")
             return 0
+
+        if args.for_execution:
+            payload, code = resolve_for_execution(args.for_execution)
+            print(json.dumps(payload, indent=2))
+            return code
 
         if args.check_params:
             return _cmd_check_params(args.check_params, as_json=args.json)

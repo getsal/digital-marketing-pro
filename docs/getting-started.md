@@ -1,6 +1,6 @@
 # Getting Started with Digital Marketing Pro
 
-**Version 3.20.0** | A plugin for Claude Code and Claude Cowork
+**Version 3.21.0** | A plugin for Claude Code and Claude Cowork
 
 Digital Marketing Pro transforms Claude into a marketing command center that knows your brand, understands your industry, and produces strategy and content that sounds like you wrote it. v3.0 adds a **12-Part Engagement Methodology** that orchestrates the plugin into a sequential workflow producing ~50–60 traceable files per engagement. This guide walks you through installation, brand setup, your first marketing task, and your first full engagement.
 
@@ -90,7 +90,7 @@ For full details on Cowork capabilities (document creation, visual review, app i
 After running either command, you should see output similar to this:
 
 ```
-Installing plugin: digital-marketing-pro v3.20.0
+Installing plugin: digital-marketing-pro v3.21.0
   - 16 marketing modules loaded
   - 163 skills + 18 top commands registered (/digital-marketing-pro:*)
   - 24 specialist agents available

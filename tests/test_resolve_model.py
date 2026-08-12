@@ -152,5 +152,45 @@ class TestListFilter(unittest.TestCase):
             self.assertEqual(m["status"], "deprecated")
 
 
+class TestExecutionLadder(unittest.TestCase):
+    """resolve_for_execution never returns a bare id — provenance travels with
+    every resolution, and unknown input refuses instead of guessing."""
+
+    def test_known_alias_carries_provenance(self):
+        payload, code = resolve_model.resolve_for_execution("latest-balanced-anthropic")
+        self.assertEqual(code, 0)
+        self.assertEqual(payload["basis"], "shipped-registry")
+        self.assertIn("registry_age_days", payload)
+        self.assertIn("registry_last_updated", payload)
+        self.assertTrue(payload["model_id"].startswith("claude-"))
+
+    def test_unknown_input_refuses_with_ladder(self):
+        payload, code = resolve_model.resolve_for_execution("latest-imaginary-vendor")
+        self.assertEqual(code, 3)
+        self.assertEqual(payload["status"], "unresolved")
+        self.assertIn("Do NOT guess", payload["action_required"])
+        self.assertNotIn("model_id", payload)
+
+    def test_aged_registry_attaches_warning(self):
+        from unittest import mock
+        with mock.patch.object(resolve_model, "registry_age_days", return_value=45):
+            payload, code = resolve_model.resolve_for_execution("latest-balanced-anthropic")
+        self.assertEqual(code, 0)
+        self.assertIn("45 days old", payload["warning"])
+        self.assertIn("Live-verify", payload["warning"])
+
+    def test_fresh_registry_has_no_warning(self):
+        from unittest import mock
+        with mock.patch.object(resolve_model, "registry_age_days", return_value=2):
+            payload, _ = resolve_model.resolve_for_execution("latest-balanced-anthropic")
+        self.assertNotIn("warning", payload)
+
+    def test_undated_registry_warns(self):
+        from unittest import mock
+        with mock.patch.object(resolve_model, "registry_age_days", return_value=None):
+            payload, _ = resolve_model.resolve_for_execution("latest-balanced-anthropic")
+        self.assertIn("undated", payload["warning"])
+
+
 if __name__ == "__main__":
     unittest.main()
