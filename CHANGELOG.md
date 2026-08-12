@@ -4,6 +4,61 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.23.0] - 2026-08-12
+
+Translation goes capability-first — the last hardcoded-vendor surface in the
+plugin, verified in code (not from notes) and reworked. The localization
+cluster shipped a four-vendor routing table ("Indic → product A, European →
+product B") plus a closed enum in language-config: a bet on the 2026 vendor
+landscape baked into a plugin that runs at arbitrary future dates.
+
+### Changed
+
+- **`language-router.py --action route` rebuilt.** The route result names a
+  CAPABILITY KIND per language family (translation.indic / .european / .cjk /
+  .semitic / .sea / .general) with selection criteria — native script-aware
+  models, formality registers, segmentation, RTL integrity — and resolves a
+  concrete service only at run time: the brand's recorded
+  `translation_preferences` first (free-form, honored even for servers no
+  shipped list knows), then translation-capable MCP servers discovered live in
+  `.mcp.json` (one candidate → resolved; several → judged against the
+  criteria). Nothing connected → `basis: unresolved` plus a resolution ladder:
+  the harness's own multilingual capability with mandatory scoring, tools the
+  user already has, or ask-and-record. Every payload carries `basis`. Detection
+  and scoring are untouched.
+- **`language-config`**: `set-translation-pref` accepts any server-name slug —
+  the closed four-vendor enum is gone; unknown-but-recorded preferences warn
+  instead of being rejected.
+- **`translate-content` / `localize-campaign`**: execution steps rewritten
+  around the resolved service's capabilities (register control, glossaries,
+  script handling) with the harness-translation path as a legitimate,
+  score-gated route — vendor-specific step instructions removed.
+- **`localization-specialist` agent**: routes capability-first; judges
+  connected candidates against criteria; never instructs installing a
+  commercial product.
+- **`multilingual-execution-guide`**: the vendor comparison table (whose rate
+  limits and prices rot like all shipped market facts) replaced by a
+  capability checklist and per-family requirements; routing tree redrawn as
+  the resolution ladder; Indic guidance reframed as what an Indic specialist
+  must provide. `india-market-context` and `docs/architecture.md` aligned.
+- Deliberately unchanged: the connector CATALOG (CONNECTORS.md, registry
+  tables, per-connector setup in docs/) — enabling connectors the USER chose
+  is the "already-connected tools" rung of the ladder, not an endorsement.
+
+### Added
+
+- **`tests/test_language_router.py`** (10): resolution ladder, free-form
+  preference ("my-own-translator" resolves — unknown ≠ unusable), candidate
+  handling, missing-preference warning, no vendor names inside the capability
+  profiles, detection/scoring regression pins.
+- **`tests/test_vendor_neutrality.py`** (6): no commercial translation vendor
+  named on the skills/agents instruction surface (catalog exemptions by name),
+  no sign-up/install instructions, the language-config enum pinned free-form,
+  and the router's unresolved payload verified vendor-free. Plant-checked.
+  Suite: 253 → 269.
+
+---
+
 ## [3.22.0] - 2026-08-12
 
 The Routing Layer — all 163 skill descriptions rewritten to the trigger-dense

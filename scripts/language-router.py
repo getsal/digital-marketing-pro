@@ -7,10 +7,19 @@ multilingual quality scoring.
 
 Detects languages from text using Unicode script analysis and common word
 frequency matching (stdlib only, no external APIs). Routes source/target
-language pairs to the best translation service (Sarvam AI, DeepL, Google
-Cloud Translation, Lara Translate). Scores translated content across length
-ratio, formatting preservation, key-term consistency, and placeholder
-integrity dimensions.
+language pairs to a translation CAPABILITY — never to a hardcoded product:
+the route action names what the language family needs from a translation
+service, then resolves an actual service at RUN TIME from (1) the brand's
+recorded preference, (2) translation MCP servers the user has already
+connected, or (3) refuses to name one and hands back the resolution ladder
+(the harness's own multilingual capability, scored by this script's
+`score` action, is always available as the floor). Also scores translated
+content across length ratio, formatting preservation, key-term consistency,
+and placeholder integrity dimensions.
+
+WHY: a routing table that says "family X → product Y" is a bet on the
+2026 vendor landscape shipped inside a plugin that runs at arbitrary future
+dates. Capability criteria age well; product endorsements do not.
 
 Dependencies: none (stdlib only)
 
@@ -18,6 +27,7 @@ Usage:
     python language-router.py --action detect --text "यह एक हिंदी वाक्य है"
     python language-router.py --action detect --file content.txt
     python language-router.py --action route --source en --target hi
+    python language-router.py --action route --source en --target de --brand acme
     python language-router.py --action score --original "Hello world" --translated "Bonjour le monde" --source en --target fr
     python language-router.py --action score --original "Hi {{name}}" --translated "Hola {{name}}" --source en --target es --do-not-translate "BrandX,TagLine"
     python language-router.py --action supported-languages
@@ -230,38 +240,69 @@ CJK_CODES = {"ja", "ko", "zh"}
 SEMITIC_CODES = {"ar", "he", "fa"}
 SEA_CODES = {"th", "vi", "id", "ms"}
 
-ROUTING_RULES = {
+# What each language family NEEDS from a translation service. These are
+# selection CRITERIA, not product names: the agent judges whichever services
+# are actually available against them. Criteria age well; endorsements don't.
+FAMILY_CAPABILITY_PROFILES = {
     "indic": {
-        "primary": "sarvam-ai",
-        "fallbacks": ["google-cloud-translation", "lara-translate"],
-        "notes": "Sarvam AI specializes in 22 Indic languages with native quality",
+        "capability_kind": "translation.indic",
+        "service_criteria": [
+            "native model coverage of the target Indic language (trained, not transliterated)",
+            "script-aware output (Devanagari conjuncts, Tamil ligatures, Gurmukhi rendering)",
+            "handles code-mixed content (English loanwords inside Indic sentences)",
+        ],
+        "notes": "Indic targets reward Indic-specialist services; judge candidates on native coverage of the SPECIFIC target language, not on brand.",
     },
     "european": {
-        "primary": "deepl",
-        "fallbacks": ["lara-translate", "google-cloud-translation"],
-        "notes": "DeepL excels at European language nuance and formality",
+        "capability_kind": "translation.european",
+        "service_criteria": [
+            "formality registers (German Sie/du, French vous/tu, Spanish usted/tú)",
+            "glossary / do-not-translate term support",
+            "idiomatic quality beyond word-level accuracy",
+        ],
+        "notes": "European targets need register control — a service without formality settings forces a manual pass on every B2B asset.",
     },
     "cjk": {
-        "primary": "deepl",
-        "fallbacks": ["google-cloud-translation", "lara-translate"],
-        "notes": "DeepL provides strong CJK support with context-aware translations",
+        "capability_kind": "translation.cjk",
+        "service_criteria": [
+            "context-aware segmentation (no word boundaries in the source)",
+            "correct script mixing for Japanese (kanji/hiragana/katakana)",
+            "Simplified vs Traditional Chinese variant control",
+        ],
+        "notes": "CJK quality varies sharply between services — sample-test before committing a campaign.",
     },
     "semitic": {
-        "primary": "google-cloud-translation",
-        "fallbacks": ["lara-translate", "deepl"],
-        "notes": "Google Cloud Translation has the broadest Semitic language coverage",
+        "capability_kind": "translation.semitic",
+        "service_criteria": [
+            "RTL text integrity (no direction corruption around numerals/Latin embeds)",
+            "coverage of the specific target (Arabic dialect awareness where relevant)",
+        ],
+        "notes": "RTL rendering bugs surface in templates, not in the translation text — score AND visually verify.",
     },
     "sea": {
-        "primary": "google-cloud-translation",
-        "fallbacks": ["lara-translate"],
-        "notes": "Google Cloud Translation covers Southeast Asian languages comprehensively",
+        "capability_kind": "translation.sea",
+        "service_criteria": [
+            "genuine coverage of the target (Thai/Vietnamese/Indonesian/Malay quality varies widely)",
+        ],
+        "notes": "Southeast Asian coverage is the thinnest across the industry — sample-test candidates first.",
     },
     "default": {
-        "primary": "google-cloud-translation",
-        "fallbacks": ["lara-translate", "deepl"],
-        "notes": "Google Cloud Translation as general-purpose fallback",
+        "capability_kind": "translation.general",
+        "service_criteria": [
+            "broad language coverage with published quality benchmarks",
+        ],
+        "notes": "General-purpose translation; verify the pair is actually supported before sending a batch.",
     },
 }
+
+# Recognition data, NOT endorsement: name fragments that identify a configured
+# MCP server as translation-capable so the user's ALREADY-CONNECTED tools can
+# be discovered (rung 2 of the capability ladder). A server matching none of
+# these can still be used via an explicit brand preference — unknown ≠ unusable.
+TRANSLATION_SERVER_HINTS = (
+    "translat", "deepl", "sarvam", "lara", "lingo", "lokalise", "crowdin",
+    "phrase", "smartling", "weglot", "localiz",
+)
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
@@ -512,8 +553,52 @@ def _special_considerations(target_code, family):
     return considerations
 
 
+def _connected_translation_servers():
+    """Names of translation-capable MCP servers the user has ACTUALLY
+    configured (read live from .mcp.json — never assumed)."""
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from _connector_registry import _load_mcp_json
+        servers = _load_mcp_json()
+    except Exception:
+        servers = {}
+    return sorted(n for n in servers
+                  if any(h in n.lower() for h in TRANSLATION_SERVER_HINTS))
+
+
+def _brand_translation_pref(brand, target):
+    """The brand's recorded translation preference for a target language, if
+    any. Free-form server name — the user's explicit choice outranks routing."""
+    if not brand:
+        return None
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from _common import brand_dir
+        profile_path = brand_dir(brand) / "profile.json"
+        if not profile_path.exists():
+            return None
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        prefs = (profile.get("language") or {}).get("translation_preferences") or {}
+        return prefs.get(target) or None
+    except Exception:
+        return None
+
+
+RESOLUTION_LADDER = [
+    "Use the harness's own multilingual capability: translate directly, then "
+    "score with `--action score`; below 85 flag for human review.",
+    "Use any translation tool the user has ALREADY connected (MCP server or "
+    "otherwise) — never instruct installing a commercial product.",
+    "Ask the user which translation service to use, and record the answer "
+    "with /digital-marketing-pro:language-config set-translation-pref so the "
+    "next run resolves without asking.",
+]
+
+
 def action_route(args):
-    """Route a translation pair to the best service."""
+    """Route a translation pair to a capability, resolving a concrete service
+    only from the brand's recorded preference or the user's connected servers.
+    Never names a product from a shipped table."""
     source = args.source
     target = args.target
     if not source or not target:
@@ -521,25 +606,49 @@ def action_route(args):
         sys.exit(1)
 
     family = _get_language_family_for_routing(target)
-    rule = ROUTING_RULES[family]
+    profile = FAMILY_CAPABILITY_PROFILES[family]
 
-    # Look up language family name for output (prefer the broader category name)
-    display_family = family
-    if family == "sea":
-        display_family = "southeast_asian"
-
+    display_family = "southeast_asian" if family == "sea" else family
     considerations = _special_considerations(target, family)
+    connected = _connected_translation_servers()
+    pref = _brand_translation_pref(getattr(args, "brand", None), target)
 
     result = {
         "source": source,
         "target": target,
-        "recommended_service": rule["primary"],
-        "fallback_services": rule["fallbacks"],
         "language_family": display_family,
-        "notes": rule["notes"],
+        "capability_kind": profile["capability_kind"],
+        "service_criteria": profile["service_criteria"],
+        "notes": profile["notes"],
         "rtl": target in RTL_LANGUAGES,
         "special_considerations": considerations,
+        "connected_candidates": connected,
+        "brand_preference": pref,
     }
+
+    if pref:
+        result["recommended_service"] = pref
+        result["basis"] = "brand-preference"
+        if connected and pref not in connected:
+            result["warning"] = (
+                f"Brand prefers {pref!r} for {target!r} but no configured MCP server "
+                "matches it — connect it, or update the preference via "
+                "language-config set-translation-pref.")
+    elif len(connected) == 1:
+        result["recommended_service"] = connected[0]
+        result["basis"] = "connected-servers"
+    elif connected:
+        result["recommended_service"] = None
+        result["basis"] = "connected-servers"
+        result["selection_instruction"] = (
+            "Multiple connected candidates — pick the one that best meets "
+            "service_criteria for this target; record the choice with "
+            "language-config set-translation-pref so future runs resolve directly.")
+    else:
+        result["recommended_service"] = None
+        result["basis"] = "unresolved"
+        result["resolution_ladder"] = RESOLUTION_LADDER
+
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
 
@@ -862,9 +971,9 @@ def build_parser():
             "Actions:\n"
             "  detect               Detect language from text using Unicode script\n"
             "                       analysis and common word frequency matching.\n"
-            "  route                Route a source/target language pair to the best\n"
-            "                       translation service (Sarvam AI, DeepL, Google\n"
-            "                       Cloud Translation, Lara Translate).\n"
+            "  route                Route a source/target language pair to a translation\n"
+            "                       capability; resolves a concrete service only from the\n"
+            "                       brand's preference or connected MCP servers.\n"
             "  score                Score translated content across length ratio,\n"
             "                       formatting preservation, key-term consistency,\n"
             "                       and placeholder integrity.\n"
@@ -893,6 +1002,11 @@ def build_parser():
     parser.add_argument(
         "--target",
         help="Target language code, e.g. 'hi' (for route/score actions).",
+    )
+    parser.add_argument(
+        "--brand",
+        help="Brand slug — lets route honor the brand's recorded translation "
+             "preference for the target language (for route action).",
     )
     parser.add_argument(
         "--original",

@@ -899,10 +899,9 @@ The multilingual layer enables content creation, translation, and cultural adapt
 
 ### Routing
 language-router.py automatically selects the optimal translation service:
-- Indic languages → Sarvam AI → Google Cloud (fallback)
-- European languages → DeepL → Lara → Google Cloud
-- CJK languages → DeepL → Google Cloud → Lara
-- Other → Google Cloud → Lara → DeepL
+- The router names a capability kind per language family (translation.indic, translation.european, translation.cjk, …) with selection criteria — never a product from a shipped table
+- A concrete service resolves at run time: brand `translation_preferences` first, then translation MCP servers found live in `.mcp.json` (judged against the criteria)
+- Nothing connected → `basis: unresolved` plus a resolution ladder (harness's own multilingual capability with mandatory scoring → user's already-connected tools → ask and record)
 
 ### Localization Specialist Agent
 Manages translation routing, transcreation for emotional content, cultural adaptation, multilingual SEO, and translation quality assurance.

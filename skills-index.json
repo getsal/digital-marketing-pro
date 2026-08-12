@@ -740,7 +740,7 @@
         "validate-profile"
       ],
       "doc_files": 56,
-      "bytes": 875706
+      "bytes": 877388
     },
     {
       "name": "continuous-improvement-loop",
@@ -1524,7 +1524,7 @@
         "translate-content"
       ],
       "doc_files": 1,
-      "bytes": 10278
+      "bytes": 10598
     },
     {
       "name": "launch-ad-campaign",
@@ -1696,7 +1696,7 @@
         "translate-content"
       ],
       "doc_files": 1,
-      "bytes": 14860
+      "bytes": 14955
     },
     {
       "name": "loop-detect",
@@ -2597,10 +2597,11 @@
       "missing_scripts": [],
       "gates": [],
       "cross_refs": [
-        "brand-setup"
+        "brand-setup",
+        "language-config"
       ],
       "doc_files": 1,
-      "bytes": 10291
+      "bytes": 11358
     },
     {
       "name": "validate-output",
