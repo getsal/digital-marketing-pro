@@ -4,6 +4,48 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.25.0] - 2026-08-13
+
+Honest provenance + the structural tier — the disclosure-and-structure layer
+proven in the suite's content pipeline (CF v3.22.0), mirrored into DMP's
+content surface. Context: Anthropic now statistically watermarks Claude text
+output (models ≥ 2026-08-02; a mark proves *processed by*, not *authored by*),
+and StoryScope (arXiv 2604.03136) showed AI text stays detectable on document
+STRUCTURE even after a perfect surface-style pass. DMP's answer is
+transparency and genuinely human-shaped structure — no watermark detection or
+removal exists in this plugin, permanently.
+
+### Added
+
+- **`scripts/detect_surface.py`** — classifies the running harness
+  (claude / non-claude / uncertain) from affirmative env fingerprints, with
+  the fail-safe pinned in tests: uncertain ⇒ disclose; skipping the
+  disclosure requires an AFFIRMATIVE non-Claude fingerprint.
+- **AI-assistance disclosure** (brand-setup + content-engine): profile.json
+  gains `ai_disclosure` — `{"mode": "claude-surfaces"|"always"|"off",
+  "text": null|custom, "author": null|name}`. Default wording is
+  author-optional, vendor-neutral (guard-tested), and claims only the review
+  the pipeline performs. Applied inside the `09-publish-ready.md` body so it
+  survives `/digital-marketing-pro:publish-blog`; the decision is recorded
+  in handoff metadata either way. Complements (never replaces) the existing
+  `eu_disclosure_if_ai` gate.
+- **`scripts/structural-tell-scan.py`** — Tier-2 structural AI-tell proxies
+  with spans (moralizing/over-explained takeaways, template section symmetry,
+  parallel heading syntax, specificity density, stance absence,
+  paragraph-rhythm evenness). Bands OK/NOTE/ATTENTION with thresholds in the
+  script, deliberately outside every eval/scoring config (guard-tested).
+- **content-engine structural pass**: after `05-humanize.md`, the scan runs
+  and NOTE/ATTENTION findings get fact-grounded structural edits (cut the
+  spelled-out takeaway, break unearned symmetry, add verified specifics,
+  take a defensible stance); the band lands in the quality scorecard as
+  ADVISORY and never gates `status: ready`.
+- **/check advisory section**: the structural findings report alongside the
+  eval scorers but NEVER affect the PASS/WARN/BLOCKED decision.
+- `tests/test_disclosure_and_structure.py` (13 tests): decision matrix incl.
+  the uncertain⇒disclose pin, vendor-neutral default wording, AI-shaped
+  fixture fires / human-shaped fixture stays quiet, advisory-never-a-gate,
+  and the skill wiring. **Tests 281 → 294.**
+
 ## [3.24.0] - 2026-08-12
 
 The timing ladder — the last "shipped table pretending to be timeless" in the

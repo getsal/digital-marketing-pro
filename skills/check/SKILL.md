@@ -144,6 +144,10 @@ Decision: PASS — safe to publish but address WARNINGs first
 
 If any CRITICAL issue is found, decision = **BLOCKED** and the user is asked to fix before publishing.
 
+## Structural-tell scan (advisory section, never scored)
+
+Alongside the eval-runner scorers, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/structural-tell-scan.py" --file <input>` and report its findings as a separate ADVISORY section of the check output: the overall OK/NOTE/ATTENTION band plus each NOTE/ATTENTION finding with its spans (moralizing, section symmetry, parallel headings, specificity, stance, paragraph evenness). This section NEVER affects the PASS/WARN/BLOCKED decision — structure-scan thresholds live in the script, deliberately outside the eval config, because these are editorial judgment calls for a human, not publish gates. The scan measures visible structure only; it cannot see and has no relationship to any statistical watermark.
+
 ## EU AI Act Article 50 — C2PA provenance gate
 
 The check gains a compliance dimension for AI-generated assets in EU-targeted campaigns. It fires when **both** conditions hold:

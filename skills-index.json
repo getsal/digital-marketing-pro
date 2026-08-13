@@ -259,7 +259,7 @@
       "gates": [],
       "cross_refs": [],
       "doc_files": 1,
-      "bytes": 6187
+      "bytes": 6921
     },
     {
       "name": "budget-optimizer",
@@ -407,7 +407,8 @@
         "eval-runner.py",
         "hallucination-detector.py",
         "output-validator.py",
-        "readability-analyzer.py"
+        "readability-analyzer.py",
+        "structural-tell-scan.py"
       ],
       "missing_scripts": [],
       "gates": [
@@ -423,7 +424,7 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 14985
+      "bytes": 15745
     },
     {
       "name": "churn-risk",
@@ -639,7 +640,9 @@
       "scripts": [
         "benchmark_book.py",
         "campaign-tracker.py",
-        "readability-analyzer.py"
+        "detect_surface.py",
+        "readability-analyzer.py",
+        "structural-tell-scan.py"
       ],
       "missing_scripts": [],
       "gates": [
@@ -658,7 +661,7 @@
         "verify-claims"
       ],
       "doc_files": 17,
-      "bytes": 138007
+      "bytes": 140307
     },
     {
       "name": "content-repurpose",

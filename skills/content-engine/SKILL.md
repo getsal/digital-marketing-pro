@@ -219,6 +219,18 @@ PLAN.md                    summary + publish instructions
 
 `status: ready` requires all five gates pass.
 
+## AI-assistance disclosure (all runs, not just EU)
+
+Beyond the EU gate above, every publish-ready draft applies the brand's `ai_disclosure` block from profile.json — `{"mode": "claude-surfaces"|"always"|"off", "text": null|custom, "author": null|name}` (missing block = the default: claude-surfaces, no custom text, no author).
+
+1. Run `python "${CLAUDE_PLUGIN_ROOT}/scripts/detect_surface.py" --mode {mode}` — its `disclosure_applies` field IS the decision. The fail-safe is deliberate: an `uncertain` surface applies the disclosure in claude-surfaces mode (skipping requires an AFFIRMATIVE non-Claude fingerprint). Never override the script's answer by guessing.
+2. When it applies, append the block as the final content paragraph of `09-publish-ready.md` — inside the body, so it survives `/digital-marketing-pro:publish-blog` — using: no custom text and no author → `*Created with AI assistance and reviewed by our editorial team.*`; author set → `*Created with AI assistance; researched, fact-checked, and edited by {author}.*`; custom text → verbatim. The default wording is vendor-neutral (no model or vendor names) and claims only the review this pipeline performs. The author field is OPTIONAL — never invent a name, never block on it being blank.
+3. Record the decision in the handoff metadata either way: `disclosure: {applied, mode, surface}` — an unapplied disclosure is a recorded choice, not an omission.
+
+## Structural-tell pass (advisory, never a gate)
+
+After `05-humanize.md`, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/structural-tell-scan.py" --file {draft}` — the Tier-2 STRUCTURAL layer (StoryScope-derived: AI text stays detectable on structure even after a perfect surface pass). Where it reports NOTE/ATTENTION (moralizing closers, template symmetry, low specificity, stance absence, uniform rhythm), apply structural edits grounded in the fact-check file: cut the spelled-out takeaway, break symmetry the content doesn't earn, add specific verified facts (never invented), take a defensible stance. Append the scan JSON to `05-humanize.md` and note the overall band in `08-quality-scorecard.md` as ADVISORY — it never gates `status: ready`, and it measures visible structure only (it cannot see and has no relationship to any statistical watermark).
+
 ## Chain handoffs
 
 - **Upstream:** `/digital-marketing-pro:content-brief` (preferred — pre-researched) or `/digital-marketing-pro:keyword-cluster` (`06-pillar-pages.md` becomes content briefs)
