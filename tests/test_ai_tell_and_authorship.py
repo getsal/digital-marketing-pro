@@ -7,9 +7,11 @@ undefined does not fail; it passes on impression.
 
 These tests pin the replacement and, just as importantly, its restraint:
 
-  * only the three tells precise enough to gate on count toward the gate,
-    because the aphorism heuristic alone flagged half the paragraphs of
-    genuinely good hand-written copy;
+  * only the tells precise enough to gate on count toward the gate, because
+    the aphorism heuristic alone flagged half the paragraphs of genuinely good
+    hand-written copy — and `llm_favored_word` was later measured firing ONLY
+    on prose published before ChatGPT existed, so it was dropped from the gate
+    too;
   * absolute floors stop a single legitimate "actually" in a short piece from
     normalizing into a tell;
   * significance markers are DELETED, never reworded;
@@ -140,7 +142,43 @@ class TestTheGateMeasuresSomething(unittest.TestCase):
 
     def test_gate_counts_only_the_precise_tells(self):
         self.assertEqual(ats._GATING_TELLS,
-                         {"significance_marker", "soft_adverb_cluster", "llm_favored_word"})
+                         {"significance_marker", "soft_adverb_cluster"})
+
+    def test_llm_favored_words_do_not_gate(self):
+        """Measured 2026-08-15 against 272 chunks of prose published before
+        ChatGPT existed: 23 words from the list fired, every one of them ONLY
+        on the human class and none on the LLM class. "robust", "facilitate",
+        "harness" and "leverage" are ordinary technical English, while current
+        models have largely been trained off them. As a gating signal it could
+        only ever produce false positives.
+
+        It must still be REPORTED — it is sound editorial advice for marketing
+        copy — but it must never move the gate. If a future edit puts it back,
+        this test is the record of why that is wrong."""
+        self.assertNotIn("llm_favored_word", ats._GATING_TELLS)
+        text = ("# T\n\nWe will leverage a robust framework to facilitate the "
+                "rollout across the landscape of our estate. This will harness "
+                "the platform and unlock a myriad of seamless outcomes.\n")
+        r = ats.ai_tell_scan(text)
+        self.assertTrue(r["humanize_passed"],
+                        "llm-favored vocabulary alone must not fail the gate")
+        flagged = [p for p in r["flagged_paragraphs"] if "llm_favored_word" in p["tells"]]
+        self.assertTrue(flagged, "llm-favored words must still be reported to the editor")
+        self.assertFalse(flagged[0]["counts_toward_gate"])
+
+    def test_the_gate_does_not_claim_to_prove_humanness(self):
+        """The gate is a density floor. Measured on 18 documents of default LLM
+        prose it caught 0 — it would not catch a humanizer that silently did
+        nothing. The advisory_note must not imply otherwise, because a gate
+        that overstates what it proves is the same defect as a gate with no
+        measurement behind it, just harder to notice."""
+        note = ats.ai_tell_scan("# T\n\nA short factual paragraph about nothing.\n")["advisory_note"]
+        low = note.lower()
+        for overclaim in ("proves", "guarantees", "confirms human", "human-written",
+                          "detects ai", "ai-generated"):
+            self.assertNotIn(overclaim, low, f"advisory_note overclaims: {overclaim!r}")
+        self.assertIn("floor", low,
+                      "advisory_note should say plainly that the gate is a floor")
 
     def test_imprecise_tells_are_reported_but_do_not_gate(self):
         """Short declaratives and 'So,' openers stay visible to an editor
@@ -440,3 +478,45 @@ class TestRobustnessAndPerformance(unittest.TestCase):
     def test_scan_output_is_deterministic_in_process(self):
         blobs = {json.dumps(ats.ai_tell_scan(HUMAN_COPY), sort_keys=True) for _ in range(5)}
         self.assertEqual(len(blobs), 1, "ai_tell_scan output varies between identical runs")
+
+
+class TestScanOutputMustNotLandInTheMeasuredFile(unittest.TestCase):
+    """The content-engine used to say "append the scan JSON to 05-humanize.md"
+    while ALSO running `authorship.py --draft 05-humanize.md` against that same
+    file. authorship.py classifies every sentence in the draft, so following
+    both instructions diluted the author's share with the tool's own output.
+
+    Measured on a real humanizer run: appending a report and the scan JSON moved
+    author_word_share 0.253 -> 0.206 and flipped may_claim_authored true ->
+    false. Violations stayed clean throughout, which is why the defect was
+    invisible to the check that was supposed to catch problems.
+    """
+
+    SKILL = Path(__file__).resolve().parent.parent / "skills" / "content-engine" / "SKILL.md"
+
+    def test_skill_no_longer_appends_scan_output_to_the_draft(self):
+        text = self.SKILL.read_text(encoding="utf-8")
+        self.assertNotIn("Append the scan JSON to `05-humanize.md`", text)
+        self.assertNotIn("paste its JSON into `05-humanize.md`", text)
+
+    def test_skill_names_a_separate_destination(self):
+        text = self.SKILL.read_text(encoding="utf-8")
+        self.assertIn("05-scans.json", text,
+                      "scan output needs its own file, or it lands in the measured draft")
+
+    def test_diluting_the_draft_moves_the_share_but_not_the_violations(self):
+        src = ("we spent two years on this and got it wrong twice.\n"
+               "the fix in the end was unglamorous and took a fortnight.\n")
+        body = ("# T\n\nwe spent two years on this and got it wrong twice.\n\n"
+                "A researched sentence adds context from the fact-check file here.\n\n"
+                "the fix in the end was unglamorous and took a fortnight.\n")
+        appended = body + "\n\n```json\n" + json.dumps(
+            {"advisory_rating": "LOW", "note": "scan output pasted into the draft"}) + "\n```\n" \
+            + "The scan reported no flagged sentences in this pass. " * 14
+
+        clean = auth.classify(src, body)
+        diluted = auth.classify(src, appended)
+        self.assertTrue(clean["may_claim_authored"])
+        self.assertFalse(diluted["may_claim_authored"])
+        self.assertEqual(clean["violations"], diluted["violations"],
+                         "the violation check cannot see this problem — only the share moves")

@@ -6,6 +6,54 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.27.0] - 2026-08-15
+
+The humanize gate got measured against writing that predates ChatGPT, and lost a signal
+that was pointing the wrong way.
+
+### Fixed — `llm_favored_word` was gating, and it fires on human prose, not model prose
+
+A calibration corpus was built from **39 documents published before 2022-11-01** — before
+ChatGPT was public, so human authorship is guaranteed by publication date rather than
+assumed — across four registers (marketing blog, personal and technical essay, journalism
+and institutional reports, academic and standards prose), cut into **272 chunks of ~1000
+words** so both classes are compared at equal length. Negative class: 18 documents of
+default model prose written with no anti-tell guidance.
+
+Result: of the 45 words in `_LLM_FAVORED_WORDS`, **23 fired — every one of them only on the
+human class, none on the model class.** "robust", "facilitate", "harness", "landscape" and
+"leverage" are ordinary technical and journalistic English, while current models have
+largely been trained off them. As a **gating** signal it could therefore only ever produce
+false positives, which disqualifies it under the rule this scan already followed. It stays
+in the report and in the humanizer's catalog, where it remains sound editorial advice.
+
+### Changed — the gate now says what it actually proves
+
+Measured: the gate fails **0 of 39** documents of published human prose and catches **0 of
+18** documents of unedited model prose. It is a density floor that catches egregious
+tell-stuffing; it is not evidence a piece was humanized, and it would not catch a humanize
+step that did nothing. `advisory_note`, the content-engine skill, and `/check` now say so
+plainly instead of implying more. The discrimination that does exist lives in the advisory
+rating (human 62.5% LOW / 8.8% HIGH vs model 0% LOW / 83.3% HIGH) and the structural scan
+(human 34.6% OK vs model 0% OK) — both editor-facing, neither a publish gate.
+
+The full calibration, including per-register thresholds and the composite rules that were
+tested and rejected, is recorded in the `ai-tell-scan.py` docstring so no future threshold
+edit can be made without re-measuring.
+
+### Fixed — scan output was being appended to the file `authorship.py` measures
+
+The content-engine said "append the scan JSON to `05-humanize.md`" while also running
+`authorship.py --draft 05-humanize.md` against that same file. Measured on a real run:
+appending a report and scan JSON moved `author_word_share` 0.253 -> 0.206 and flipped
+`may_claim_authored` true -> false. Scan output now goes to **`05-scans.json`**; the draft
+file stays the draft. `violations` stayed clean throughout, which is exactly why this was
+invisible.
+
+Suite: 335 -> 340.
+
+---
+
 ## [3.26.2] - 2026-08-14
 
 Load-test corrections, mirroring ContentForge 3.23.3.

@@ -38,6 +38,43 @@ scan measures visible text; it cannot see and has no relationship to any
 statistical watermark. No part of this tool detects or removes a watermark,
 and none will be added.
 
+CALIBRATION (measured 2026-08-15 — read this before changing any threshold)
+--------------------------------------------------------------------------
+Corpus: 39 documents published BEFORE 2022-11-01, i.e. before ChatGPT was
+public, so human authorship is guaranteed by publication date rather than
+assumed. Four registers (marketing blog, personal/technical essay, journalism
+and institutional reports, academic/standards prose), cut into 272 chunks of
+~1000 words so both classes are compared at equal length. Negative class: 18
+default-LLM documents written with no anti-tell guidance.
+
+  humanize gate (flagged_paragraph_pct <= 10)
+      false positives on human prose ....... 0/272 chunks, 0/39 documents
+      un-humanized LLM prose caught ........ 0/18 documents
+
+  The gate is SAFE and, on this corpus, INERT. It is a density floor that
+  catches egregious tell-stuffing; it is NOT evidence that a piece was
+  humanized, and it would not catch a humanizer that silently did nothing.
+  Do not describe it as more than that.
+
+  Per-signal, at the strictest threshold with ZERO false positives on human
+  prose, the best single signal catches 11% of LLM prose. Accepting a 5%
+  false-positive rate, em-dash density catches 94% — but thresholds computed
+  per register diverge sharply (em-dash 95th percentile: 1.47 in standards
+  prose, 9.90 in essays), so any single pooled threshold high enough to spare
+  essayists catches nothing. Composite K-of-N rules were tested too: at
+  register-robust thresholds every combination catches 0%.
+
+  CONCLUSION: surface tells cannot carry a fair blocking gate. Discrimination
+  that does exist lives in the advisory rating (human 62.5% LOW / 8.8% HIGH
+  vs LLM 0% LOW / 83.3% HIGH) and in the structural scan (human 34.6% OK vs
+  LLM 0% OK) — both of which route a human editor's attention rather than
+  blocking a publish.
+
+  Limits of this measurement, stated plainly: the negative class is prose from
+  one model family, so the vocabulary findings may not transfer to other
+  models; and 18 negative documents is a small sample. The human class is the
+  strong half of the corpus.
+
 Usage:
     python ai-tell-scan.py --file draft.md
     python ai-tell-scan.py --file draft.md --paragraph-flags
@@ -119,7 +156,17 @@ _FLOORS = {"significance_markers_per_1000": 2, "soft_adverb_tags_per_1000": 3,
 # which is worse than the undefined gate this scan replaced. They stay in the
 # report as advisory context for an editor, where a false positive costs two
 # seconds instead of a rewrite.
-_GATING_TELLS = frozenset(("significance_marker", "soft_adverb_cluster", "llm_favored_word"))
+#
+# llm_favored_word was REMOVED from this set on 2026-08-15 after measurement.
+# See CALIBRATION below: across 272 chunks of prose published before ChatGPT
+# existed, 23 words from _LLM_FAVORED_WORDS fired — every one of them ONLY on
+# the human class, none on the LLM class. "robust", "facilitate", "harness",
+# "landscape" and "leverage" are ordinary in technical and journalistic
+# English, while current models have largely been trained off them. As a
+# GATING signal it could therefore only ever produce false positives, which
+# disqualifies it under the rule above. It remains in the report and in the
+# humanizer's catalog, where it is still sound editorial advice.
+_GATING_TELLS = frozenset(("significance_marker", "soft_adverb_cluster"))
 
 # The paragraph-flag rate the content-engine's humanize gate reads.
 DEFAULT_MAX_FLAGGED_PARAGRAPH_PCT = 10.0
@@ -327,7 +374,14 @@ def ai_tell_scan(md_text: str, max_flagged_pct: float = DEFAULT_MAX_FLAGGED_PARA
             "content-engine's humanize_passed gate. `flagged_paragraph_pct` vs "
             "`max_flagged_paragraph_pct` IS that gate; every other number here is advisory "
             "context for a human editor. Fix a flag with a verified specific, never a synonym "
-            "swap and never an invented fact. Measures visible text only; it cannot see and has "
+            "swap and never an invented fact. "
+            "WHAT PASSING MEANS: the gate is a density floor. Measured against 39 documents "
+            "published before ChatGPT existed it failed none of them, and against 18 documents "
+            "of unedited model prose it caught none — so a pass means no dense cluster of "
+            "known tells, NOT that the piece reads as a person wrote it and NOT that the "
+            "humanize step did any work. Read the advisory_rating and the structural scan for "
+            "that, and read them as an editor's to-do list rather than a verdict. "
+            "Measures visible text only; it cannot see and has "
             "no relationship to any statistical watermark."),
     }
 

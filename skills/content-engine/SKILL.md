@@ -231,19 +231,26 @@ Beyond the EU gate above, every publish-ready draft applies the brand's `ai_disc
 
 ## Humanize step (`05-humanize.md`) — what a flag actually is
 
-The `humanize_passed` gate is measured by `scripts/ai-tell-scan.py`, not by impression. Run it, paste its JSON into `05-humanize.md`, and work the flags it returns:
+The `humanize_passed` gate is measured by `scripts/ai-tell-scan.py`, not by impression. Run it, save its JSON to **`05-scans.json`**, and work the flags it returns.
+
+**Keep `05-humanize.md` to the article body.** `scripts/authorship.py --draft 05-humanize.md` classifies every sentence in that file, so scan JSON or report prose living there is counted as machine-added text against the author's share. Measured on a real run: appending the scan JSON and a short report moved `author_word_share` from 0.253 to 0.206 and flipped `may_claim_authored` from true to false — denying the author credit for work they actually did, on nothing but file layout. Reports go in `05-scans.json`; the draft file stays the draft.
 
 ```bash
 python "${CLAUDE_PLUGIN_ROOT}/scripts/ai-tell-scan.py" --file 05-humanize.md [--max-flagged-pct N]
 ```
 
-**Three tells count toward the gate**, because they are precise enough to gate on:
+**Two tells count toward the gate**, because they are precise enough to gate on:
 
-- **`llm_favored_word`** — delve, leverage, seamless, tapestry, testament, pivotal, myriad… → the plain word you would say out loud, or better, a concrete noun from the piece's own subject.
 - **`significance_marker`** — a sentence whose only job is to tell the reader what a neighbouring sentence means: "here's the thing", "that's the part that got me", "which is exactly the problem", "let that sink in". → **DELETE the sentence. Do not reword it.** The specific it points at already does the work; softening a marker into a gentler marker is not a fix. If the moment matters, return to the specific instead of announcing it.
 - **`soft_adverb_cluster`** — two or more of honestly / genuinely / truly / literally / actually / basically / quietly in one sentence → delete them. A sentence that needs force needs a specific, not an adverb.
 
-**Everything else the scan reports is advisory context, not gate material** — connective openers ("So,", "However,"), participial openers, em-dash density, and short ungrounded one-liners. Those appear in ordinary human writing too, and gating on them would fail good copy and spin the pipeline into pointless rewrites. Fix them where the scan is right; do not chase the number.
+**Everything else the scan reports is advisory context, not gate material** — `llm_favored_word`, connective openers ("So,", "However,"), participial openers, em-dash density, and short ungrounded one-liners. Those appear in ordinary human writing too, and gating on them would fail good copy and spin the pipeline into pointless rewrites. Fix them where the scan is right; do not chase the number.
+
+- **`llm_favored_word`** (advisory since 2026-08-15) — delve, leverage, seamless, tapestry, testament, pivotal, myriad… → still worth fixing: use the plain word you would say out loud, or better, a concrete noun from the piece's own subject. It stopped counting toward the gate after measurement: across 272 chunks of prose published before ChatGPT existed, 23 of these words fired and **every one fired only on the human writing, none on the model writing**. Technical and journalistic English uses "robust", "facilitate" and "leverage" normally, while current models have largely been trained off them — so as a gating signal it could only ever produce false positives.
+
+### What passing this gate does and does not mean
+
+Passing means **no dense cluster of the two precise tells**. It is a floor, not a verdict. Measured on 39 documents published before ChatGPT existed, the gate failed none of them; measured on 18 documents of unedited model prose, it caught none of them. So a pass is not evidence the piece reads as a person wrote it, and it would not catch a humanize step that did nothing at all. Treat `advisory_rating` and the structural scan as the editor-facing signal — they do separate the two classes (unedited model prose landed HIGH 83% of the time versus 9% for published human prose) — and treat both as a to-do list for a person, never as proof of authorship.
 
 **The fix for any flag is a verified specific from `04-fact-check.md`, never a synonym swap and never an invented fact.** If no grounding exists for a sentence, cut the sentence or add a defensible caveat — do not invent a number, date, source, or example to make prose sound human.
 
@@ -271,7 +278,7 @@ Exit 3 means author sentences were rewritten or dropped. **Restore them verbatim
 
 After `05-humanize.md`, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/structural-tell-scan.py" --file {draft}` — the Tier-2 STRUCTURAL layer (StoryScope-derived: AI text stays detectable on structure even after a perfect surface pass). Where it reports NOTE/ATTENTION (moralizing closers, template symmetry, low specificity, stance absence, uniform rhythm, entity development), apply structural edits grounded in the fact-check file: cut the spelled-out takeaway, break symmetry the content doesn't earn, add specific verified facts (never invented), take a defensible stance.
 
-**`entity_development`** deserves its own note because it is easy to fix the wrong way. A NOTE/ATTENTION band means the piece introduces name after name and number after number, each mentioned once and abandoned — a machine establishing a setting rather than an expert making a case. **Fix by developing, never by deleting:** give a specific the argument already rests on a second substantive mention from `04-fact-check.md` — what it implies, who disputes it, what it cost. Cutting specifics to move this number would lower the `specificity` finding in the same scan, which matters more, and inventing a mention is forbidden outright. The proxy stays silent below 600 words or 12 distinct entities, because a short piece names things once for lack of room. Append the scan JSON to `05-humanize.md` and note the overall band in `08-quality-scorecard.md` as ADVISORY — it never gates `status: ready`, and it measures visible structure only (it cannot see and has no relationship to any statistical watermark).
+**`entity_development`** deserves its own note because it is easy to fix the wrong way. A NOTE/ATTENTION band means the piece introduces name after name and number after number, each mentioned once and abandoned — a machine establishing a setting rather than an expert making a case. **Fix by developing, never by deleting:** give a specific the argument already rests on a second substantive mention from `04-fact-check.md` — what it implies, who disputes it, what it cost. Cutting specifics to move this number would lower the `specificity` finding in the same scan, which matters more, and inventing a mention is forbidden outright. The proxy stays silent below 600 words or 12 distinct entities, because a short piece names things once for lack of room. Append the scan JSON to **`05-scans.json`** (never to `05-humanize.md` — see the humanize step: that file is measured sentence-by-sentence by `authorship.py`) and note the overall band in `08-quality-scorecard.md` as ADVISORY — it never gates `status: ready`, and it measures visible structure only (it cannot see and has no relationship to any statistical watermark).
 
 ## Chain handoffs
 
