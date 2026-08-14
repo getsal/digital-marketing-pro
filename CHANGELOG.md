@@ -6,6 +6,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.26.1] - 2026-08-14
+
+Field-test corrections to the new `ai-tell-scan.py`, measured against a
+published human essay and against this plugin's own generated article.
+
+### Fixed — the aphorism proxy was too blunt to headline a rating
+
+`is_aphorism_candidate` flagged ordinary factual sentences ("The neighbouring
+region barely moved.", "Net, the office is down seven people.") and rated both
+a human essay and DMP's own 1081-word article HIGH.
+
+- The heuristic now excludes sentences carrying a personal or anaphoric pronoun
+  or opening with a coordinating conjunction — context-dependent sentences are
+  not the self-contained general claims this targets.
+- `aphorism_candidates_per_1000` is computed, banded and reported, but no longer
+  contributes to `advisory_rating`. It was already excluded from the gate for
+  the same reason; excluding it from the rating applies that logic one level up.
+
+### Verified in the field (no change needed)
+
+The gate itself held under real conditions. DMP's own generated article passes
+its own gate at 0% flagged paragraphs; the published human essay passes at 0%;
+the AI-shaped fixture still fails at 66.7%. `entity_development` read OK on the
+real article (18 distinct entities, 1.67 mentions each, measurable) — the proxy
+behaves correctly on genuine long-form content, not just synthetic fixtures.
+
+327 -> 331 tests.
+
 ## [3.26.0] - 2026-08-14
 
 **The humanize gate stops being a vibe, and the author stays in the piece.**

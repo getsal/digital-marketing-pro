@@ -84,6 +84,13 @@ _SOFT_ADVERB_TAGS = frozenset((
 _CONNECTIVE_OPENERS = ("so", "because", "moreover", "furthermore", "additionally",
                        "however", "indeed", "ultimately", "in fact", "the reason is")
 
+# Personal and anaphoric pronouns. A sentence carrying one is context-dependent
+# — it points at a speaker, a reader, or an earlier sentence — so it cannot be
+# the self-contained general claim the aphorism proxy targets.
+_PRONOUN_RE = re.compile(
+    r"\b(?:i|me|my|mine|we|us|our|ours|you|your|yours|he|him|his|she|her|hers|"
+    r"they|them|their|theirs|it|its|this|that|these|those)\b", re.I)
+
 # Advisory bands: (high, moderate). Higher is worse for every metric here.
 _BANDS = {
     "llm_favored_words_per_1000": (4.0, 2.0),
@@ -162,8 +169,15 @@ def _paragraphs(md_text):
 
 
 def is_aphorism_candidate(sentence: str) -> bool:
-    """Short declarative one-liner with zero grounding: <=9 words, no digit,
-    no citation marker, no question, no mid-sentence capitalized entity."""
+    """A short, self-contained, ungrounded general claim — "Speed wins the shelf."
+
+    The <=9-word test alone is not enough: measured against a published human
+    essay and against this plugin's own generated article, it flagged ordinary
+    short prose ("But pick something and get going.") at ~13 per 1000 words and
+    pushed both to a HIGH advisory rating. A maxim generalizes; a sentence that
+    refers to you, me, or the sentence before it is context-dependent and is not
+    the broad over-neutral one-liner this targets.
+    """
     s = sentence.strip()
     words = s.split()
     if not s or len(words) > 9 or s.endswith("?"):
@@ -173,6 +187,12 @@ def is_aphorism_candidate(sentence: str) -> bool:
     if re.search(r"\((?:[A-Z][\w.]*,?\s*\d{4}|\d+)\)|\[\d+\]", s):
         return False
     if any(w[:1].isupper() for w in words[1:]):
+        return False
+    if _PRONOUN_RE.search(s):
+        return False
+    # Opening with a coordinating conjunction continues the previous sentence,
+    # which is the same context-dependence the pronoun test rules out.
+    if words[0].lower().strip(",") in ("but", "and", "so", "or", "yet", "nor"):
         return False
     return s.endswith(".")
 
@@ -251,6 +271,14 @@ def ai_tell_scan(md_text: str, max_flagged_pct: float = DEFAULT_MAX_FLAGGED_PARA
         "aphorism_candidates_per_1000": counts["aphorism_candidates"],
     }
     bands = {k: _band(k, v, absolutes.get(k)) for k, v in metrics.items()}
+    # Bands that may drive advisory_rating. The aphorism proxy is excluded: it
+    # cannot separate a content-free maxim ("Speed wins the shelf.") from a
+    # short factual sentence ("The neighbouring region barely moved."), and it
+    # rated both a published human essay and this plugin's own generated article
+    # HIGH. A signal too imprecise to gate on is too imprecise to headline a
+    # rating; its count and sentences stay in the report for the editor.
+    rating_bands = {k: v for k, v in bands.items()
+                    if k != "aphorism_candidates_per_1000"}
 
     # Paragraph flag rate — the number the humanize gate reads. Only
     # _GATING_TELLS count toward it; everything else is editor-facing context.
@@ -279,7 +307,7 @@ def ai_tell_scan(md_text: str, max_flagged_pct: float = DEFAULT_MAX_FLAGGED_PARA
     total_paras = max(1, len(paras))
     flagged_pct = round(100.0 * flagged_paras / total_paras, 1)
     order = {"LOW": 0, "MODERATE": 1, "HIGH": 2}
-    overall = max(bands.values(), key=lambda b: order[b]) if bands else "LOW"
+    overall = max(rating_bands.values(), key=lambda b: order[b]) if rating_bands else "LOW"
 
     return {
         "words_analyzed": words_total,

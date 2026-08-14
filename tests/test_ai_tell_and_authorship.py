@@ -349,3 +349,40 @@ class TestSelfContainment(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAphorismProxyIsCalibrated(unittest.TestCase):
+    """Field-test findings, 2026-08-14. Measured against a published human essay
+    AND against this plugin's own generated article, the <=9-word heuristic
+    flagged ordinary factual sentences ("The neighbouring region barely moved.")
+    and rated both HIGH. A proxy that cannot tell a maxim from a short fact must
+    not headline the rating."""
+
+    def test_self_contained_maxims_still_flagged(self):
+        for s in ("Speed wins the shelf.", "Strong brands design the data to travel.",
+                  "The future looks bright."):
+            with self.subTest(s=s):
+                self.assertTrue(ats.is_aphorism_candidate(s))
+
+    def test_context_dependent_sentences_are_not_maxims(self):
+        for s in ("That is what you are looking for.", "The next step is to notice them.",
+                  "I decided to find out by making it.", "But pick something and get going.",
+                  "And that is not all."):
+            with self.subTest(s=s):
+                self.assertFalse(ats.is_aphorism_candidate(s))
+
+    def test_aphorisms_do_not_drive_the_advisory_rating(self):
+        maxims = "\n\n".join(["Speed wins the shelf. Quality matters above all else."] * 12)
+        r = ats.ai_tell_scan(maxims)
+        self.assertGreater(r["per_1000_words"]["aphorism_candidates_per_1000"], 30,
+                           "sanity: fixture should be dense with maxims")
+        self.assertEqual(r["bands"]["aphorism_candidates_per_1000"], "HIGH",
+                         "the band is still computed and reported")
+        self.assertEqual(r["advisory_rating"], "LOW",
+                         "aphorism density alone must not raise the rating")
+
+    def test_real_human_writing_passes_the_gate_and_rates_calmly(self):
+        """The regression that matters: good prose must not read as AI."""
+        r = ats.ai_tell_scan(HUMAN_COPY)
+        self.assertTrue(r["humanize_passed"])
+        self.assertIn(r["advisory_rating"], ("LOW", "MODERATE"))
