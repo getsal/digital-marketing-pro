@@ -4,6 +4,48 @@ All notable changes to the Digital Marketing Pro plugin are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses [Semantic Versioning](https://semver.org/).
 
+---
+
+## [3.26.0] - 2026-08-14
+
+**The humanize gate stops being a vibe, and the author stays in the piece.**
+
+### Fixed — `humanize_passed` had no implementation behind it
+
+The content-engine's quality scorecard gated on "`05-humanize.md` shows AI-pattern density below the brand-specific threshold (default: under 10% of paragraphs flagged)". There was no pattern catalog, no humanizer agent, and no script anywhere in the repo that produced a flag. A gate whose measurement is undefined does not fail — it passes on impression, every time.
+
+- **`scripts/ai-tell-scan.py`** (new) is that missing measurement. Deterministic, self-contained, lexicon in-script: LLM-favored vocabulary, significance markers, soft-adverb clusters, connective openers, participial openers, em-dash density, and ungrounded one-liners — each per 1000 words, with flagged sentences and a per-paragraph flag rate. `humanize_passed` now reads a number the script computes.
+- **The gate counts only three tells**, and that restraint is the point. Measured against real hand-written marketing copy, the short-declarative heuristic alone flagged 50% of paragraphs — gating on it would fail good human writing and spin the pipeline into rewrite loops, which is worse than the undefined gate it replaced. Only `llm_favored_word`, `significance_marker`, and `soft_adverb_cluster` gate; the rest are reported as editor-facing context where a false positive costs two seconds instead of a rewrite.
+- **Absolute floors** stop small samples from manufacturing tells: one legitimate "actually" in a 150-word excerpt normalizes to a per-1000 figure well over threshold, and is not a pattern.
+- The fix for any flag is a verified specific from `04-fact-check.md` — never a synonym swap, never an invented fact.
+
+### Added — significance markers
+
+A sentence whose only job is to tell the reader what a neighbouring sentence means: "here's the thing", "the thing is,", "that's the part that got me", "which is exactly the problem", "let that sink in". The scan returns these with `"fix": "Delete this sentence; do not reword it."` — softening a marker into a gentler marker is not a fix; the specific it points at already does the work. Phrases are scoped to their marker senses so ordinary prose ("that's the part of the regulation that changed", "the thing is broken") is not flagged.
+
+### Added — bring your own words (`--source-draft`)
+
+- **`scripts/authorship.py`** (new) measures sentence-level provenance between the author's own rough draft and the finished piece: which sentences are theirs verbatim, which were **rewritten**, which were **dropped**. Matching is greedy and one-to-one, so repeating an author's line cannot inflate their share.
+- The author's draft is saved verbatim as `00-source-draft.md` and carried into the draft **unchanged** — typos, run-ons, lowercase and all. **Their sentences are exempt from every tell**: if the author wrote "here's the thing", it stays, because a pattern describes what a model writes unprompted, not what a person chose to say.
+- **This check blocks; it does not advise.** Every tell scan here stays advisory because a detector signal is a probabilistic opinion. "The author wrote this sentence and it is no longer here" is a checkable fact about a promise the pipeline made, so `authorship.py` exits 3 until the sentence is restored *verbatim* — never resolved by editing their words further.
+- **Their claims are their voice, not verified facts.** Anything factual the pipeline adds still comes from `04-fact-check.md`; a claim of theirs that contradicts the research is flagged for the human editor, never silently corrected.
+- **Provenance-accurate disclosure**, gated on the record: `may_claim_authored` requires both a 25% author-word floor and zero outstanding violations. The direction is one-way by design — an authorship record may only ever make a disclosure MORE specific about human involvement that demonstrably happened. Overclaiming human authorship is the one form of this statement a reader cannot check.
+
+### Added — entity development (structural scan)
+
+A seventh proxy in `structural-tell-scan.py`: specifics introduced once and abandoned read as a machine establishing a setting; an expert returns to the few that carry the argument. **Fixed by developing, never by deleting** — cutting specifics would lower the `specificity` finding in the same scan, which matters more, and inventing a mention is forbidden outright. Silent below 600 words or 12 distinct entities, because a short piece names things once for lack of room.
+
+### Changed
+
+- `/digital-marketing-pro:check` now reports **both** tell tiers in one advisory section, and still **NEVER** lets either affect the PASS/WARN/BLOCKED decision.
+- Both scans keep their thresholds inside their own scripts, deliberately outside every eval config — guard-tested.
+
+### Notes
+
+- **No watermark detection or removal exists anywhere in DMP, and none will be added.** Both scans measure visible text only. A guard fails the suite if evasion vocabulary (zero-width characters, homoglyphs, watermark stripping, "pass as human") appears in the files this release touched.
+- Both new scripts are fully self-contained — no sibling-plugin delegation, guard-tested.
+- 294 → **327 tests**. New: `tests/test_ai_tell_and_authorship.py` (33).
+
 ## [3.25.0] - 2026-08-13
 
 Honest provenance + the structural tier — the disclosure-and-structure layer

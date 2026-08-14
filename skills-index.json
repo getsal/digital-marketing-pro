@@ -400,6 +400,7 @@
       "tier": "E",
       "description": "Run the unified pre-publish quality gate on marketing content — wraps scripts/eval-runner.py to score hallucination risk, claim substantiation (with --evidence), brand-voice fit (with --brand), structure (with --schema), content quality, and readability, plus a C2PA provenance check for AI assets in EU-targeted campaigns; returns a composite score with a PASS / WARN / BLOCKED decision and per-issue fix suggestions. Reports only — it never edits the content. Triggers on \\\"/digital-marketing-pro:check\\\", \\\"is this safe to publish\\\", \\\"run a hallucination check on this draft\\\", \\\"validate this copy against the brand voice\\\", \\\"pre-publish quality gate\\\". Resolves the active brand profile automatically; pairs with /digital-marketing-pro:c2pa-metadata to fix missing manifests.",
       "scripts": [
+        "ai-tell-scan.py",
         "brand-voice-scorer.py",
         "claim-verifier.py",
         "content-scorer.py",
@@ -424,7 +425,7 @@
         "eval-content"
       ],
       "doc_files": 1,
-      "bytes": 15745
+      "bytes": 16737
     },
     {
       "name": "churn-risk",
@@ -638,6 +639,8 @@
       "tier": "E",
       "description": "Draft marketing content in brand voice — blog posts, ad copy, email sequences, social posts, landing pages, and brand-voice guides — through a gated pipeline (research, outline, draft, fact-check, humanize, voice check, SEO checklist) with numbered working files and a five-gate quality scorecard before copy is publish-ready. Triggers on \\\"/digital-marketing-pro:content-engine\\\", \\\"write a blog post about X\\\", \\\"draft ad copy for this campaign\\\", \\\"create an email sequence\\\", \\\"landing page copy for our product\\\". Takes /digital-marketing-pro:content-brief as preferred upstream; hands off to /digital-marketing-pro:publish-blog, /digital-marketing-pro:content-repurpose, and /digital-marketing-pro:check. Reads the brand profile, guidelines, platform specs, and compliance rules.",
       "scripts": [
+        "ai-tell-scan.py",
+        "authorship.py",
         "benchmark_book.py",
         "campaign-tracker.py",
         "detect_surface.py",
@@ -661,7 +664,7 @@
         "verify-claims"
       ],
       "doc_files": 17,
-      "bytes": 140307
+      "bytes": 146341
     },
     {
       "name": "content-repurpose",

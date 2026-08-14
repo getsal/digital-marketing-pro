@@ -17,6 +17,9 @@ editor knows exactly where to work:
                            (the generic AI center; humans name checkable things)
     stance               — hedged positionless evenness vs a real point of view
     paragraph_evenness   — uniform paragraph rhythm (machine fingerprint)
+    entity_development   — specifics name-dropped once and abandoned (a machine
+                           establishing a setting) vs developed (an expert
+                           making a case). FIX BY DEVELOPING, NEVER BY DELETING
 
 ADVISORY ONLY, never a scored gate: bands (OK/NOTE/ATTENTION) and thresholds
 live in THIS script, deliberately outside every eval/scoring config. The scan
@@ -59,8 +62,24 @@ _BANDS = {
     "specificity_per_1000": (5.0, 10.0),      # LOWER is worse
     "hedging_per_1000": (18.0, 12.0),
     "paragraph_evenness_cv": (0.25, 0.40),    # LOWER is worse
+    "mentions_per_entity": (1.25, 1.60),      # LOWER is worse (churn, not dwell)
 }
-_LOWER_IS_WORSE = ("section_symmetry_cv", "specificity_per_1000", "paragraph_evenness_cv")
+_LOWER_IS_WORSE = ("section_symmetry_cv", "specificity_per_1000", "paragraph_evenness_cv",
+                   "mentions_per_entity")
+
+# Entity extraction for the development proxy. Capitalized runs are merged so
+# "European Medicines Agency" counts as one entity, not three.
+_ENTITY_TOKEN_RE = re.compile(r"^[A-Z][\w'’.&-]*$")
+_NUMERIC_RE = re.compile(r"^[$€£¥]?\d[\d,.]*%?$")
+_ENTITY_STOPWORDS = frozenset((
+    "the", "a", "an", "this", "that", "these", "those", "it", "its", "they",
+    "their", "there", "and", "but", "or", "if", "when", "while", "however",
+    "moreover", "furthermore", "additionally", "because", "so", "then",
+    "in", "on", "at", "for", "with", "by", "from", "to", "of", "as", "after",
+    "before", "during", "since", "until", "each", "every", "both", "most",
+    "many", "some", "no", "not", "we", "our", "you", "your", "he", "she",
+    "his", "her", "i", "my", "one", "two", "three", "first", "second", "third",
+))
 
 
 def _band(metric, value):
@@ -96,6 +115,41 @@ def _inline_to_plain(s):
 def _split_sentences(text):
     raw = re.split(r"(?<=[.!?])\s+", text)
     return [s for s in (x.strip() for x in raw) if s]
+
+
+def _extract_entities(sentences):
+    """Distinct named/numeric specifics and how often each recurs.
+
+    The first token of a sentence is skipped because English capitalizes it
+    regardless of whether it names anything — the same simplification the
+    specificity proxy makes.
+    """
+    counts = {}
+    for s in sentences:
+        tokens = s.split()
+        run = []
+        for tok in tokens[1:]:
+            bare = tok.strip("([{\"'“”’,;:.!?)]}")
+            if not bare:
+                continue
+            if _NUMERIC_RE.match(bare):
+                counts[bare.lower()] = counts.get(bare.lower(), 0) + 1
+                if run:
+                    key = " ".join(run).lower()
+                    counts[key] = counts.get(key, 0) + 1
+                    run = []
+                continue
+            if _ENTITY_TOKEN_RE.match(bare) and bare.lower() not in _ENTITY_STOPWORDS:
+                run.append(bare)
+                continue
+            if run:
+                key = " ".join(run).lower()
+                counts[key] = counts.get(key, 0) + 1
+                run = []
+        if run:
+            key = " ".join(run).lower()
+            counts[key] = counts.get(key, 0) + 1
+    return counts
 
 
 def structure_scan(md_text: str) -> dict:
@@ -205,6 +259,33 @@ def structure_scan(md_text: str) -> dict:
         "paragraphs_measured": len(plens), "coefficient_of_variation": pcv,
         "band": _band("paragraph_evenness_cv", pcv) if pcv is not None else "OK",
         "meaning": "Uniform paragraph rhythm is a machine fingerprint; human writing has short punches and long developments.",
+    }
+
+    ents = _extract_entities(sentences)
+    distinct = len(ents)
+    mentions = sum(ents.values())
+    depth = round(mentions / distinct, 2) if distinct else None
+    singletons = sum(1 for c in ents.values() if c == 1)
+    top = sorted(ents.items(), key=lambda kv: (-kv[1], kv[0]))[:10]
+    # A short piece names things once because it has no room to develop them —
+    # that is brevity, not churn. Only speak where development was possible.
+    measurable = words_total >= 600 and distinct >= 12
+    findings["entity_development"] = {
+        "distinct_entities": distinct,
+        "distinct_per_1000_words": round(distinct * per_k, 2),
+        "mentions_per_entity": depth,
+        "single_mention_share": round(singletons / distinct, 2) if distinct else None,
+        "most_developed": [{"entity": e, "mentions": c} for e, c in top if c > 1],
+        "band": _band("mentions_per_entity", depth) if measurable else "OK",
+        "measurable": measurable,
+        "measurable_note": ("Banded only at >=600 words and >=12 distinct entities; below that a "
+                            "single mention each is brevity, not churn."),
+        "meaning": ("A new name or number in almost every sentence, each mentioned once, reads as a "
+                    "machine establishing a setting; human experts return to the few specifics that "
+                    "carry the argument. FIX BY DEVELOPING, NEVER BY DELETING: give an existing "
+                    "specific a second, substantive mention from the verified fact-check file. "
+                    "Cutting specifics to raise this number would lower the specificity finding "
+                    "above and is the wrong move — and inventing a mention is forbidden outright."),
     }
 
     order = {"OK": 0, "NOTE": 1, "ATTENTION": 2}

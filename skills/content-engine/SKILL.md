@@ -199,7 +199,9 @@ All content-engine outputs go to `${CLAUDE_PLUGIN_DATA}/{brand}/seo/content-engi
 02-outline.md              H1, H2/H3 structure with target word counts per section
 03-draft-v1.md             first complete draft
 04-fact-check.md           per-claim verification + citations
-05-humanize.md             AI-pattern detection + rewrite log
+00-source-draft.md         the author's own words, verbatim (ONLY when --source-draft was given)
+05-humanize.md             AI-pattern detection + rewrite log (flags from scripts/ai-tell-scan.py)
+05-authorship.json         author-sentence provenance (ONLY when 00-source-draft.md exists)
 06-brand-voice-check.md    voice score (formality/energy/humor/authority) vs brand profile
 07-seo-checklist.md        title, meta, schema, internal links, image alt text
 08-quality-scorecard.md    the gates below
@@ -213,7 +215,7 @@ PLAN.md                    summary + publish instructions
 |---|---|
 | **brand_voice_match** | `06-brand-voice-check.md` shows ≤ 1.5 point deviation from brand profile on each axis (formality/energy/humor/authority) |
 | **fact_check_clean** | `04-fact-check.md` shows 0 unverified claims and ≥ 1 citation per factual statement |
-| **humanize_passed** | `05-humanize.md` shows AI-pattern density below the brand-specific threshold (default: under 10% of paragraphs flagged) |
+| **humanize_passed** | `python "${CLAUDE_PLUGIN_ROOT}/scripts/ai-tell-scan.py" --file 05-humanize.md` reports `humanize_passed: true` — i.e. `flagged_paragraph_pct` ≤ the brand threshold (default 10%). **Run the script; do not judge this by eye.** See "Humanize step" below for what counts as a flag |
 | **seo_complete** | `07-seo-checklist.md` shows title ≤ 60 chars, meta 150-160 chars, ≥ 1 schema type, ≥ 3 internal links, all images have alt text |
 | **eu_disclosure_if_ai** | If the brand has `target_markets` including EU AND the content is AI-generated, `09-publish-ready.md` carries the required Article 50 disclosure (machine-readable + visible) |
 
@@ -227,9 +229,49 @@ Beyond the EU gate above, every publish-ready draft applies the brand's `ai_disc
 2. When it applies, append the block as the final content paragraph of `09-publish-ready.md` — inside the body, so it survives `/digital-marketing-pro:publish-blog` — using: no custom text and no author → `*Created with AI assistance and reviewed by our editorial team.*`; author set → `*Created with AI assistance; researched, fact-checked, and edited by {author}.*`; custom text → verbatim. The default wording is vendor-neutral (no model or vendor names) and claims only the review this pipeline performs. The author field is OPTIONAL — never invent a name, never block on it being blank.
 3. Record the decision in the handoff metadata either way: `disclosure: {applied, mode, surface}` — an unapplied disclosure is a recorded choice, not an omission.
 
+## Humanize step (`05-humanize.md`) — what a flag actually is
+
+The `humanize_passed` gate is measured by `scripts/ai-tell-scan.py`, not by impression. Run it, paste its JSON into `05-humanize.md`, and work the flags it returns:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/ai-tell-scan.py" --file 05-humanize.md [--max-flagged-pct N]
+```
+
+**Three tells count toward the gate**, because they are precise enough to gate on:
+
+- **`llm_favored_word`** — delve, leverage, seamless, tapestry, testament, pivotal, myriad… → the plain word you would say out loud, or better, a concrete noun from the piece's own subject.
+- **`significance_marker`** — a sentence whose only job is to tell the reader what a neighbouring sentence means: "here's the thing", "that's the part that got me", "which is exactly the problem", "let that sink in". → **DELETE the sentence. Do not reword it.** The specific it points at already does the work; softening a marker into a gentler marker is not a fix. If the moment matters, return to the specific instead of announcing it.
+- **`soft_adverb_cluster`** — two or more of honestly / genuinely / truly / literally / actually / basically / quietly in one sentence → delete them. A sentence that needs force needs a specific, not an adverb.
+
+**Everything else the scan reports is advisory context, not gate material** — connective openers ("So,", "However,"), participial openers, em-dash density, and short ungrounded one-liners. Those appear in ordinary human writing too, and gating on them would fail good copy and spin the pipeline into pointless rewrites. Fix them where the scan is right; do not chase the number.
+
+**The fix for any flag is a verified specific from `04-fact-check.md`, never a synonym swap and never an invented fact.** If no grounding exists for a sentence, cut the sentence or add a defensible caveat — do not invent a number, date, source, or example to make prose sound human.
+
+## Bring your own words (`--source-draft`)
+
+When the user supplies their own rough draft — a voice-note transcript, bullets, a stream-of-consciousness dump — save it verbatim as `00-source-draft.md` and build the piece **around their sentences instead of over them**. Do not clean it up on the way in; the mess is the signal.
+
+- Carry their sentences into `03-draft-v1.md` **verbatim** — typos, run-ons, lowercase and all. Never paraphrase, condense, merge, or grammar-fix them; "improving" their voice is what deletes their authorship.
+- **The humanize step's tells do not apply to their sentences.** If the author wrote "here's the thing", it stays. A pattern describes what a model writes unprompted, not what a person chose to say.
+- Add your material *between* their sentences: the research, the sourced specifics, the structure, the sections they only gestured at.
+- **Their claims are their voice, not verified facts.** Anything factual you ADD still comes from `04-fact-check.md`. If one of their claims contradicts the research, flag it for the human editor and leave the sentence alone — they decide, not you.
+- After humanizing, verify the promise was kept:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/authorship.py" \
+  --source 00-source-draft.md --draft 05-humanize.md --out 05-authorship.json
+```
+
+Exit 3 means author sentences were rewritten or dropped. **Restore them verbatim and re-run until it exits 0.** This one is not advisory: every AI-tell scan here stays advisory because a detector signal is a probabilistic opinion, but "the author wrote this sentence and it is no longer here" is a checkable fact about a promise this pipeline made.
+
+- **Provenance-accurate disclosure.** When `05-authorship.json` reports `may_claim_authored: true` — which requires both that ≥25% of the finished words are the author's verbatim AND that none of their sentences were rewritten or dropped — the disclosure in `09-publish-ready.md` becomes `*Written by {author} with AI assistance for research, structure, and fact-checking.*` (or, with no author named, `*Written from the author's own draft, developed with AI assistance and reviewed before publication.*`). Otherwise use the standard wording above. **Never infer authorship from anything but this record.** The direction is one-way by design: an authorship record may only ever make a disclosure MORE specific about human involvement that demonstrably happened. Overclaiming human authorship is the one form of this statement a reader cannot check.
+- There is no target ratio. `author_word_share` exists so the disclosure can be accurate; no number makes text "human enough", and nothing here is aimed at a detector.
+
 ## Structural-tell pass (advisory, never a gate)
 
-After `05-humanize.md`, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/structural-tell-scan.py" --file {draft}` — the Tier-2 STRUCTURAL layer (StoryScope-derived: AI text stays detectable on structure even after a perfect surface pass). Where it reports NOTE/ATTENTION (moralizing closers, template symmetry, low specificity, stance absence, uniform rhythm), apply structural edits grounded in the fact-check file: cut the spelled-out takeaway, break symmetry the content doesn't earn, add specific verified facts (never invented), take a defensible stance. Append the scan JSON to `05-humanize.md` and note the overall band in `08-quality-scorecard.md` as ADVISORY — it never gates `status: ready`, and it measures visible structure only (it cannot see and has no relationship to any statistical watermark).
+After `05-humanize.md`, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/structural-tell-scan.py" --file {draft}` — the Tier-2 STRUCTURAL layer (StoryScope-derived: AI text stays detectable on structure even after a perfect surface pass). Where it reports NOTE/ATTENTION (moralizing closers, template symmetry, low specificity, stance absence, uniform rhythm, entity development), apply structural edits grounded in the fact-check file: cut the spelled-out takeaway, break symmetry the content doesn't earn, add specific verified facts (never invented), take a defensible stance.
+
+**`entity_development`** deserves its own note because it is easy to fix the wrong way. A NOTE/ATTENTION band means the piece introduces name after name and number after number, each mentioned once and abandoned — a machine establishing a setting rather than an expert making a case. **Fix by developing, never by deleting:** give a specific the argument already rests on a second substantive mention from `04-fact-check.md` — what it implies, who disputes it, what it cost. Cutting specifics to move this number would lower the `specificity` finding in the same scan, which matters more, and inventing a mention is forbidden outright. The proxy stays silent below 600 words or 12 distinct entities, because a short piece names things once for lack of room. Append the scan JSON to `05-humanize.md` and note the overall band in `08-quality-scorecard.md` as ADVISORY — it never gates `status: ready`, and it measures visible structure only (it cannot see and has no relationship to any statistical watermark).
 
 ## Chain handoffs
 
@@ -243,7 +285,7 @@ After `05-humanize.md`, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/structural-te
 ## Tips & caveats
 
 - **Brand voice deviation tolerance is per-axis, not aggregate.** A piece that's 1 point off on every axis is not the same as 4 points off on humor alone — the latter is a fail even if the average looks OK.
-- **Humanize step is not a guarantee** against AI-detection tools — it's a probabilistic improvement. For pieces that must minimize AI-sounding patterns, run additional humanize passes and re-score with `/digital-marketing-pro:eval-content`, iterating until the flagged patterns clear; a final human edit pass remains the strongest signal.
+- **Humanize step is not a guarantee** against AI-detection tools — it's a probabilistic improvement, and no scan here detects or removes any statistical watermark. `ai-tell-scan.py` measures visible text only. For pieces that must minimize AI-sounding patterns, run additional humanize passes and re-score with `/digital-marketing-pro:eval-content`, iterating until the flagged patterns clear; a final human edit pass remains the strongest signal — and the strongest signal of all is the author's own sentences, which is what `--source-draft` preserves.
 - **Fact-check is content's most-skipped gate.** Don't ship a piece with "0 unverified" only because no one looked. Run `/digital-marketing-pro:verify-claims` against the draft if you didn't have a fact-checker in the loop.
 - **For pillar content,** target the upper bound of word count (3000+ for SaaS, 5000+ for B2B research) — pillar pages need depth for topical authority. For spoke content, the lower bound is fine.
 - **Don't write the meta description last.** Write it FIRST, before the article — it's the answer to "what's this page's promise?" Writing it last produces post-hoc summaries that don't drive click intent.
