@@ -386,12 +386,29 @@ def create_brand(name, slug=None):
         if not fpath.exists():
             fpath.write_text("[]", encoding="utf-8")
 
-    # Set as active brand
+    # Set as active brand. This is a GLOBAL side effect: every skill that reads
+    # "the active brand" now resolves to the new one, and _active-brand.json
+    # stores a single value with no history. Creating a throwaway brand used to
+    # silently repoint a working session at it with nothing printed, so say so
+    # and name the way back.
+    previous = None
+    if ACTIVE_BRAND_FILE.exists():
+        try:
+            previous = json.loads(
+                ACTIVE_BRAND_FILE.read_text(encoding="utf-8")).get("active_slug")
+        except (json.JSONDecodeError, OSError):
+            previous = None
+
     _common.atomic_write_json(
         ACTIVE_BRAND_FILE,
-        {"active_slug": slug, "updated_at": datetime.now().isoformat()})
+        {"active_slug": slug, "updated_at": datetime.now().isoformat(),
+         "previous_slug": previous})
 
     print(f"BRAND_CREATED: {name} ({slug})")
+    if previous and previous != slug:
+        print(f"ACTIVE_BRAND_CHANGED: {previous} -> {slug}")
+        print(f"  Every skill that reads the active brand now resolves to {slug!r}.")
+        print(f"  To go back: python setup.py --switch-brand {previous}")
     print(f"Profile: {profile_path}")
     return str(profile_path)
 
@@ -526,6 +543,12 @@ def main():
     parser.add_argument("--check-brand", action="store_true", help="Check active brand")
     parser.add_argument("--install", choices=["lite", "full"], help="Install dependencies")
     parser.add_argument("--create-brand", metavar="NAME", help="Create a new brand profile")
+    # create_brand() has always accepted a slug; the CLI never exposed it, so a
+    # caller who needed a specific slug had to import the module and call the
+    # function directly. The storage path IS the slug, so this was not optional.
+    parser.add_argument("--slug", metavar="SLUG",
+                        help="Explicit slug for --create-brand (default: slugified name). "
+                             "The slug is the directory name under ~/.claude-marketing/brands/.")
     parser.add_argument("--list-brands", action="store_true", help="List all brands")
     parser.add_argument("--switch-brand", metavar="SLUG", help="Switch active brand")
     parser.add_argument("--migrate", action="store_true", help="Migrate brand schemas")
@@ -555,7 +578,7 @@ def main():
             exit_code = 1
 
     if args.create_brand:
-        create_brand(args.create_brand)
+        create_brand(args.create_brand, slug=args.slug)
 
     if args.list_brands:
         list_brands()

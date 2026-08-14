@@ -323,7 +323,14 @@ def generate_deviations(dimension_scores: dict, profile: dict) -> list[dict]:
             actual = info["actual"]
             low_label, high_label = labels.get(dim, ("low", "high"))
             direction = high_label if actual > target else low_label
-            target_dir = high_label if target > 0.5 else low_label
+            # The remedy is the direction from actual TOWARD target, which is
+            # simply the opposite of how the content currently reads. Pivoting
+            # on an absolute 0.5 produced advice that pointed the wrong way:
+            # copy scoring humor 0.00 against a target of 0.20 was told it
+            # "reads as too serious" and that the brand "calls for more serious
+            # tone" — following that message literally moves the score further
+            # out of tolerance.
+            target_dir = low_label if actual > target else high_label
             deviations.append({
                 "dimension": dim,
                 "severity": "high" if dist > 0.35 else "medium",

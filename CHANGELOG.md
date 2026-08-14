@@ -6,6 +6,64 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.28.0] - 2026-08-15
+
+A `brand-setup` → `content-engine` run on a fresh brand, following the instructions
+literally, surfaced five contract defects that no unit test could see — each is about what
+an instruction MEANS rather than whether code runs.
+
+### Fixed — `brand_voice_match` was unfailable as written
+
+The gate asked for "≤ 1.5 point deviation on each axis" while `brand-voice-scorer.py` emits
+`distance` bounded at 1.0. Read literally it could never fail — the same hollow-gate defect
+as a gate with no measurement behind it, sitting in the scorecard passing everything. Now
+stated in the scorer's own 0–1 unit at **`distance` ≤ 0.15**, which is the threshold the
+scorer already used internally, with a test that fails if the two ever diverge. The gate also
+now says plainly what it does not measure: the target axis values come from `brand-setup`'s
+descriptor→number mapping, and there is no rubric for descriptors it has not seen.
+
+### Fixed — `seo_complete` contained one impossible and one vacuous criterion
+
+"≥ 3 internal links" cannot be met by a pre-launch brand's first article, and "all images
+have alt text" passed at zero images — a pass verifying nothing. Both now take an explicit
+`N/A` that must name its reason; a bare `N/A` is a FAIL, so the exemption cannot become a way
+to skip any gate.
+
+### Fixed — `brand-setup` produced a profile its own validator rejected
+
+The generator writes `brand_voice` / `target_markets` and no `guardrails`; `validate-profile`
+demanded `voice.*`, `target_jurisdictions` and `guardrails.*` as BLOCKERs. A freshly created
+brand therefore failed the plugin's own validator. `content-engine` and `brand-voice-scorer.py`
+both read the generator's keys, which made the validator the outlier — it now accepts them,
+and missing guardrails is a WARNING for unregulated brands rather than an unsatisfiable BLOCKER.
+
+### Fixed — the voice remediation message inverted its own diagnosis
+
+Copy scoring humor 0.00 against a target of 0.20 was told it "reads as too serious" **and**
+that the brand "calls for more serious tone". The remedy direction pivoted on an absolute 0.5
+instead of the direction of the gap, so following the advice moved the score further out of
+tolerance.
+
+### Fixed — two instructions wrote incompatible things to `05-scans.json`
+
+One said save, the other said append; appending a second JSON document to a file holding one
+yields a file `json.load` rejects. The file now has one specified shape —
+`{"surface": …, "structure": …}` — is listed in the numbered-output convention it was missing
+from, and carries the Windows note that the documented redirect writes cp1252 and breaks
+parsing without `PYTHONIOENCODING=utf-8`.
+
+### Fixed — creating a brand silently repointed every skill at it
+
+`create_brand` set the global active brand with nothing printed, and `_active-brand.json`
+stores one value with no history, so the previous brand was unrecoverable. It now announces
+the change, records `previous_slug`, and prints the command to undo it. `--slug` is also
+finally exposed on the CLI: `create_brand()` always accepted one, the storage path IS the
+slug, and callers who needed a specific slug had to import the module to get it.
+
+Suite: 340 -> 358.
+
+---
+
 ## [3.27.0] - 2026-08-15
 
 The humanize gate got measured against writing that predates ChatGPT, and lost a signal

@@ -201,6 +201,7 @@ All content-engine outputs go to `${CLAUDE_PLUGIN_DATA}/{brand}/seo/content-engi
 04-fact-check.md           per-claim verification + citations
 00-source-draft.md         the author's own words, verbatim (ONLY when --source-draft was given)
 05-humanize.md             AI-pattern detection + rewrite log (flags from scripts/ai-tell-scan.py)
+05-scans.json              Surface + structural scan output, keyed {"surface":…, "structure":…}
 05-authorship.json         author-sentence provenance (ONLY when 00-source-draft.md exists)
 06-brand-voice-check.md    voice score (formality/energy/humor/authority) vs brand profile
 07-seo-checklist.md        title, meta, schema, internal links, image alt text
@@ -213,10 +214,10 @@ PLAN.md                    summary + publish instructions
 
 | Gate | What it checks |
 |---|---|
-| **brand_voice_match** | `06-brand-voice-check.md` shows ≤ 1.5 point deviation from brand profile on each axis (formality/energy/humor/authority) |
+| **brand_voice_match** | `06-brand-voice-check.md` shows **`distance` ≤ 0.15 on each axis** (formality/energy/humor/authority). **The unit is the scorer's 0–1 scale, not the profile's 1–10 scale.** This gate previously read "≤ 1.5 point deviation" while `brand-voice-scorer.py` emits `distance` bounded at 1.0 — so read literally it could never fail, which is the same hollow-gate defect as a gate with no measurement behind it. 0.15 is the threshold the scorer already uses internally to flag a deviation. Note what this does and does not measure: the target axis values come from `brand-setup`'s mapping of voice descriptors to numbers, and there is no rubric for descriptors it has not seen — so a FAIL here is a prompt to check the profile's targets as much as the copy |
 | **fact_check_clean** | `04-fact-check.md` shows 0 unverified claims and ≥ 1 citation per factual statement |
 | **humanize_passed** | `python "${CLAUDE_PLUGIN_ROOT}/scripts/ai-tell-scan.py" --file 05-humanize.md` reports `humanize_passed: true` — i.e. `flagged_paragraph_pct` ≤ the brand threshold (default 10%). **Run the script; do not judge this by eye.** See "Humanize step" below for what counts as a flag |
-| **seo_complete** | `07-seo-checklist.md` shows title ≤ 60 chars, meta 150-160 chars, ≥ 1 schema type, ≥ 3 internal links, all images have alt text |
+| **seo_complete** | `07-seo-checklist.md` shows title ≤ 60 chars, meta 150-160 chars, ≥ 1 schema type, ≥ 3 internal links, all images have alt text. **Two criteria take an explicit `N/A` rather than a pass:** internal links when the brand has no published site (a pre-launch brand's first article cannot link internally to anything — record `N/A (no site)` and the gate ignores it, but never record it as met), and alt text when the piece has no images (0 of 0 is a pass that verifies nothing — record `N/A (no images)`). An `N/A` must name its reason; a bare `N/A` is a FAIL |
 | **eu_disclosure_if_ai** | If the brand has `target_markets` including EU AND the content is AI-generated, `09-publish-ready.md` carries the required Article 50 disclosure (machine-readable + visible) |
 
 `status: ready` requires all five gates pass.
@@ -231,7 +232,9 @@ Beyond the EU gate above, every publish-ready draft applies the brand's `ai_disc
 
 ## Humanize step (`05-humanize.md`) — what a flag actually is
 
-The `humanize_passed` gate is measured by `scripts/ai-tell-scan.py`, not by impression. Run it, save its JSON to **`05-scans.json`**, and work the flags it returns.
+The `humanize_passed` gate is measured by `scripts/ai-tell-scan.py`, not by impression. Run it and work the flags it returns.
+
+**`05-scans.json` holds BOTH scans under named keys — never two JSON documents in one file.** Write it as `{"surface": {...ai-tell-scan output...}, "structure": {...structural-tell-scan output...}}`. Two `>` redirects into the same path produce a file that `json.load` rejects; a run doing exactly that is how this was found. On Windows, redirect with `PYTHONIOENCODING=utf-8` set — the default cp1252 encodes the em-dash in the advisory note as byte `0x97` and the file then fails to parse.
 
 **Keep `05-humanize.md` to the article body.** `scripts/authorship.py --draft 05-humanize.md` classifies every sentence in that file, so scan JSON or report prose living there is counted as machine-added text against the author's share. Measured on a real run: appending the scan JSON and a short report moved `author_word_share` from 0.253 to 0.206 and flipped `may_claim_authored` from true to false — denying the author credit for work they actually did, on nothing but file layout. Reports go in `05-scans.json`; the draft file stays the draft.
 
@@ -278,7 +281,7 @@ Exit 3 means author sentences were rewritten or dropped. **Restore them verbatim
 
 After `05-humanize.md`, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/structural-tell-scan.py" --file {draft}` — the Tier-2 STRUCTURAL layer (StoryScope-derived: AI text stays detectable on structure even after a perfect surface pass). Where it reports NOTE/ATTENTION (moralizing closers, template symmetry, low specificity, stance absence, uniform rhythm, entity development), apply structural edits grounded in the fact-check file: cut the spelled-out takeaway, break symmetry the content doesn't earn, add specific verified facts (never invented), take a defensible stance.
 
-**`entity_development`** deserves its own note because it is easy to fix the wrong way. A NOTE/ATTENTION band means the piece introduces name after name and number after number, each mentioned once and abandoned — a machine establishing a setting rather than an expert making a case. **Fix by developing, never by deleting:** give a specific the argument already rests on a second substantive mention from `04-fact-check.md` — what it implies, who disputes it, what it cost. Cutting specifics to move this number would lower the `specificity` finding in the same scan, which matters more, and inventing a mention is forbidden outright. The proxy stays silent below 600 words or 12 distinct entities, because a short piece names things once for lack of room. Append the scan JSON to **`05-scans.json`** (never to `05-humanize.md` — see the humanize step: that file is measured sentence-by-sentence by `authorship.py`) and note the overall band in `08-quality-scorecard.md` as ADVISORY — it never gates `status: ready`, and it measures visible structure only (it cannot see and has no relationship to any statistical watermark).
+**`entity_development`** deserves its own note because it is easy to fix the wrong way. A NOTE/ATTENTION band means the piece introduces name after name and number after number, each mentioned once and abandoned — a machine establishing a setting rather than an expert making a case. **Fix by developing, never by deleting:** give a specific the argument already rests on a second substantive mention from `04-fact-check.md` — what it implies, who disputes it, what it cost. Cutting specifics to move this number would lower the `specificity` finding in the same scan, which matters more, and inventing a mention is forbidden outright. The proxy stays silent below 600 words or 12 distinct entities, because a short piece names things once for lack of room. Add the scan JSON to **`05-scans.json`** under the `"structure"` key, alongside the surface scan's `"surface"` key (never to `05-humanize.md` — see the humanize step: that file is measured sentence-by-sentence by `authorship.py`) and note the overall band in `08-quality-scorecard.md` as ADVISORY — it never gates `status: ready`, and it measures visible structure only (it cannot see and has no relationship to any statistical watermark).
 
 ## Chain handoffs
 
