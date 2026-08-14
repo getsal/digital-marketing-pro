@@ -386,3 +386,57 @@ class TestAphorismProxyIsCalibrated(unittest.TestCase):
         r = ats.ai_tell_scan(HUMAN_COPY)
         self.assertTrue(r["humanize_passed"])
         self.assertIn(r["advisory_rating"], ("LOW", "MODERATE"))
+
+
+class TestRobustnessAndPerformance(unittest.TestCase):
+    """Found by adversarial load testing, 2026-08-14. The all-pairs authorship
+    matcher was quadratic (11.4s at 500 sentences) and its prefilter pruned
+    nothing when the draft genuinely contained the author's sentences."""
+
+    ADVERSARIAL = {
+        "empty": "", "whitespace": "   \n\n\t ", "single_char": "x",
+        "no_punctuation": "this never ends",
+        "unicode": "# 🎯 Résumé\n\nLe café naïve 日本語 Ελληνικά مرحبا\n",
+        "rtl": "# שלום\n\nזהו טקסט עם 31 ו-14.\n",
+        "cjk": "# 標題\n\n這是一段中文文字。第二句話。\n",
+        "malformed_frontmatter": "---\ntitle: unterminated\n\n# H\n\nBody.\n",
+        "unclosed_fence": "# D\n\n```py\nprint(1)\n\nAfter.\n",
+        "null_bytes": "# D\x00\n\nText \x00 here.\n",
+        "html": "# <script>alert(1)</script>\n\n<img src=x onerror=y>\n",
+        "windows_newlines": "# D\r\n\r\nA line.\r\nAnother.\r\n",
+        "only_punctuation": "... !!! ??? ---\n",
+    }
+
+    def test_scans_never_crash_on_adversarial_input(self):
+        for name, text in self.ADVERSARIAL.items():
+            with self.subTest(case=name):
+                a = ats.ai_tell_scan(text)
+                s = sts.structure_scan(text)
+                self.assertIn(a["advisory_rating"], ("LOW", "MODERATE", "HIGH"))
+                self.assertIn(s["overall"], ("OK", "NOTE", "ATTENTION"))
+                self.assertIsInstance(a["humanize_passed"], bool)
+                for f in s["findings"].values():
+                    self.assertIn(f["band"], ("OK", "NOTE", "ATTENTION"))
+
+    def test_authorship_never_crashes_on_adversarial_input(self):
+        for name, text in self.ADVERSARIAL.items():
+            with self.subTest(case=name):
+                r = auth.classify(text, text)
+                self.assertEqual(r["violations"]["author_sentences_rewritten"], 0)
+                auth.classify(text, "")
+                auth.classify("", text)
+
+    def test_authorship_is_not_quadratic(self):
+        import time
+        big = "The Fraunhofer report tracked review delays across Bavaria in 2024. " * 5000
+        start = time.time()
+        r = auth.classify(big, big)
+        elapsed = time.time() - start
+        self.assertEqual(r["counts"]["author_verbatim"], 5000)
+        self.assertLess(elapsed, 5.0,
+                        f"authorship matching took {elapsed:.1f}s on 5000 sentences — "
+                        "the quadratic all-pairs behaviour has returned")
+
+    def test_scan_output_is_deterministic_in_process(self):
+        blobs = {json.dumps(ats.ai_tell_scan(HUMAN_COPY), sort_keys=True) for _ in range(5)}
+        self.assertEqual(len(blobs), 1, "ai_tell_scan output varies between identical runs")

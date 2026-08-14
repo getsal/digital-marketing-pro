@@ -6,6 +6,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.26.2] - 2026-08-14
+
+Load-test corrections, mirroring ContentForge 3.23.3.
+
+### Fixed — the authorship matcher was quadratic
+
+`classify()` was all-pairs: 11.43s at 500 sentences, and its difflib prefilter
+pruned nothing when the draft genuinely contained the author's sentences. A long
+piece would have hung the humanize step. Rewritten as a hash-indexed pass for
+verbatim survivors plus fuzzy matching over the remainder only, bounded by a
+length test derived from difflib's ratio formula. **5000 sentences: 0.07s.**
+
+### Verified — adversarial inputs and determinism
+
+The same 28-case battery (empty, 50k words, RTL, CJK, null bytes, unclosed
+fences, HTML injection, Windows newlines) runs through `ai-tell-scan.py`,
+`structural-tell-scan.py` and `authorship.py` without a crash, with every band
+inside its declared vocabulary and every metric finite and non-negative. Scan
+output is byte-identical across repeated runs. Exit codes confirmed: 0 / 1 / 3.
+The cases are now regression tests, including an explicit non-quadratic
+assertion on the matcher.
+
+331 -> 335 tests.
+
 ## [3.26.1] - 2026-08-14
 
 Field-test corrections to the new `ai-tell-scan.py`, measured against a
