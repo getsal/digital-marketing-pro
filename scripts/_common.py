@@ -86,13 +86,15 @@ def workspace_root() -> Path:
     Resolution order:
       1. $CLAUDE_MARKETING_HOME (explicit override; used by tests)
       2. $CLAUDE_PLUGIN_DATA/digital-marketing-pro if $CLAUDE_PLUGIN_DATA is
-         set (non-empty) AND that directory exists
+         set (non-empty) AND that directory exists; $PLUGIN_DATA (the Agent
+         Plugins 1.0 standard name — non-Claude hosts set only this) is the
+         fallback spelling
       3. ~/.claude-marketing
     """
     override = os.environ.get("CLAUDE_MARKETING_HOME")
     if override:
         return Path(override).expanduser()
-    plugin_data = os.environ.get("CLAUDE_PLUGIN_DATA")
+    plugin_data = os.environ.get("CLAUDE_PLUGIN_DATA") or os.environ.get("PLUGIN_DATA")
     if plugin_data:  # empty string must NOT resolve to Path(".")
         base = Path(plugin_data).expanduser()
         if base.exists():
