@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.30.0] - 2026-08-16
+
+### Added — the content-engine run auditor
+
+`scripts/run-audit.py` re-derives a run's gate claims from its artifacts, using
+the plugin's own scripts. "status: ready" now requires the audit: the humanize
+verdict is re-measured with a fresh ai-tell-scan run rather than read off the
+scorecard; scan JSON embedded in the measured file (the corruption class that
+once flipped `may_claim_authored`) is a violation; the authorship record must
+match a fresh measurement; recorded voice distances must actually sit inside the
+0.15 gate a ready-declaration claims they do; publish-ready copy must be free of
+production placeholders. Missing inputs are reported-N/A, never silent-pass.
+12 new tests with plants for every guard.
+
 ## [3.29.0] - 2026-08-16
 
 ### Added — Agent Plugins 1.0 packaging

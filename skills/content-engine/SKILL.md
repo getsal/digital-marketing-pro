@@ -220,7 +220,13 @@ PLAN.md                    summary + publish instructions
 | **seo_complete** | `07-seo-checklist.md` shows title ≤ 60 chars, meta 150-160 chars, ≥ 1 schema type, ≥ 3 internal links, all images have alt text. **Two criteria take an explicit `N/A` rather than a pass:** internal links when the brand has no published site (a pre-launch brand's first article cannot link internally to anything — record `N/A (no site)` and the gate ignores it, but never record it as met), and alt text when the piece has no images (0 of 0 is a pass that verifies nothing — record `N/A (no images)`). An `N/A` must name its reason; a bare `N/A` is a FAIL |
 | **eu_disclosure_if_ai** | If the brand has `target_markets` including EU AND the content is AI-generated, `09-publish-ready.md` carries the required Article 50 disclosure (machine-readable + visible) |
 
-`status: ready` requires all five gates pass.
+`status: ready` requires all five gates pass — **and the run audit re-deriving them:**
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/run-audit.py" --run-dir "${CLAUDE_PLUGIN_DATA}/{brand}/seo/content-engine/{date}/{slug}"
+```
+
+Run it after writing `08-quality-scorecard.md` and before declaring `status: ready`. It re-derives what the scorecard claims from the artifacts themselves: every numbered artifact present, the humanize verdict re-measured with a fresh `ai-tell-scan.py` run (never read off the scorecard), no scan JSON embedded in the file `authorship.py` measures, the authorship record matching a fresh measurement when a source draft exists, recorded voice distances actually inside the 0.15 gate, and the publish-ready copy free of production placeholders. **Exit 1 means the scorecard is claiming something the artifacts do not support — fix the finding, never the wording.** The verdict lands in `run-audit.json` beside the artifacts, so the next reader can see the run was verified rather than trusted.
 
 ## AI-assistance disclosure (all runs, not just EU)
 

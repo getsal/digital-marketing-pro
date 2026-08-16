@@ -645,6 +645,7 @@
         "campaign-tracker.py",
         "detect_surface.py",
         "readability-analyzer.py",
+        "run-audit.py",
         "structural-tell-scan.py"
       ],
       "missing_scripts": [],
@@ -664,7 +665,7 @@
         "verify-claims"
       ],
       "doc_files": 17,
-      "bytes": 149928
+      "bytes": 150907
     },
     {
       "name": "content-repurpose",
