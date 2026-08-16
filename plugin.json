@@ -1,10 +1,23 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "digital-marketing-pro",
-  "version": "3.30.0",
+  "version": "3.30.1",
   "description": "Complete digital marketing operating system \u2014 163 skills and 24 agents covering strategy, content, SEO/AEO, paid media, analytics, and compliance.",
   "author": {
     "name": "Indranil Banerjee",
     "url": "https://github.com/indranilbanerjee"
-  }
+  },
+  "homepage": "https://github.com/indranilbanerjee/digital-marketing-pro",
+  "repository": "https://github.com/indranilbanerjee/digital-marketing-pro",
+  "license": "MIT",
+  "keywords": [
+    "marketing",
+    "seo",
+    "aeo",
+    "paid-media",
+    "analytics",
+    "email",
+    "social-media",
+    "compliance"
+  ]
 }
