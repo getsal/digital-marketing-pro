@@ -68,7 +68,7 @@ rm -rf ~/.claude-marketing/
 
 **Expected Results:**
 - [ ] Marketplace loads without errors
-- [ ] DM Pro listed with version 3.17.0
+- [ ] DM Pro listed with the current version (= CHANGELOG.md top entry)
 - [ ] Description mentions "24 specialist agents, 18 commands, 163 skills"
 - [ ] Installation completes without rollback
 - [ ] No "Host key verification failed" error (uses HTTPS, not SSH)
@@ -622,14 +622,19 @@ Run this after any changes to verify nothing is broken.
 
 ### Versioning Consistency
 
-- [ ] `plugin.json` version = 3.17.0
+Never pin version numbers or counts in this checklist — they rot silently (this very
+section once pinned v3.17.0 for thirteen releases). Verify against the sources of truth:
+
+- [ ] `.claude-plugin/plugin.json` version = CHANGELOG.md top entry = README version
+      badge (enforced by `tests/test_release_consistency.py`)
+- [ ] Root Agent Plugins `plugin.json` carries the same version (enforced by
+      `tests/test_agent_plugins_portability.py`)
 - [ ] `hooks/hooks.json` ships `{"hooks":{}}` (empty; no version string to sync)
-- [ ] `README.md` version = 3.17.0
-- [ ] Marketplace entry version for `digital-marketing-pro` = 3.17.0
-- [ ] `24 agents` in all descriptions
-- [ ] `163 skills` in all descriptions
-- [ ] `18 commands` in all descriptions
-- [ ] `~86 scripts` in all descriptions
+- [ ] Marketplace entry version matches (checked by the marketplace repo's own suite)
+- [ ] Skill / agent / command / script counts in every live doc match the filesystem —
+      run `python -m pytest tests/test_doc_counts.py` instead of counting by hand
+- [ ] AGENTS.md "Supported surfaces" line carries the current version and all 8 native
+      surfaces (guarded by the same test)
 - [ ] `10 registry-backed HTTP connectors` (+ 4 catalog-only servers) in all descriptions
 
 ---

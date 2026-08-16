@@ -44,7 +44,7 @@ digital-marketing-pro/
 │   ├── journey-orchestrator.md        # NEW in v2.1.0
 │   ├── quality-assurance.md           # NEW in v2.2.0
 │   └── localization-specialist.md     # NEW in v2.2.0
-├── scripts/                           # 86 Python scripts + requirements
+├── scripts/                           # 93 Python scripts + requirements
 │   ├── setup.py                       # Brand management, initialization
 │   ├── campaign-tracker.py            # Campaign persistence + violation tracking
 │   ├── adaptive-scorer.py             # Context-aware scoring weights
@@ -422,7 +422,7 @@ When enabled, these three reference lifecycle hooks wrap a Claude Code session w
 
 ## 8. Script Architecture
 
-All 86 scripts in `scripts/` follow consistent conventions.
+All 93 scripts in `scripts/` follow consistent conventions.
 
 ### Conventions
 

@@ -6,6 +6,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.30.2] - 2026-08-16
+
+### Fixed — the documentation truth pass
+
+A from-zero audit of every live document found the doc-count guard pattern-blind: it
+required a number directly before one of three nouns, and every stale count in the
+repo was phrased some other way.
+
+- **README** — the "How does this compare?" table said "Skills count **158**" (the repo
+  ships 163), "All 158 SKILL.md files" (163), and a "### 86 Python scripts" section
+  heading (93).
+- **AGENTS.md** — the file every non-Claude runtime auto-loads — pinned "Supported
+  surfaces (v3.17.0)", thirteen releases stale. It now carries the current version.
+- **docs/architecture.md** and **docs/claude-interfaces.md** quoted "86 Python scripts"
+  in five places and "The 158 SKILL.md files" — all now 93 and 163.
+- **TESTING-GUIDE.md**'s versioning checklist pinned v3.17.0 and "~86 scripts"; it is
+  now version-agnostic and points at the sources of truth instead of restating them.
+- **docs/distribution/submission-bundle.md** pinned a release version in its
+  release-notes section; made version-agnostic so it cannot rot.
+
+### Changed — the guard can now see what rotted
+
+`tests/test_doc_counts.py` grew the patterns the audit proved necessary: script counts
+(including "N Python scripts"), "N SKILL.md files", comparison-table "Skills count"
+rows, and AGENTS.md currency (version = manifest, all 8 surfaces named).
+Release-narrative sections keep their ship-time numbers via heading-aware exemptions,
+and each new pattern is plant-checked against the exact phrasing that previously
+escaped. Tests 376 → 379.
+
 ## [3.30.1] - 2026-08-16
 
 ### Changed — richer Agent Plugins 1.0 listing metadata + submission bundle
