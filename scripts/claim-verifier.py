@@ -55,7 +55,11 @@ from pathlib import Path
 CLAIM_PATTERNS = [
     (r"\b\d{1,3}(?:\.\d+)?%\s+(?:increase|decrease|growth|decline|improvement|reduction|boost|drop|rise|gain|lift)\s+in\s+[\w\s]+", "percentage_change"),
     (r"\b(?:increase[ds]?|decrease[ds]?|grew|boost(?:ed)?|improved|reduced|grew)\s+(?:by\s+)?\d{1,3}(?:\.\d+)?%", "percentage_change"),
-    (r"\b\d{1,3}(?:\.\d+)?%\b", "percentage"),
+    # "%" is a non-word char, so a trailing \b here would only match when a word
+    # character FOLLOWS the "%" — "98%x" matched while "98% of customers", "98%."
+    # and end-of-line never did (GitHub issue #10). (?!\w) expresses the intent:
+    # the token ends at "%" unless something word-like is glued on.
+    (r"\b\d{1,3}(?:\.\d+)?%(?!\w)", "percentage"),
     (r"\$[\d,]+(?:\.\d{1,2})?(?:\s*(?:million|billion|trillion|M|B|K|k))?", "dollar_amount"),
     (r"\b\d+(?:\.\d+)?[xX]\s+(?:increase|growth|improvement|return|ROI|more|faster|better)", "multiplier"),
     (r"\b(?:over|more than|nearly)\s+[\d,]+\+?\s+(?:companies|customers|clients|users|brands|partners|businesses|teams|organizations)", "customer_count"),

@@ -6,6 +6,47 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.31.1] - 2026-08-17
+
+### Fixed — all five open community issues, each verified by reproduction first
+
+- **#10 `claim-verifier.py`: percent regex matched only when a word character
+  followed "%".** `%\b` requires a word char AFTER the non-word "%" — so
+  "98%x" was a claim while "98% of customers", "98%." and end-of-line
+  percentages extracted nothing. Fixed with `%(?!\w)`; new
+  `tests/test_claim_verifier.py` (7 tests) pins the corrected behavior through
+  the real CLI, including that "98%x" is now correctly NOT a claim.
+- **#11 `keyword_cluster.py`: `[a-z0-9]+` tokenizer split every non-ASCII
+  letter; German compounds scored 0.00.** "bürohaftpflicht" tokenized as
+  "rohaftpflicht"; Jaccard("betriebshaftpflichtversicherung",
+  "betriebshaftpflicht") = 0.00, leaving the cannibalisation gate and internal
+  link map blind in compounding languages. Fixed: Unicode tokenizer
+  (`[^\W_]+`) + `_lexical_similarity` with compound-aware containment matching
+  (6-char floor) used at the three lexical call sites; SERP-URL overlap keeps
+  pure `_jaccard`. New `tests/test_keyword_cluster.py` (9 tests) includes an
+  English-parity bound and proof that English sets without containment pairs
+  score exactly as before.
+- **#13 `engagement-workflow`: `allowed-tools` lacked `Task` while the body
+  mandates Task dispatch in Parts 2/9/10/11 and the parallel-dispatch rules.**
+  `Task` added to the declaration. New `TestSkillToolDeclarations` guard fails
+  any skill whose body references Task dispatch without declaring it
+  (detection regex plant-checked against the real phrasing). A sweep confirmed
+  engagement-workflow was the only offender.
+- **#12 `plugin.yaml` said "158 skills" against 163 shipped.** The Hermes
+  manifest was the one description outside the count guards. Fixed to 163;
+  the auto-register comment and two test-message literals made count-free;
+  new guard pins the plugin.yaml description to the derived skill count.
+- **#9 `hooks/hooks.json` carried a `_readme` field that Cowork plugin
+  validation rejects.** The rationale text moved to `hooks/README.md`;
+  hooks.json is now exactly `{"hooks": {}}`. The same defect existed in
+  ContentForge and SocialForge — fixed and guarded in all three repos
+  (`TestHooksManifestSchemaClean`).
+
+Reported by @jurazerr (#10, #11, #12, #13) and @theepicsaxguy (#9) — thank you
+for precise, reproducible reports. Tests: 381 → 402.
+
+---
+
 ## [3.31.0] - 2026-08-17
 
 ### Added — Grok (xAI Build CLI) native support

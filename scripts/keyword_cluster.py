@@ -116,16 +116,57 @@ QUESTION_PREFIXES = {"how", "what", "why", "when", "where", "which", "who", "is"
 
 
 def _tokenize(text: str) -> set[str]:
-    toks = re.findall(r"[a-z0-9]+", text.lower())
+    # [^\W_] = Unicode letters and digits, no underscore. The old [a-z0-9]+
+    # split every non-ASCII letter: "bürohaftpflicht" -> ["b", "rohaftpflicht"],
+    # which silently broke clustering, the link map, and the cannibalisation
+    # gate for any non-English keyword set (GitHub issue #11).
+    toks = re.findall(r"[^\W_]+", text.lower())
     return {t for t in toks if t not in STOPWORDS and len(t) > 1}
 
 
 def _jaccard(a: set, b: set) -> float:
+    """Pure set Jaccard — used for SERP URL overlap, where exact match is right."""
     if not a and not b:
         return 0.0
     inter = len(a & b)
     union = len(a | b)
     return inter / union if union else 0.0
+
+
+# Compounding languages (German, Dutch, the Scandinavian languages) write
+# "betriebshaftpflichtversicherung" where English writes three words, so exact
+# token match scores related keywords at 0.0. Two tokens also count as a match
+# when one CONTAINS the other and the shorter is at least this long — long
+# enough that "in"/"kosten" prefixes don't create noise, short enough that real
+# compound stems ("betriebshaftpflicht") do match their extensions.
+_COMPOUND_MIN_LEN = 6
+
+
+def _tokens_match(x: str, y: str) -> bool:
+    if x == y:
+        return True
+    shorter, longer = (x, y) if len(x) <= len(y) else (y, x)
+    return len(shorter) >= _COMPOUND_MIN_LEN and shorter in longer
+
+
+def _lexical_similarity(a: set, b: set) -> float:
+    """Jaccard generalised with compound-aware token matching (greedy one-to-one).
+
+    Identical to _jaccard whenever no containment pairs exist, so English
+    keyword sets score exactly as before."""
+    if not a or not b:
+        return 0.0
+    exact = a & b
+    matched = len(exact)
+    remaining_b = [t for t in b if t not in exact]
+    for x in (t for t in a if t not in exact):
+        for i, y in enumerate(remaining_b):
+            if _tokens_match(x, y):
+                matched += 1
+                del remaining_b[i]
+                break
+    union = len(a) + len(b) - matched
+    return matched / union if union else 0.0
 
 
 def _classify_intent(keyword: str, override: str | None = None) -> str:
@@ -244,7 +285,7 @@ def _cluster_by_lexical(keywords: list[dict], overlap: float) -> list[list[dict]
     for i in range(n):
         a = keywords[i]["tokens"]
         for j in range(i + 1, n):
-            if _jaccard(a, keywords[j]["tokens"]) >= overlap:
+            if _lexical_similarity(a, keywords[j]["tokens"]) >= overlap:
                 union(i, j)
 
     groups: dict[int, list[dict]] = defaultdict(list)
@@ -315,7 +356,7 @@ def _build_internal_link_map(clusters: list[dict]) -> None:
         for other in clusters:
             if other["id"] == c["id"]:
                 continue
-            sim = _jaccard(cluster_tokens[c["id"]], cluster_tokens[other["id"]])
+            sim = _lexical_similarity(cluster_tokens[c["id"]], cluster_tokens[other["id"]])
             if sim >= 0.2:
                 targets.append({
                     "to_cluster": other["id"],
@@ -329,15 +370,16 @@ def _quality_scorecard(clusters: list[dict], n_input_seeds: int, n_clustered: in
     coverage_pct = (n_clustered / n_input_seeds * 100) if n_input_seeds else 0
 
     # Cannibalisation: two clusters whose pillar keywords share >=60% of their
-    # token sets (Jaccard) AND have the same primary intent will likely compete
-    # for the same SERP. Reported as "warn" with the offending pairs listed.
+    # token sets (compound-aware similarity — see _lexical_similarity) AND have
+    # the same primary intent will likely compete for the same SERP. Reported
+    # as "warn" with the offending pairs listed.
     cannibalisation_pairs = []
     for i, a in enumerate(clusters):
         a_tokens = _tokenize(a["pillar"])
         for b in clusters[i + 1:]:
             if a["primary_intent"] != b["primary_intent"]:
                 continue
-            if _jaccard(a_tokens, _tokenize(b["pillar"])) >= 0.6:
+            if _lexical_similarity(a_tokens, _tokenize(b["pillar"])) >= 0.6:
                 cannibalisation_pairs.append({
                     "cluster_ids": [a["id"], b["id"]],
                     "pillars": [a["pillar"], b["pillar"]],

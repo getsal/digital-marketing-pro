@@ -16,9 +16,9 @@
 # the skills/ directory and exposes every SKILL.md to Hermes via ctx.register_skill().
 
 name: digital-marketing-pro
-version: 3.31.0
+version: 3.31.1
 description: >-
-  Open-source AI marketing plugin for agencies & in-house teams. 158 skills,
+  Open-source AI marketing plugin for agencies & in-house teams. 163 skills,
   24 specialist agents, 12-Part Strategy Flow, Cowork team-persistent, EU AI
   Act Article 50 ready. Now native on Hermes Agent.
 author: Indranil Banerjee
@@ -26,7 +26,7 @@ license: MIT
 homepage: https://github.com/indranilbanerjee/digital-marketing-pro
 
 # We don't register any Hermes-side Python tools (we're a skills-only plugin).
-# All 158 skills are auto-registered from skills/ at register() time.
+# Every skill directory under skills/ is auto-registered at register() time.
 provides_tools: []
 
 # We don't register any Hermes lifecycle hooks (zero global hooks policy across

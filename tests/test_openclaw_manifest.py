@@ -39,12 +39,12 @@ class TestOpenClawManifest(unittest.TestCase):
         self.assertIn("skills", self.data)
         self.assertEqual(self.data["skills"], ["./skills"])
 
-        # And that directory must actually exist with 158 skills
+        # And that directory must actually exist with the full skill set
         skills_dir = PLUGIN_ROOT / "skills"
         self.assertTrue(skills_dir.exists())
         skill_dirs = [d for d in skills_dir.iterdir() if d.is_dir() and (d / "SKILL.md").exists()]
         self.assertGreater(len(skill_dirs), 100,
-                           f"OpenClaw will load from ./skills; expected 158, found {len(skill_dirs)}")
+                           f"OpenClaw will load from ./skills; found only {len(skill_dirs)}")
 
     def test_version_matches_plugin_json(self):
         plugin_json = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))

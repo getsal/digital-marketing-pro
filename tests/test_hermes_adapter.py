@@ -98,7 +98,7 @@ class TestHermesAdapterPy(unittest.TestCase):
         self.assertIn("plugin_version", result)
         self.assertIn("skill_count", result)
         self.assertGreater(result["skill_count"], 100,
-                           "audit() should discover all 158 skills")
+                           "audit() should discover every skills/ directory")
 
     def test_register_against_mock_ctx_registers_all_skills(self):
         registered = []
@@ -109,7 +109,7 @@ class TestHermesAdapterPy(unittest.TestCase):
 
         self.module.register(MockCtx())
         self.assertGreater(len(registered), 100,
-                           f"register() should expose 158 skills; got {len(registered)}")
+                           f"register() should expose every skill; got {len(registered)}")
 
     def test_register_degrades_gracefully_when_ctx_missing_register_skill(self):
         """If Hermes API differs from the documented spec, plugin must not crash."""

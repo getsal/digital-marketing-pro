@@ -205,6 +205,68 @@ class TestDescriptionConsistency(unittest.TestCase):
             self.assertIn(f"{actual_skill_count} skills", desc,
                           f"{name} description should mention '{actual_skill_count} skills'; got: {desc[:100]}")
 
+    def test_plugin_yaml_description_mentions_canonical_skill_count(self):
+        """plugin.yaml (Hermes) was never in the description guards — it said
+        '158 skills' for five releases while the JSON manifests said 163
+        (GitHub issue #12)."""
+        actual_skill_count = sum(
+            1 for d in (PLUGIN_ROOT / "skills").iterdir()
+            if d.is_dir() and (d / "SKILL.md").exists()
+        )
+        desc = _read_yaml_field(PLUGIN_YAML.read_text(encoding="utf-8"), "description") or ""
+        self.assertIn(f"{actual_skill_count} skills", desc,
+                      f"plugin.yaml description should mention "
+                      f"'{actual_skill_count} skills'; got: {desc[:120]}")
+
+
+class TestHooksManifestSchemaClean(unittest.TestCase):
+    """Cowork's plugin validation rejects unknown top-level fields in
+    hooks.json — a `_readme` field made the whole plugin fail to load there
+    (GitHub issue #9). The rationale now lives in hooks/README.md; hooks.json
+    must contain the `hooks` key and nothing else."""
+
+    def test_hooks_json_has_only_the_hooks_key(self):
+        doc = json.loads((PLUGIN_ROOT / "hooks" / "hooks.json").read_text(encoding="utf-8"))
+        self.assertEqual(set(doc.keys()), {"hooks"},
+                         f"hooks.json carries extra top-level fields: "
+                         f"{sorted(set(doc.keys()) - {'hooks'})} — Cowork "
+                         "validation rejects them; prose belongs in hooks/README.md")
+
+    def test_rationale_still_documented(self):
+        self.assertTrue((PLUGIN_ROOT / "hooks" / "README.md").exists(),
+                        "the zero-hooks rationale must stay documented in "
+                        "hooks/README.md, not vanish with the _readme field")
+
+
+class TestSkillToolDeclarations(unittest.TestCase):
+    """A skill whose body mandates Task-tool dispatch must declare Task in its
+    allowed-tools — engagement-workflow required parallel `Task` calls in five
+    Parts while its frontmatter allowed-tools lacked Task, so a runtime that
+    enforces the declaration degraded the whole 12-part flow (GitHub issue #13)."""
+
+    TASK_REF = re.compile(r"`Task`|\bTask tool\b|\bTask calls?\b")
+
+    def test_task_dispatching_skills_declare_task(self):
+        offenders = []
+        for f in sorted((PLUGIN_ROOT / "skills").glob("*/SKILL.md")):
+            text = f.read_text(encoding="utf-8", errors="replace")
+            m = re.search(r"^allowed-tools:\s*(.+)$", text, re.M)
+            if not m:
+                continue  # no restriction declared — nothing to contradict
+            if self.TASK_REF.search(text) and "Task" not in m.group(1):
+                offenders.append(f.parent.name)
+        self.assertEqual(offenders, [],
+                         f"skills whose body references Task dispatch but whose "
+                         f"allowed-tools omits Task: {offenders}")
+
+    def test_guard_can_fail(self):
+        """Plant: the detection regex must match the real phrasing the
+        engagement-workflow body uses."""
+        self.assertTrue(self.TASK_REF.search(
+            "dispatched in parallel via multiple `Task` tool calls"))
+        self.assertTrue(self.TASK_REF.search("four parallel Task calls in one message"))
+        self.assertFalse(self.TASK_REF.search("multitasking is a myth"))
+
 
 class TestReadmeBadgeAccuracy(unittest.TestCase):
     """README badges must reflect the actual state of the repo."""
