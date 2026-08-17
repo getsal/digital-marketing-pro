@@ -6,6 +6,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [3.31.0] - 2026-08-17
+
+### Added — Grok (xAI Build CLI) native support
+
+- New `.grok-plugin/plugin.json` (mirrors the Claude manifest + the
+  `"skills": "./skills/"` pointer Grok's loader uses) and
+  `.grok-plugin/marketplace.json` (single-plugin marketplace source), so
+  `grok plugin install indranilbanerjee/digital-marketing-pro` works directly.
+  Grok also reads the Claude Code manifests for compatibility
+  ([Grok Build docs](https://docs.x.ai/build/features/skills-plugins-marketplaces));
+  the native pair is the first-class lane.
+- Both files version-locked in `tests/test_release_consistency.py`
+  (`PLATFORM_MANIFESTS_JSON` grows to 8; a dedicated test pins the marketplace
+  entry's version and source URL). Grok added to the install-command guard,
+  the README troubleshooting platform-name guard, and the AGENTS.md surfaces
+  guard. Shared manifest description now lists Grok in the platform run.
+- README: platforms 8→9 native across the compare table, surfaces table
+  (new Grok row + install commands), troubleshooting (new Grok section),
+  FAQ, and the harnesses lede; AGENTS.md surfaces line updated.
+
+### Fixed — four stale counts that escaped the doc-count guard, and the guard taught to see them
+
+- "DMP's 158 `SKILL.md` files" (backticks broke the guard's adjacency match),
+  "all 158 marketing skills" and "All 158 DMP skill names" (qualifier words
+  between number and noun), and "All 209 tests" (tests was never a guarded
+  noun — 170 stale against the real 379). All four corrected to derived truth.
+- `tests/test_doc_counts.py`: `SKILL_MD_RE` now tolerates backticks, new
+  `QUALIFIED_SKILLS_RE` catches the qualifier phrasings, new `TESTS_RE` makes
+  "N tests" a guarded noun with ground truth derived from `def test_` counts.
+  Each new pattern plant-checked against the exact phrasing it previously
+  missed.
+
+Tests: 379 → 381.
+
+---
+
 ## [3.30.2] - 2026-08-16
 
 ### Fixed — the documentation truth pass

@@ -55,6 +55,9 @@
     "content-provenance",
     "synthid",
     "deepfake-disclosure",
+    "grok",
+    "xai-grok",
+    "grok-plugin",
     "claude-code",
     "claude-code-plugin",
     "claude-cowork",
@@ -71,5 +74,6 @@
     "veo-3",
     "gemini-omni",
     "neelverse"
-  ]
+  ],
+  "skills": "./skills/"
 }

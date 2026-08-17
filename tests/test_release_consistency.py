@@ -1,7 +1,8 @@
 """Release-consistency tests — catches cross-manifest drift before it ships.
 
 These tests fail when:
-- The 7 platform manifests (5 Claude-family + Hermes + OpenClaw) get out of version sync
+- The 8 platform manifests (6 Claude-family incl. Grok + Hermes + OpenClaw) get out of version sync
+- The Grok marketplace manifest (.grok-plugin/marketplace.json) drifts from the canonical version
 - The README version badge falls behind plugin.json
 - The CHANGELOG's latest entry doesn't match the current plugin version
 - The test-count badge in the README is stale
@@ -25,10 +26,12 @@ PLATFORM_MANIFESTS_JSON = [
     PLUGIN_ROOT / ".codex-plugin" / "plugin.json",
     PLUGIN_ROOT / ".cursor-plugin" / "plugin.json",
     PLUGIN_ROOT / ".github" / "plugin" / "plugin.json",
+    PLUGIN_ROOT / ".grok-plugin" / "plugin.json",
     PLUGIN_ROOT / "gemini-extension.json",
     PLUGIN_ROOT / "openclaw.plugin.json",
     PLUGIN_ROOT / "package.json",
 ]
+GROK_MARKETPLACE = PLUGIN_ROOT / ".grok-plugin" / "marketplace.json"
 PLUGIN_YAML = PLUGIN_ROOT / "plugin.yaml"
 HERMES_ADAPTER_PY = PLUGIN_ROOT / "__init__.py"
 
@@ -66,6 +69,17 @@ class TestVersionConsistency(unittest.TestCase):
         self.assertEqual(mismatched, [],
                          f"Canonical version is {self.canonical}. "
                          f"Out-of-sync manifests: {mismatched}")
+
+    def test_grok_marketplace_entry_matches_canonical_version(self):
+        data = json.loads(GROK_MARKETPLACE.read_text(encoding="utf-8"))
+        entry = data["plugins"][0]
+        self.assertEqual(entry["name"], "digital-marketing-pro")
+        self.assertEqual(entry["version"], self.canonical,
+                         f".grok-plugin/marketplace.json v={entry['version']} "
+                         f"!= canonical v={self.canonical}")
+        self.assertEqual(entry["source"]["url"],
+                         "https://github.com/indranilbanerjee/digital-marketing-pro.git",
+                         "Grok marketplace source must point at this repo")
 
     def test_hermes_plugin_yaml_matches_canonical_version(self):
         yaml_version = _read_yaml_field(PLUGIN_YAML.read_text(encoding="utf-8"), "version")
@@ -247,6 +261,9 @@ class TestInstallCommandCoverage(unittest.TestCase):
             self.text
         )
 
+    def test_grok_install_command_present(self):
+        self.assertIn("grok plugin install indranilbanerjee/digital-marketing-pro", self.text)
+
 
 class TestCriticalReadmeSections(unittest.TestCase):
     """The high-traffic sections must exist by their canonical names."""
@@ -284,8 +301,9 @@ class TestCriticalReadmeSections(unittest.TestCase):
         # Common install issues should be addressed inline, not buried in docs/.
         self.assertIn("## Troubleshooting", self.text)
 
-    def test_troubleshooting_covers_all_8_native_platforms(self):
-        # Each native platform should appear by name in the troubleshooting section.
+    def test_troubleshooting_covers_all_native_platforms(self):
+        # Each native platform should appear by name in the troubleshooting
+        # section. (9 native platforms since v3.31.0 added Grok.)
         troubleshoot_start = self.text.find("## Troubleshooting")
         troubleshoot_end = self.text.find("## Updating", troubleshoot_start)
         self.assertNotEqual(troubleshoot_start, -1)
@@ -294,7 +312,7 @@ class TestCriticalReadmeSections(unittest.TestCase):
 
         # Required platform mentions in troubleshooting
         for platform in ("Claude Code", "Cowork", "Codex", "Cursor",
-                         "Copilot CLI", "Antigravity", "Hermes", "OpenClaw"):
+                         "Copilot CLI", "Antigravity", "Hermes", "OpenClaw", "Grok"):
             self.assertIn(platform, section,
                           f"Troubleshooting section missing '{platform}' coverage")
 

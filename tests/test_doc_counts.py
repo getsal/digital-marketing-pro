@@ -33,8 +33,20 @@ REPO = Path(__file__).resolve().parent.parent
 
 # "163 skills" / "93 Python scripts" but not "3-5 skills", "<5 agents", "v3.19.2 skills"
 COUNT_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+(?:Python\s+)?(skills|agents|commands|scripts)\b")
-# "The 158 SKILL.md files" — the phrasing the original guard could not see
-SKILL_MD_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+SKILL\.md files?\b")
+# "The 158 SKILL.md files" — the phrasing the original guard could not see.
+# 2026-08-17: backticks ("158 `SKILL.md` files") made the same rot invisible again.
+SKILL_MD_RE = re.compile(r"(?<![-<>~\d])\b(\d{1,3})\s+`?SKILL\.md`?\s+files?\b")
+# "all 158 marketing skills" / "All 158 DMP skill names" — a qualifier word between
+# the number and the noun escaped COUNT_RE (found rotten 2026-08-17, five releases old).
+QUALIFIED_SKILLS_RE = re.compile(
+    r"(?<![-<>~\d])\b(\d{1,3})\s+(?:marketing\s+skills|DMP\s+skills|DMP\s+skill\s+names)\b")
+# "All 209 tests are stdlib-only" — tests was never a guarded noun; found 170 stale.
+# In a marketing repo "tests" also means A/B tests ("running 8 tests per quarter"),
+# so the number only counts as a suite claim when the same line carries a suite
+# marker (stdlib / passing / test suite / unittest).
+TESTS_RE = re.compile(
+    r"(?<![-<>~\d])\b(\d{1,4})\s+tests\b"
+    r"(?=[^.\n]*?\b(?:stdlib|passing|test suite|unittest)\b)")
 # "| Skills count | **158** |" — comparison-table row form
 TABLE_ROW_RE = re.compile(r"Skills count\s*\|\s*\*\*(\d{1,3})\*\*")
 DATED_LINE = re.compile(r"\*\*v\d+\.\d+")
@@ -52,6 +64,9 @@ def ground_truth():
         "agents": len(list((REPO / "agents").glob("*.md"))),
         "commands": len(list((REPO / "commands").glob("*.md"))),
         "scripts": len(list((REPO / "scripts").glob("*.py"))),
+        "tests": sum(
+            len(re.findall(r"^\s*def test_", f.read_text(encoding="utf-8"), re.M))
+            for f in (REPO / "tests").glob("test_*.py")),
     }
 
 
@@ -102,8 +117,10 @@ class TestLiveDocCounts(unittest.TestCase):
                 found = [(int(m.group(1)), m.group(2), m.group(0))
                          for m in COUNT_RE.finditer(line)]
                 found += [(int(m.group(1)), "skills", m.group(0))
-                          for pat in (SKILL_MD_RE, TABLE_ROW_RE)
+                          for pat in (SKILL_MD_RE, TABLE_ROW_RE, QUALIFIED_SKILLS_RE)
                           for m in pat.finditer(line)]
+                found += [(int(m.group(1)), "tests", m.group(0))
+                          for m in TESTS_RE.finditer(line)]
                 for n, noun, shown in found:
                     if n != truth[noun]:
                         stale.append(
@@ -118,13 +135,20 @@ class TestLiveDocCounts(unittest.TestCase):
         self.assertGreater(truth["agents"], 0)
         self.assertGreater(truth["commands"], 0)
         self.assertGreater(truth["scripts"], 0)
+        self.assertGreater(truth["tests"], 0)
 
     def test_guard_can_fail(self):
         """Plant-check: each new pattern must actually match its rot form."""
         self.assertTrue(SKILL_MD_RE.search("The 158 SKILL.md files can be loaded"))
+        self.assertTrue(SKILL_MD_RE.search("DMP's 158 `SKILL.md` files work out-of-the-box"))
         self.assertTrue(TABLE_ROW_RE.search("| Skills count | **158** |"))
         self.assertTrue(COUNT_RE.search("86 Python scripts"))
         self.assertFalse(COUNT_RE.search("~86 scripts"))  # approx stays exempt
+        self.assertTrue(QUALIFIED_SKILLS_RE.search("all 158 marketing skills are discoverable"))
+        self.assertTrue(QUALIFIED_SKILLS_RE.search("All 158 DMP skill names pass this regex"))
+        self.assertTrue(TESTS_RE.search("All 209 tests are stdlib-only"))
+        # A/B-testing prose must stay exempt — "tests" is a marketing noun too.
+        self.assertFalse(TESTS_RE.search("A team running 8 tests per quarter with a 30% win rate"))
 
 
 class TestAgentsContextCurrent(unittest.TestCase):
@@ -143,11 +167,11 @@ class TestAgentsContextCurrent(unittest.TestCase):
                          "AGENTS.md surfaces line pins v%s but the plugin is v%s"
                          % (m.group(1), self.version))
 
-    def test_supported_surfaces_lists_all_eight(self):
+    def test_supported_surfaces_lists_all_native_surfaces(self):
         m = re.search(r"^.*Supported surfaces.*$", self.text, re.M)
         line = m.group(0) if m else ""
         for name in ("Claude Code", "Cowork", "Codex", "Cursor", "Copilot",
-                     "Antigravity", "Hermes", "OpenClaw"):
+                     "Antigravity", "Hermes", "OpenClaw", "Grok"):
             self.assertIn(name, line, "AGENTS.md surfaces line is missing %s" % name)
 
 
