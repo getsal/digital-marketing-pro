@@ -2,6 +2,7 @@
 name: connect
 description: "Set up an MCP connector. Use when: connecting Google Ads, Salesforce, Mailchimp, or any service to the plugin."
 argument-hint: "[connector-name]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:connect

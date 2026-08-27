@@ -1,6 +1,7 @@
 ---
 name: churn-risk
 description: "Assess customer churn risk. Use when: churn scoring, at-risk segment identification, intervention playbook generation."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:churn-risk

@@ -1,6 +1,7 @@
 ---
 name: marketing-automation
 description: "Design marketing automation workflows. Use when: building lead scoring, nurture sequences, drip campaigns, or behavioral triggers."
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch, Agent
 ---
 
 # Marketing Automation

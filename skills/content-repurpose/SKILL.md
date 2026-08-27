@@ -1,6 +1,7 @@
 ---
 name: content-repurpose
 description: "Repurpose content across channels. Use when: blog-to-social, webinar-to-article, pillar derivatives, format adaptation."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:content-repurpose

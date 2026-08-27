@@ -1,6 +1,7 @@
 ---
 name: pdf-report
 description: "Generate branded PDF reports. Use when: creating executive summaries, campaign reports, or client deliverables."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:pdf-report

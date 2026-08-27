@@ -1,6 +1,7 @@
 ---
 name: simulate
 description: "Simulate revenue impact via Monte Carlo. Use when: testing channel mix changes, budget shifts, or new channel launches."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:simulate

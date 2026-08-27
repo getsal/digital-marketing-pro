@@ -1,6 +1,7 @@
 ---
 name: competitor-monitor
 description: "Set up ongoing competitor monitoring. Use when: defining tracked competitors, scan frequency, change detection alerts."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:competitor-monitor

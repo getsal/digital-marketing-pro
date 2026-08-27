@@ -1,6 +1,7 @@
 ---
 name: geo-monitor
 description: "Monitor brand AI visibility. Use when: tracking mentions in ChatGPT, Perplexity, Gemini, or AI Overviews."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:geo-monitor

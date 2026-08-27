@@ -1,6 +1,7 @@
 ---
 name: save-knowledge
 description: "Save brand knowledge to memory. Use when: persisting campaign learnings, guidelines, or competitive intel for retrieval."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:save-knowledge

@@ -1,6 +1,7 @@
 ---
 name: what-if
 description: "Compare budget scenarios side-by-side. Use when: testing 2-4 allocation variants with projected outcomes."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:what-if

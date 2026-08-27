@@ -3,6 +3,7 @@ name: publish-blog
 description: "Publish blog posts. Use when: deploying to WordPress or Webflow with SEO optimization, categories, and scheduling."
 disable-model-invocation: true
 argument-hint: "[--platform=wordpress|webflow]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:publish-blog

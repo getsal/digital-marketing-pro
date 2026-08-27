@@ -1,6 +1,7 @@
 ---
 name: paid-advertising
 description: "Plan paid advertising campaigns. Use when: managing Google Ads, Meta Ads, LinkedIn Ads, bid strategy, or budget optimization."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Paid Advertising

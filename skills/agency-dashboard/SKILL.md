@@ -11,6 +11,7 @@ triggers:
   - multi-client dashboard
   - agency team utilization
   - overview of all client accounts
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:agency-dashboard

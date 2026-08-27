@@ -1,6 +1,7 @@
 ---
 name: eval-config
 description: "Configure content eval settings. Use when: adjusting score thresholds, dimension weights, or auto-reject rules."
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:eval-config

@@ -1,6 +1,7 @@
 ---
 name: pricing-test
 description: "Test pricing strategies with synthetic data. Use when: simulating willingness to pay, price sensitivity, or optimal price points."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:pricing-test

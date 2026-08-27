@@ -2,6 +2,7 @@
 name: localize-campaign
 description: "Localize campaigns for multiple markets. Use when: translating assets, adapting references, adjusting compliance."
 argument-hint: "[target-markets]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:localize-campaign

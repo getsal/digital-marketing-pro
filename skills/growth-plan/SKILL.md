@@ -9,7 +9,7 @@ triggers:
   - synthesise the engagement into a growth plan
   - write the strategy document for the client
   - 11-section growth plan
-allowed-tools: Read Write Edit Bash Glob Grep
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 engagement-part: "8"
 view-preference: v2-primary
 ---

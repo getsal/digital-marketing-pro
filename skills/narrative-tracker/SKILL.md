@@ -1,6 +1,7 @@
 ---
 name: narrative-tracker
 description: "Track AI engine brand narratives. Use when: detecting narrative drift, misrepresentation, or competitor narrative gains over time."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:narrative-tracker

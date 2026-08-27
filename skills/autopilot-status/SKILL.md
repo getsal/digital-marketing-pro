@@ -1,6 +1,7 @@
 ---
 name: autopilot-status
 description: "Check campaign autopilot status. Use when: health scores, auto-corrections, guardrail review, campaigns needing attention."
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch, Agent
 ---
 
 # /digital-marketing-pro:autopilot-status

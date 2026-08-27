@@ -2,6 +2,7 @@
 name: keyword-research
 description: "Research and cluster keywords. Use when: mapping search intent, finding content gaps, or long-tail discovery."
 argument-hint: "[topic or seed keywords]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:keyword-research

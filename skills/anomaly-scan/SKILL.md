@@ -1,6 +1,7 @@
 ---
 name: anomaly-scan
 description: "Detect marketing anomalies. Use when: traffic drops, cost spikes, conversion changes, deliverability issues, budget overruns."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:anomaly-scan

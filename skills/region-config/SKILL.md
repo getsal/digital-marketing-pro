@@ -1,6 +1,7 @@
 ---
 name: region-config
 description: "Configure regional settings. Use when: setting timezone, language, compliance rules, currency, or local preferences."
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:region-config

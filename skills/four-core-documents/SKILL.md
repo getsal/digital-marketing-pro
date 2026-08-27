@@ -11,7 +11,7 @@ triggers:
   - brand positioning document
   - DMFlow document
   - re-run a core document as v2
-allowed-tools: Read Write Edit Bash Glob Grep
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch
 engagement-part: "3"
 view-preference: v2-primary
 ---

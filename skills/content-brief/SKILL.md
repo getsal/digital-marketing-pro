@@ -2,6 +2,7 @@
 name: content-brief
 description: "Create detailed content briefs. Use when: keyword targets, outline, structure, voice guidelines, SEO requirements."
 argument-hint: "[topic]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:content-brief

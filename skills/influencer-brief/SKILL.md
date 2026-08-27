@@ -2,6 +2,7 @@
 name: influencer-brief
 description: "Create influencer campaign briefs. Use when: setting creator criteria, FTC compliance, or measurement plans."
 argument-hint: "[campaign-objective]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:influencer-brief

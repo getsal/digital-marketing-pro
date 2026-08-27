@@ -1,6 +1,7 @@
 ---
 name: sop-library
 description: "Manage agency SOPs. Use when: creating, assigning, versioning, or auditing standard operating procedures."
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch, Agent
 ---
 
 # /digital-marketing-pro:sop-library

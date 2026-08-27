@@ -1,6 +1,7 @@
 ---
 name: integrations
 description: "Show MCP integration status. Use when: checking active connectors, available integrations, or skill unlocks."
+allowed-tools: Read, Bash
 ---
 
 # /digital-marketing-pro:integrations

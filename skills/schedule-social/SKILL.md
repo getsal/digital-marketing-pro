@@ -3,6 +3,7 @@ name: schedule-social
 description: "Schedule social media posts. Use when: publishing to Twitter/X, Instagram, LinkedIn, TikTok, YouTube, or Pinterest."
 disable-model-invocation: true
 argument-hint: "[platform]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:schedule-social

@@ -1,6 +1,7 @@
 ---
 name: market-weather
 description: "Assess current market conditions. Use when: checking economic indicators, cultural moments, or competitive activity."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:market-weather

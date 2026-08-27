@@ -1,6 +1,7 @@
 ---
 name: client-report
 description: "Generate client-facing reports. Use when: white-labeled performance report with KPIs, trends, strategic recommendations."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:client-report

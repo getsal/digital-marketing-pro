@@ -3,6 +3,7 @@ name: image-seo-audit
 description: "Audit image SEO. Use when: checking alt text, file sizes, WebP/AVIF formats, lazy loading, or responsive images."
 argument-hint: "[URL]"
 user-invocable: true
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:image-seo-audit

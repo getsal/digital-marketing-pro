@@ -1,6 +1,7 @@
 ---
 name: dark-funnel
 description: "Map invisible buyer journeys. Use when: tracking unattributed discovery, Reddit, AI chatbots, or word-of-mouth."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:dark-funnel

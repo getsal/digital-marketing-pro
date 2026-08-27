@@ -11,6 +11,7 @@ triggers:
   - plan creative iterations
   - sample size for ad test
   - creative optimization testing
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:creative-testing-framework

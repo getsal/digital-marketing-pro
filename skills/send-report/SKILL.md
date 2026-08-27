@@ -3,6 +3,7 @@ name: send-report
 description: "Deliver performance reports. Use when: sending KPI summaries via Slack, email, or Google Sheets with analysis."
 disable-model-invocation: true
 argument-hint: "[destination]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:send-report

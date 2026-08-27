@@ -2,6 +2,7 @@
 name: video-script
 description: "Write video scripts. Use when: creating YouTube, TikTok, Reels, LinkedIn, demo, or explainer video content."
 argument-hint: "[topic or format]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:video-script

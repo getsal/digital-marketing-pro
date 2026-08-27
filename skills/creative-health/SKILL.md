@@ -1,6 +1,7 @@
 ---
 name: creative-health
 description: "Assess ad creative fatigue. Use when: ads underperform, need refresh timing, or creative lifecycle review."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:creative-health

@@ -2,6 +2,7 @@
 name: media-plan
 description: "Create a paid media plan. Use when: building media buy schedules, cross-channel budget allocation, or creative rotation calendars."
 argument-hint: "[--budget=amount --channels=list]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:media-plan

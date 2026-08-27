@@ -1,6 +1,7 @@
 ---
 name: review-response
 description: "Respond to online reviews. Use when: drafting replies for Google, Yelp, G2, or building review response templates."
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:review-response

@@ -2,6 +2,7 @@
 name: eval-content
 description: "Evaluate content quality. Use when: scoring drafts, checking hallucinations, or assessing brand voice compliance."
 argument-hint: "[content-path]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:eval-content

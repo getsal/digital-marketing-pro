@@ -3,6 +3,7 @@ name: lead-import
 description: "Import leads into CRM. Use when: loading leads from forms, CSV, or manual entry with deduplication and scoring."
 disable-model-invocation: true
 argument-hint: "[source-file or URL]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:lead-import

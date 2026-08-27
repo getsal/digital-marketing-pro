@@ -3,6 +3,7 @@ name: send-email-campaign
 description: "Send email campaigns. Use when: deploying via SendGrid, Klaviyo, Customer.io, Brevo, or Mailgun with A/B testing."
 disable-model-invocation: true
 argument-hint: "[campaign-name]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:send-email-campaign

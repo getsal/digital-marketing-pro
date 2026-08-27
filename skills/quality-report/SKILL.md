@@ -1,6 +1,7 @@
 ---
 name: quality-report
 description: "Generate quality trends report. Use when: reviewing eval scores over time, content type performance, or regression alerts."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:quality-report

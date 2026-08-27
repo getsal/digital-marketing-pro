@@ -1,6 +1,7 @@
 ---
 name: martech-audit
 description: "Audit the martech stack. Use when: evaluating marketing tools, recommending consolidation, or choosing between platforms."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:martech-audit

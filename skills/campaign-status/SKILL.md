@@ -1,6 +1,7 @@
 ---
 name: campaign-status
 description: "Check active campaign status. Use when: cross-platform execution history, performance metrics, pending approvals."
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:campaign-status

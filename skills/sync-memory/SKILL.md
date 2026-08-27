@@ -1,6 +1,7 @@
 ---
 name: sync-memory
 description: "Batch sync session learnings to memory. Use when: persisting campaign insights and performance history across sessions."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:sync-memory

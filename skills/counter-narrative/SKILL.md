@@ -1,6 +1,7 @@
 ---
 name: counter-narrative
 description: "Build counter-narrative playbooks. Use when: competitor rebrand, new category claim, aggressive campaign, price change response."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:counter-narrative

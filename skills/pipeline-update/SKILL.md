@@ -3,6 +3,7 @@ name: pipeline-update
 description: "Update CRM pipeline. Use when: changing deal stages, values, notes, tracking velocity, or managing deal progression."
 disable-model-invocation: true
 argument-hint: "[deal-name or stage]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:pipeline-update

@@ -1,6 +1,7 @@
 ---
 name: aeo-geo
 description: "Optimize AI engine visibility. Use when: AEO/GEO strategy, citation optimization, entity consistency across AI platforms."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # AEO/GEO Intelligence

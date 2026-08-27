@@ -1,6 +1,7 @@
 ---
 name: influencer-creator
 description: "Plan influencer and creator partnerships. Use when: discovering creators, UGC campaigns, or FTC compliance."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Influencer & Creator Marketing

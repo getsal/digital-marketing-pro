@@ -2,6 +2,7 @@
 name: aeo-audit
 description: "Audit AI search visibility. Use when: checking brand presence in ChatGPT, Perplexity, AI Overviews, Gemini."
 argument-hint: "[brand-name or URL]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:aeo-audit

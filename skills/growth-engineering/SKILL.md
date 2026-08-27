@@ -1,6 +1,7 @@
 ---
 name: growth-engineering
 description: "Engineer growth loops. Use when: building referral programs, viral loops, or product-led growth strategy."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Growth Engineering

@@ -2,6 +2,7 @@
 name: verify-claims
 description: "Verify marketing claims. Use when: cross-checking statistics, awards, certifications, or performance claims with sources."
 argument-hint: "[content-path]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:verify-claims

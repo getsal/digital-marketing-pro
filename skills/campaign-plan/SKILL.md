@@ -2,6 +2,7 @@
 name: campaign-plan
 description: "Build multi-channel campaign plans. Use when: objectives, audience targeting, channel mix, budget, timeline, KPIs."
 argument-hint: "[campaign-objective]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:campaign-plan

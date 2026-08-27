@@ -1,6 +1,7 @@
 ---
 name: import-template
 description: "Import deliverable templates. Use when: adding proposal formats, report structures, or brief templates."
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 # /digital-marketing-pro:import-template

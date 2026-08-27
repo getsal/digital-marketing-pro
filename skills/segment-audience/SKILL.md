@@ -3,6 +3,7 @@ name: segment-audience
 description: "Create audience segments. Use when: building or updating CRM or email platform segments for campaign targeting."
 disable-model-invocation: true
 argument-hint: "[segment-name or criteria]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:segment-audience

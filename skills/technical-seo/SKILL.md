@@ -1,6 +1,7 @@
 ---
 name: technical-seo
 description: "Deep technical SEO analysis. Use when: optimizing crawlability, Core Web Vitals, rendering, redirects, or sitemaps."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Technical SEO

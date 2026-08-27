@@ -2,6 +2,7 @@
 name: content-engine
 description: "Create or optimize marketing content. Use when: blog posts, ad copy, emails, social posts, landing pages, voice guidelines."
 argument-hint: "[content-type and topic]"
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch, Agent
 ---
 
 # Content Engine

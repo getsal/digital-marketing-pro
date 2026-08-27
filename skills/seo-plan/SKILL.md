@@ -3,6 +3,7 @@ name: seo-plan
 description: "Build SEO strategy and roadmap. Use when: planning site architecture, content strategy, or phased implementation."
 argument-hint: "[business-type]"
 user-invocable: true
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:seo-plan

@@ -3,6 +3,7 @@ name: launch-plan
 description: "Build product launch playbooks. Use when: planning pre-launch, launch day, or post-launch phases."
 argument-hint: "[product-name]"
 disable-model-invocation: true
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:launch-plan

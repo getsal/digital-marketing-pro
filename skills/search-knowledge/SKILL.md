@@ -1,6 +1,7 @@
 ---
 name: search-knowledge
 description: "Search stored brand knowledge. Use when: recalling past learnings, voice guidelines, or competitor insights via semantic search."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:search-knowledge

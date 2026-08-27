@@ -2,6 +2,7 @@
 name: landing-page-audit
 description: "Audit landing pages. Use when: scoring above-fold clarity, trust signals, form friction, message match, or mobile UX."
 argument-hint: "[URL]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:landing-page-audit

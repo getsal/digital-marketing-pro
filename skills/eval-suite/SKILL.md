@@ -1,6 +1,7 @@
 ---
 name: eval-suite
 description: "Batch evaluate multiple content pieces. Use when: scoring a content library, campaign assets, or deliverable set."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:eval-suite

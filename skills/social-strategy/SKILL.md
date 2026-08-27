@@ -2,6 +2,7 @@
 name: social-strategy
 description: "Build social media strategy. Use when: defining content pillars, posting cadence, engagement tactics, or growth plans."
 argument-hint: "[platform or objective]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:social-strategy

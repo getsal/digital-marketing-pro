@@ -1,6 +1,7 @@
 ---
 name: budget-tracker
 description: "Track budget pacing in real time. Use when: cross-platform spend tracking, overspend alerts, reallocation recommendations."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:budget-tracker

@@ -3,6 +3,7 @@ name: send-sms
 description: "Send SMS or WhatsApp messages. Use when: deploying marketing messages via Twilio or Brevo with compliance checks."
 disable-model-invocation: true
 argument-hint: "[message-type]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:send-sms

@@ -2,6 +2,7 @@
 name: translate-content
 description: "Translate marketing content. Use when: localizing with brand voice preservation, quality scoring, or transcreation."
 argument-hint: "[target-language]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:translate-content

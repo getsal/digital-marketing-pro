@@ -2,6 +2,7 @@
 name: switch-brand
 description: "Switch active brand profile. Use when: changing brand context in multi-client or agency workflows."
 argument-hint: "[brand-slug]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # Switch Brand

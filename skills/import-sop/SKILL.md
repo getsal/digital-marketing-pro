@@ -1,6 +1,7 @@
 ---
 name: import-sop
 description: "Import agency SOPs. Use when: adding workflow definitions, approval processes, or launch checklists."
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 # /digital-marketing-pro:import-sop

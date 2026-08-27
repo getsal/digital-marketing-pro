@@ -1,6 +1,7 @@
 ---
 name: validate-output
 description: "Validate content structure. Use when: checking schema compliance, required sections, word count, or placeholders."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:validate-output

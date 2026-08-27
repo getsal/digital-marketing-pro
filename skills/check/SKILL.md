@@ -11,7 +11,7 @@ triggers:
   - dm check
   - eval my content
   - is this safe to publish
-allowed-tools: Read Bash Glob Grep
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:check — Unified Pre-Publish Quality Gate

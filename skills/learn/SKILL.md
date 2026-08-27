@@ -1,6 +1,7 @@
 ---
 name: learn
 description: "Save a marketing learning or insight. Use when: capturing knowledge, recording campaign results, building compound intelligence."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:learn

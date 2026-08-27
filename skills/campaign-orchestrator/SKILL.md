@@ -1,6 +1,7 @@
 ---
 name: campaign-orchestrator
 description: "Orchestrate full campaign lifecycle. Use when: planning, launching, managing, UTM setup, media plan, post-mortem."
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch, Agent
 ---
 
 # Campaign Orchestrator

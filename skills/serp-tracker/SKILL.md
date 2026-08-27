@@ -1,6 +1,7 @@
 ---
 name: serp-tracker
 description: "Track SERP feature changes. Use when: monitoring AI Overviews, featured snippets, PAA, knowledge panels, local packs."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:serp-tracker

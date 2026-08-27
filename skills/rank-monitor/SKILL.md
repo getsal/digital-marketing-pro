@@ -1,6 +1,7 @@
 ---
 name: rank-monitor
 description: "Monitor keyword rankings. Use when: tracking keyword positions, detecting ranking drops, or alerting on position changes."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:rank-monitor

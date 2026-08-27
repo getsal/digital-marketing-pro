@@ -1,6 +1,7 @@
 ---
 name: qbr-plan
 description: "Prepare a Quarterly Business Review. Use when: building QBR presentations, client performance reviews, or strategy updates."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:qbr-plan

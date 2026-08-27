@@ -2,6 +2,7 @@
 name: webinar-plan
 description: "Plan webinars and virtual events. Use when: designing promotion, content, registration, and post-event follow-up."
 argument-hint: "[topic]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:webinar-plan

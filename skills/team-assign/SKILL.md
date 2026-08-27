@@ -1,6 +1,7 @@
 ---
 name: team-assign
 description: "Assign tasks to team members. Use when: distributing work by role, expertise, and capacity, or managing workloads."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:team-assign

@@ -3,6 +3,7 @@ name: redirect-manager
 description: "Manage URL redirects. Use when: creating 301/302 redirects, auditing chains, fixing loops, or deploying via CMS MCP."
 disable-model-invocation: true
 argument-hint: "[URL or action]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:redirect-manager

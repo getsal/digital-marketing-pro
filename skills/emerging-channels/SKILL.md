@@ -1,6 +1,7 @@
 ---
 name: emerging-channels
 description: "Explore emerging marketing channels. Use when: evaluating voice search, social commerce, or new platforms."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Emerging Channels

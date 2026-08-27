@@ -1,6 +1,7 @@
 ---
 name: narrative-landscape
 description: "Map the competitive narrative landscape. Use when: analyzing positioning territories, gaps, competitor claims, differentiation."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:narrative-landscape

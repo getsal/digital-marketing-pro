@@ -1,6 +1,7 @@
 ---
 name: analytics-insights
 description: "Analyze marketing performance. Use when: KPI frameworks, attribution modeling, anomaly investigation, measurement strategy."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Analytics & Insights

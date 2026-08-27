@@ -3,6 +3,7 @@ name: data-export
 description: "Export marketing data. Use when: sending data to BigQuery, Google Sheets, or Supabase for analysis or reporting."
 disable-model-invocation: true
 argument-hint: "[destination]"
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 # /digital-marketing-pro:data-export

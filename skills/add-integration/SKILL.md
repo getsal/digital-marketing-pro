@@ -2,6 +2,7 @@
 name: add-integration
 description: "Add MCP server integrations. Use when: connecting a custom tool, API, or service to the plugin via .mcp.json."
 argument-hint: "[service-name]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:add-integration

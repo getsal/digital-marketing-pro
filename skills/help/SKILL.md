@@ -2,6 +2,7 @@
 name: help
 description: "Show the getting started guide, available commands, examples, and help for Digital Marketing Pro"
 argument-hint: "[--commands | --examples | --troubleshoot]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:help

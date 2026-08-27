@@ -2,6 +2,7 @@
 name: seo-audit
 description: "Run comprehensive SEO audit. Use when: checking technical health, on-page, content quality, E-E-A-T, or link profile."
 argument-hint: "[URL]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:seo-audit

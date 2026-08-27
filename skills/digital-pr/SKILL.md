@@ -1,6 +1,7 @@
 ---
 name: digital-pr
 description: "Plan digital PR campaigns. Use when: pitching journalists, HARO responses, thought leadership, or E-E-A-T building."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Digital PR & Authority

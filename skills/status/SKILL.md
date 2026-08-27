@@ -11,7 +11,7 @@ triggers:
   - show engagement status
   - status snapshot
   - check brand context
-allowed-tools: Read Bash Glob Grep
+allowed-tools: Read, Bash, WebSearch
 ---
 
 # /digital-marketing-pro:status — Unified Status Snapshot

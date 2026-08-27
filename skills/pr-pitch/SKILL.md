@@ -2,6 +2,7 @@
 name: pr-pitch
 description: "Create media pitch packages. Use when: building pitch templates, media lists, outreach strategy, or HARO responses."
 argument-hint: "[topic or news-hook]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:pr-pitch

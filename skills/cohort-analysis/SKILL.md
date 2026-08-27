@@ -1,6 +1,7 @@
 ---
 name: cohort-analysis
 description: "Analyze customer cohorts. Use when: acquisition cohorts, retention curves, LTV by cohort, behavioral segmentation."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:cohort-analysis

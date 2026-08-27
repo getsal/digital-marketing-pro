@@ -1,6 +1,7 @@
 ---
 name: focus-group
 description: "Run synthetic focus groups. Use when: testing messaging, pricing, or positioning before live research spend."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:focus-group

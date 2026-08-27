@@ -2,6 +2,7 @@
 name: roi-calculator
 description: "Calculate marketing ROI. Use when: measuring campaign ROAS, CAC, CPL, LTV, or multi-channel attribution returns."
 argument-hint: "[campaign-name]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:roi-calculator

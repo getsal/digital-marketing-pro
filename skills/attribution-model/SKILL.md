@@ -1,6 +1,7 @@
 ---
 name: attribution-model
 description: "Set up attribution models. Use when: multi-touch attribution, credit distribution rules, GA4 config, channel contribution."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:attribution-model

@@ -1,6 +1,7 @@
 ---
 name: multilingual-score
 description: "Score localized content quality. Use when: checking translation accuracy, cultural adaptation, or voice preservation."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:multilingual-score

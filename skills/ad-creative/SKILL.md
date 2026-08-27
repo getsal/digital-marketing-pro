@@ -2,6 +2,7 @@
 name: ad-creative
 description: "Generate platform-specific ad copy. Use when: Google RSA, Meta, LinkedIn, TikTok ad variations with quality scoring."
 argument-hint: "[platform]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:ad-creative

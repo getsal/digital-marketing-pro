@@ -1,6 +1,7 @@
 ---
 name: share-of-voice
 description: "Measure share of voice. Use when: comparing keyword visibility, SERP presence, ad share, or AI citations vs competitors."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:share-of-voice

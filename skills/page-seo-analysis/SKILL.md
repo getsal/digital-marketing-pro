@@ -3,6 +3,7 @@ name: page-seo-analysis
 description: "Analyze SEO for a single page. Use when: auditing on-page signals, schema, content quality, E-E-A-T, or AI search readiness."
 argument-hint: "[URL]"
 user-invocable: true
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:page-analysis

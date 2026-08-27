@@ -3,6 +3,7 @@ name: programmatic-seo
 description: "Plan programmatic SEO pages. Use when: building template engines, URL patterns, thin content safeguards, or quality gates."
 argument-hint: "[URL or plan]"
 user-invocable: true
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:programmatic-seo

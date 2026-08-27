@@ -2,6 +2,7 @@
 name: context-engine
 description: "Load brand context for marketing tasks. Use when: setting up brands, switching context, or needing industry benchmarks."
 argument-hint: "[brand-slug]"
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch, Agent
 ---
 
 # Context Engine — Shared Marketing Intelligence

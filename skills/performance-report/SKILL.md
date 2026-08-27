@@ -2,6 +2,7 @@
 name: performance-report
 description: "Generate performance reports. Use when: tracking KPIs, trend analysis, anomaly detection, and actionable recommendations."
 argument-hint: "[time-period]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:performance-report

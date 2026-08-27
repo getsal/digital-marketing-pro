@@ -2,6 +2,7 @@
 name: competitor-analysis
 description: "Run competitive analysis. Use when: content, SEO, paid ads, social, AI visibility, pricing, positioning comparison."
 argument-hint: "[competitor names]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:competitor-analysis

@@ -1,6 +1,7 @@
 ---
 name: hreflang-check
 description: "Audit hreflang tags. Use when: checking missing tags, incorrect language codes, or x-default configuration."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:hreflang-check

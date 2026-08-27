@@ -2,6 +2,7 @@
 name: audience-profile
 description: "Build detailed buyer personas. Use when: demographics, psychographics, behaviors, JTBD, content preferences."
 argument-hint: "[audience-segment]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:audience-profile

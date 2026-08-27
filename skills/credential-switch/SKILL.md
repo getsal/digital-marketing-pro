@@ -3,6 +3,7 @@ name: credential-switch
 description: "Switch brand credentials. Use when: activating the correct API keys for MCP servers in multi-client workflows."
 disable-model-invocation: true
 argument-hint: "[brand-slug]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:credential-switch

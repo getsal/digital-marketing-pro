@@ -1,6 +1,7 @@
 ---
 name: language-audit
 description: "Audit multilingual content consistency. Use when: checking language parity, regional compliance, or translation quality."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:language-audit

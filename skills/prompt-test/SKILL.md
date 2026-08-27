@@ -1,6 +1,7 @@
 ---
 name: prompt-test
 description: "A/B test content variations. Use when: comparing quality scores across prompt approaches, headline styles, or content versions."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:prompt-test

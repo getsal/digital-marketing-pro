@@ -3,6 +3,7 @@ name: sitemap-manager
 description: "Manage XML sitemaps. Use when: auditing sitemap health, generating sitemaps, or planning sitemap architecture."
 argument-hint: "[URL or generate]"
 user-invocable: true
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:sitemap

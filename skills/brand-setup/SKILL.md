@@ -2,6 +2,7 @@
 name: brand-setup
 description: "Set up or update a brand profile. Use when: new brand onboarding, client setup, brand switching, context update."
 argument-hint: "[brand-name or --full]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Brand Setup — Interactive Brand Profiling

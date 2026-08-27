@@ -1,6 +1,7 @@
 ---
 name: competitor-alerts
 description: "Configure competitor alerts. Use when: tracking content changes, pricing shifts, ad launches, SERP changes, social spikes."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:competitor-alerts

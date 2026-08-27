@@ -9,7 +9,7 @@ triggers:
   - feed back into product offering decisions
   - quarterly business review feed-back
   - product offering improvement recommendations
-allowed-tools: Read Write Edit Bash Glob Grep
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch, Agent
 engagement-part: "12"
 view-preference: both
 ---

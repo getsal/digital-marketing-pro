@@ -2,6 +2,7 @@
 name: funnel-audit
 description: "Audit funnel performance. Use when: finding drop-off points, conversion gaps, or stage bottlenecks."
 argument-hint: "[funnel-stage or URL]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:funnel-audit

@@ -2,6 +2,7 @@
 name: tech-seo-audit
 description: "Run technical SEO audit. Use when: checking Core Web Vitals, crawlability, indexation, speed, or structured data."
 argument-hint: "[URL]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:tech-seo-audit

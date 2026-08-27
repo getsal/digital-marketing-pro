@@ -1,6 +1,7 @@
 ---
 name: funnel-architect
 description: "Design marketing funnels. Use when: mapping customer journeys, attribution modeling, or conversion paths."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Funnel Architect

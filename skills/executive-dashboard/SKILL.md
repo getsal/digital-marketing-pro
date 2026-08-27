@@ -1,6 +1,7 @@
 ---
 name: executive-dashboard
 description: "Design executive marketing dashboards. Use when: building CMO reports, board metrics, or leadership views."
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:executive-dashboard

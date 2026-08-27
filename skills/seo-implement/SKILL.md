@@ -3,6 +3,7 @@ name: seo-implement
 description: "Execute SEO changes. Use when: updating meta tags, schema markup, canonicals, redirects, or indexing via CMS MCP."
 disable-model-invocation: true
 argument-hint: "[URL or change-type]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:seo-implement

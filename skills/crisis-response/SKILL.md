@@ -2,6 +2,7 @@
 name: crisis-response
 description: "Manage PR crises. Use when: reputational threat emerges, need stakeholder messaging, or communication timeline."
 argument-hint: "[situation-description]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:crisis-response

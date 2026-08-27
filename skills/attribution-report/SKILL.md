@@ -1,6 +1,7 @@
 ---
 name: attribution-report
 description: "Run multi-touch attribution analysis. Use when: first/last-touch, linear, time-decay, position-based revenue allocation."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:attribution-report

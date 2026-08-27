@@ -1,6 +1,7 @@
 ---
 name: client-proposal
 description: "Draft agency proposals. Use when: pitch deck, scope of work, SLA, capabilities presentation for prospects or clients."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:client-proposal

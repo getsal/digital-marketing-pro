@@ -11,6 +11,7 @@ triggers:
   - review marketing playbooks
   - quarterly marketing intelligence
   - what patterns have we identified
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:intelligence-report

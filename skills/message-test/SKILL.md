@@ -1,6 +1,7 @@
 ---
 name: message-test
 description: "Test message variants on synthetic audiences. Use when: predicting response rates, sentiment, or objections before live tests."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:message-test

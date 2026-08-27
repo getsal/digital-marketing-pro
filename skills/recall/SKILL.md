@@ -1,6 +1,7 @@
 ---
 name: recall
 description: "Recall marketing learnings. Use when: querying what we know about a channel, audience, objective, or past campaign."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:recall

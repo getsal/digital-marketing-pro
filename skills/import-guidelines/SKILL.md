@@ -2,6 +2,7 @@
 name: import-guidelines
 description: "Import brand guidelines. Use when: adding voice guides, style restrictions, or messaging frameworks."
 argument-hint: "[file-path or URL]"
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 # /digital-marketing-pro:import-guidelines

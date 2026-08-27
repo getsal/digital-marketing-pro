@@ -11,6 +11,7 @@ triggers:
   - marketing performance check
   - quick KPI health check
   - check campaign performance
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:performance-check

@@ -9,7 +9,7 @@ triggers:
   - client validation deliverable
   - the one true stop
   - prepare v1 findings for client
-allowed-tools: Read Write Edit Bash Glob Grep
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch
 engagement-part: "5"
 view-preference: v1-only
 ---

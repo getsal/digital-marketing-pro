@@ -2,6 +2,7 @@
 name: email-sequence
 description: "Design email sequences. Use when: building subject lines, body copy, timing, segmentation logic, and deliverability plans."
 argument-hint: "[sequence-type]"
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:email-sequence

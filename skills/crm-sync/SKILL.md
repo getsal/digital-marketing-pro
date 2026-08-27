@@ -3,6 +3,7 @@ name: crm-sync
 description: "Sync data to CRM platforms. Use when: pushing contacts, deals, or campaigns to Salesforce, HubSpot, Zoho, or Pipedrive."
 disable-model-invocation: true
 argument-hint: "[crm-platform]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:crm-sync

@@ -11,6 +11,7 @@ triggers:
   - find stale content
   - content decay analysis
   - prioritize content refreshes
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:content-decay-scan

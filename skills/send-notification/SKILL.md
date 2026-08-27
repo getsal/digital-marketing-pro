@@ -3,6 +3,7 @@ name: send-notification
 description: "Send team notifications. Use when: pushing campaign updates, alerts, or approval requests via Slack or Intercom."
 disable-model-invocation: true
 argument-hint: "[channel or recipient]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:send-notification

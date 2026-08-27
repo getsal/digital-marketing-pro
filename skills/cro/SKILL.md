@@ -1,6 +1,7 @@
 ---
 name: cro
 description: "Optimize conversion rates. Use when: auditing landing pages, testing forms, or improving checkout flow."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # CRO (Conversion Rate Optimization)

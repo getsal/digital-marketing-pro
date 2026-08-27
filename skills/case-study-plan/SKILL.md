@@ -2,6 +2,7 @@
 name: case-study-plan
 description: "Create case studies and success stories. Use when: client results showcase, portfolio piece, testimonial-based proof points."
 argument-hint: "[client-name]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:case-study-plan

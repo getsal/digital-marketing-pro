@@ -9,7 +9,7 @@ triggers:
   - month-by-month execution plan
   - quarterly themes and monthly initiatives
   - operational calendar for the year
-allowed-tools: Read Write Edit Bash Glob Grep
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch
 engagement-part: "8"
 view-preference: v2-primary
 ---

@@ -1,6 +1,7 @@
 ---
 name: local-seo-audit
 description: "Audit local SEO health. Use when: reviewing GBP optimization, NAP consistency, local citations, or local pack rankings."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:local-seo-audit

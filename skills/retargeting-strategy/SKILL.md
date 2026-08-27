@@ -1,6 +1,7 @@
 ---
 name: retargeting-strategy
 description: "Design retargeting strategy. Use when: planning cross-platform remarketing, audience segmentation, or ad sequencing."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:retargeting-strategy

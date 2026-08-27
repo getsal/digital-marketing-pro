@@ -1,6 +1,7 @@
 ---
 name: journey-design
 description: "Design cross-channel customer journeys. Use when: mapping touchpoints, branching logic, or stage transitions."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:journey-design

@@ -3,6 +3,7 @@ name: data-import
 description: "Import data from external sources. Use when: loading CRM contacts, email lists, or campaign data from CSV, JSON, or Sheets."
 disable-model-invocation: true
 argument-hint: "[source-file or URL]"
+allowed-tools: Read, Write, Edit, Bash, WebSearch, WebFetch
 ---
 
 # /digital-marketing-pro:data-import

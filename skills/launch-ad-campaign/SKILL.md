@@ -3,6 +3,7 @@ name: launch-ad-campaign
 description: "Launch paid ad campaigns. Use when: deploying ads on Google, Meta, LinkedIn, or TikTok with targeting and safeguards."
 disable-model-invocation: true
 argument-hint: "[platform]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:launch-ad-campaign

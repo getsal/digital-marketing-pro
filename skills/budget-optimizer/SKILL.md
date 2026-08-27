@@ -2,6 +2,7 @@
 name: budget-optimizer
 description: "Optimize budget allocation. Use when: channel spend reallocation, data-driven budget planning, ROI-based justification."
 argument-hint: "[total-budget]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:budget-optimizer

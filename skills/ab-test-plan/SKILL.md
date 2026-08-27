@@ -2,6 +2,7 @@
 name: ab-test-plan
 description: "Design A/B and multivariate tests. Use when: sample size calculation, testing hypothesis, CRO experimentation."
 argument-hint: "[element-to-test]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:ab-test-plan

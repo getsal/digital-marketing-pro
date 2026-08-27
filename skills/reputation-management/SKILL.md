@@ -1,6 +1,7 @@
 ---
 name: reputation-management
 description: "Manage brand reputation. Use when: handling reviews, crisis comms, negative press, sentiment, or recovery plans."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Reputation Management

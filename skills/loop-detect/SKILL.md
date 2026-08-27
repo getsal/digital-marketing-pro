@@ -1,6 +1,7 @@
 ---
 name: loop-detect
 description: "Identify and model growth loops. Use when: detecting viral, content, or paid loops, modeling effectiveness, proposing new loops."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:loop-detect

@@ -1,6 +1,7 @@
 ---
 name: client-onboarding
 description: "Plan client onboarding. Use when: kickoff agenda, discovery questionnaire, account setup checklist, 30-60-90 day plan."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:client-onboarding

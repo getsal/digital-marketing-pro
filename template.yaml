@@ -1,0 +1,13 @@
+name: digital-marketing-pro
+display_name: Digital Marketing Pro
+description: >
+  The most comprehensive digital marketing plugin for Claude Code. 149 skills and
+  25 specialist agents covering the full marketing lifecycle — strategy, SEO,
+  content, paid media, social, email, CRO, analytics, and agency operations.
+  Includes the 12-Part Engagement Methodology for end-to-end client engagements.
+avatar_prompt: >
+  A sleek digital marketing command center with multiple screens showing analytics
+  dashboards, campaign metrics, SEO rankings, and social media feeds. A professional
+  marketing strategist oversees the hub. Modern, data-driven aesthetic with blue and
+  orange accents on a dark background.
+version: 3.2.0

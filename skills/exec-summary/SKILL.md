@@ -1,6 +1,7 @@
 ---
 name: exec-summary
 description: "Generate C-suite executive summaries. Use when: preparing board reports, portfolio ROI, or strategic reviews."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:exec-summary

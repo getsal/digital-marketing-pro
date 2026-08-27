@@ -1,6 +1,7 @@
 ---
 name: local-seo
 description: "Build local SEO strategy. Use when: optimizing Google Business Profile, fixing NAP consistency, improving local pack rankings."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Local SEO

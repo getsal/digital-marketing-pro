@@ -1,6 +1,7 @@
 ---
 name: audience-intelligence
 description: "Research target audiences. Use when: buyer personas, segmentation, Jobs-to-Be-Done, psychographic profiling, audience deep-dive."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # Audience Intelligence

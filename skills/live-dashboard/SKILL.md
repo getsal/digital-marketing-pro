@@ -3,6 +3,7 @@ name: live-dashboard
 description: "Create live Looker Studio dashboards. Use when: connecting marketing data sources with auto-configured visualizations."
 disable-model-invocation: true
 argument-hint: "[data-source or dashboard-type]"
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:live-dashboard

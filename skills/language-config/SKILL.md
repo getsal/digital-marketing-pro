@@ -1,6 +1,7 @@
 ---
 name: language-config
 description: "Configure language settings. Use when: setting primary languages, do-not-translate terms, or locale formatting."
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /digital-marketing-pro:language-config

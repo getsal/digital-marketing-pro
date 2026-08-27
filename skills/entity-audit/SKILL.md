@@ -1,6 +1,7 @@
 ---
 name: entity-audit
 description: "Audit brand entity consistency. Use when: checking Wikidata, Knowledge Panel, or directory discrepancies."
+allowed-tools: Read, Write, Edit, WebSearch, WebFetch, Bash
 ---
 
 # /digital-marketing-pro:entity-audit
