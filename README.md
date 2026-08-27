@@ -12,7 +12,7 @@ Open-source AI marketing plugin — **163 skills, 24 specialist agents, EU AI Ac
 [![Forks](https://img.shields.io/github/forks/indranilbanerjee/digital-marketing-pro?style=flat&logo=github&color=blue)](https://github.com/indranilbanerjee/digital-marketing-pro/network/members)
 [![Issues](https://img.shields.io/github/issues/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/issues)
 [![Last commit](https://img.shields.io/github/last-commit/indranilbanerjee/digital-marketing-pro?logo=github)](https://github.com/indranilbanerjee/digital-marketing-pro/commits/main)
-[![Tests](https://img.shields.io/badge/tests-402%2F402%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-403%2F403%20passing-brightgreen.svg)](tests/)
 [![Platforms](https://img.shields.io/badge/platforms-8%20native%20%2B%2035%20Agent%20Skills-success.svg)](#works-on-40-agent-harnesses-via-the-agent-skills-open-standard)
 [![Cowork](https://img.shields.io/badge/cowork-team%20persistent-purple.svg)](#supported-surfaces-v3311)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2050%20ready-darkred.svg)](skills/context-engine/compliance-rules.md)
@@ -131,13 +131,28 @@ Cost: roughly **$15–40 in Claude API spend** for a full 12-part engagement usi
 
 `/plugin` commands work in **Claude Code** (CLI + IDE at [claude.com/code](https://claude.com/code)) and **Anthropic Cowork**. In the standard Claude chat app (browser `claude.ai` OR the installed Claude Desktop app) plugins still install and run, but management is via the **Plugins** UI button at the bottom of the chat — not via `/plugin` slash commands. See the [Updating](#updating) section for the recovery procedure if you accidentally try a slash command in the chat UI.
 
-### 2. Turn on auto-update (recommended)
+### 2. Install on OpenAI Codex
+
+After this fork's Codex marketplace manifest is published, install the plugin
+from the `getsal/digital-marketing-pro` marketplace:
+
+```bash
+codex plugin marketplace add getsal/digital-marketing-pro
+codex plugin list --json --marketplace getsal-digital-marketing-pro --available
+codex plugin add digital-marketing-pro@getsal-digital-marketing-pro
+```
+
+Phase 1 registers the shared `skills/` directory. See
+[Codex compatibility](docs/CODEX-COMPATIBILITY.md) for the deliberate
+Claude/Codex boundary and Phase 2 adapter candidates.
+
+### 3. Turn on auto-update (recommended)
 
 Third-party marketplaces have auto-update **OFF by default** in Claude Code — no banner tells you when a new version ships. Fix it once:
 
 Open `/plugin` → **Marketplaces** tab → find `neels-plugins` → toggle **Enable auto-update**. Done — future releases pull at session start; `/reload-plugins` applies mid-session without restart.
 
-### 3. Set up your first brand
+### 4. Set up your first brand
 
 ```
 /digital-marketing-pro:brand-setup
@@ -145,7 +160,7 @@ Open `/plugin` → **Marketplaces** tab → find `neels-plugins` → toggle **En
 
 Interactive brand profiling — voice, audience, channels, industry, target jurisdictions, competitors, goals. Quick mode (5 questions) or full mode (17 questions). Optional: `/digital-marketing-pro:import-guidelines` to bulk-load existing brand guidelines, SOPs, or templates.
 
-### 4. Run a full engagement, or jump straight to a workflow
+### 5. Run a full engagement, or jump straight to a workflow
 
 ```
 /digital-marketing-pro:engagement           # full 12-Part Strategy Flow (~60 min)
@@ -252,7 +267,7 @@ Output: real API calls fired against your stack with audit logging at `~/.claude
 |---|---|---|---|
 | **Claude Code** CLI + IDE extensions | `/plugin install digital-marketing-pro@neels-plugins` | `.claude-plugin/plugin.json` | Full support (canonical) |
 | **Anthropic Cowork** | Plugins UI → Add marketplace → `indranilbanerjee/neels-plugins` → Install | same `.claude-plugin/` files | Full support — no `/plugin` slash commands in Cowork (UI-only) |
-| **OpenAI Codex** CLI + IDE + App | `codex plugin marketplace add indranilbanerjee/neels-plugins` then `codex plugin install digital-marketing-pro@neels-plugins` | `.codex-plugin/plugin.json` (published OpenAI schema) | Full skills + MCP support |
+| **OpenAI Codex** CLI + IDE + App | `codex plugin marketplace add getsal/digital-marketing-pro` then `codex plugin add digital-marketing-pro@getsal-digital-marketing-pro` | `.codex-plugin/plugin.json` + `.agents/plugins/marketplace.json` | Phase 1: marketplace install and shared skills; adapters for agents, commands, hooks, and MCP remain planned |
 | **Cursor 2.5+** | In any Cursor Agent chat: `/add-plugin digital-marketing-pro@https://github.com/indranilbanerjee/digital-marketing-pro` | `.cursor-plugin/plugin.json` (published Cursor JSON Schema) | Full skills + agents + commands support |
 | **GitHub Copilot CLI** | `copilot plugin marketplace add indranilbanerjee/neels-plugins` then `copilot plugin install digital-marketing-pro@neels-plugins` | `.github/plugin/plugin.json` (Copilot CLI also recognizes `.claude-plugin/plugin.json` as fallback) | Full skills + MCP support; subagents need `.agent.md` extension (open issue); custom slash commands not yet supported in Copilot CLI |
 | **Google Antigravity 2.0** CLI + IDE | `agy plugin install https://github.com/indranilbanerjee/digital-marketing-pro` | `gemini-extension.json` (at repo root, per Google's reference pattern) | Full skills + hooks support; subagents need `/agent` CLI spawning; slash commands fold into skills via `agy plugin import gemini` |
@@ -892,7 +907,7 @@ Use the direct repo form: `grok plugin install indranilbanerjee/digital-marketin
 ### General (any platform)
 
 **"Tests in `tests/` fail when I `git clone` locally"**
-Run `python tests/run_all.py` from the repo root. All 402 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.8+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
+Run `python tests/run_all.py` from the repo root. All 403 tests are stdlib-only — no `pip install` needed. If they fail, the most likely cause is a Python version mismatch (DMP supports Python 3.8+) or a clone that omitted some `skills/` subdirectories. Try `git clone --depth=1` again.
 
 **"`/digital-marketing-pro:doctor` shows my action as stub_unconfigured"**
 That action needs an MCP connector configured. Run `python scripts/connector-status.py --action setup-guide --name <connector-name>` for the exact setup snippet. Add it to your `.mcp.json` under `mcpServers`, restart your agent, and the action becomes `manifest_ready`. See [Connector-aware action resolver](#connector-aware-action-resolver-v3710) for the full readiness model.

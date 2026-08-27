@@ -32,6 +32,7 @@ PLATFORM_MANIFESTS_JSON = [
     PLUGIN_ROOT / "package.json",
 ]
 GROK_MARKETPLACE = PLUGIN_ROOT / ".grok-plugin" / "marketplace.json"
+CODEX_MARKETPLACE = PLUGIN_ROOT / ".agents" / "plugins" / "marketplace.json"
 PLUGIN_YAML = PLUGIN_ROOT / "plugin.yaml"
 HERMES_ADAPTER_PY = PLUGIN_ROOT / "__init__.py"
 
@@ -80,6 +81,17 @@ class TestVersionConsistency(unittest.TestCase):
         self.assertEqual(entry["source"]["url"],
                          "https://github.com/indranilbanerjee/digital-marketing-pro.git",
                          "Grok marketplace source must point at this repo")
+
+    def test_codex_marketplace_entry_targets_root_plugin(self):
+        """Codex's repo-local marketplace must expose the root Codex manifest."""
+        data = json.loads(CODEX_MARKETPLACE.read_text(encoding="utf-8"))
+        self.assertEqual(data["name"], "getsal-digital-marketing-pro")
+        self.assertEqual(data["plugins"], [{
+            "name": "digital-marketing-pro",
+            "source": {"source": "local", "path": "./"},
+            "policy": {"installation": "AVAILABLE", "authentication": "ON_USE"},
+            "category": "Productivity",
+        }])
 
     def test_hermes_plugin_yaml_matches_canonical_version(self):
         yaml_version = _read_yaml_field(PLUGIN_YAML.read_text(encoding="utf-8"), "version")
@@ -303,7 +315,7 @@ class TestInstallCommandCoverage(unittest.TestCase):
         self.assertIn("/plugin install digital-marketing-pro@neels-plugins", self.text)
 
     def test_codex_install_command_present(self):
-        self.assertIn("codex plugin install digital-marketing-pro", self.text)
+        self.assertIn("codex plugin add digital-marketing-pro@getsal-digital-marketing-pro", self.text)
 
     def test_cursor_install_command_present(self):
         self.assertIn("/add-plugin digital-marketing-pro", self.text)
